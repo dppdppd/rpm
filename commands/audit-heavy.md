@@ -1,6 +1,6 @@
 ---
-name: audit-heavy
-description: "Deep project review with external research. Investigate, research best practices, produce executive summary + action plan. Use when user runs /pm:audit-heavy or project needs strategic reassessment."
+description: "Deep project review with external research. Investigate, research best practices, produce executive summary + action plan."
+argument-hint: ""
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent", "WebSearch"]
 ---
 

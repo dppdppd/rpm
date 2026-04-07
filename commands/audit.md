@@ -1,13 +1,13 @@
 ---
-name: audit
-description: "Scan docs, memories, and session drift for issues. Present scored findings, fix what user picks, offer hookify rules for repeated violations. Use when user runs /pm:audit."
+description: "Scan docs, memories, and session drift for issues. Present scored findings, fix what user picks, offer hookify rules for repeated violations."
+argument-hint: ""
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent"]
 ---
 
 # /pm audit — Full Instructions
 
 Mechanical doc validity check, then fix what's broken. Default when
-running `/pm audit` with no argument.
+running `/pm:audit` with no argument.
 
 ## Phase 1: Scan (background agent)
 

@@ -13,7 +13,7 @@ Project management layer for LLM-assisted development.
 | `/pm:audit` | Scan docs + fix issues |
 | `/pm:audit-light` | Quick dashboard (read-only) |
 | `/pm:audit-heavy` | Deep review with external research |
-| `/pm:research` | Multi-agent deep research |
+| `/pm:deep-research` | Multi-agent deep research |
 
 ## Installation
 

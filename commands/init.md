@@ -1,6 +1,5 @@
 ---
-name: init
-description: "First-run project setup — detect state, create PM context, scaffold missing infrastructure. Use when user runs /pm:init or when docs/pm/PM.md doesn't exist."
+description: "First-run project setup — detect state, create PM context, scaffold missing infrastructure"
 argument-hint: ""
 allowed-tools: ["Read", "Write", "Bash(ls:*)", "Bash(mkdir:*)", "Bash(git:*)", "Glob", "Grep"]
 ---
@@ -205,22 +204,37 @@ demonstrably struggles. Cap at 4. Communicate via typed artifacts.
 **Large (10+):** Module ownership, conflict resolution via ADRs,
 git worktrees for parallel agent isolation.
 
-## Phase 6: Summary
+## Phase 6: Present and Confirm
 
-Stage changes for user review. Do NOT commit automatically.
+Do NOT create or modify files yet. Present all planned changes as a
+numbered checklist:
+
+```
+## /pm init — proposed changes
+
+| # | Action | File |
+|---|--------|------|
+| 1 | Create | docs/pm/PM.md |
+| 2 | Create | docs/pm/PM-LOG.md |
+| 3 | Create | docs/pm/reviews/ |
+| 4 | Create | CLAUDE.md |
+| ... | ... | ... |
+
+(Only files that don't already exist are listed)
+
+Which to create? (e.g., "1", "1,2,3", "all", "none")
+```
+
+Execute only what the user selects. After completing:
 
 ```
 ## /pm init complete
 
-Created:
-- docs/pm/PM.md (PM context — loaded every run)
-- docs/pm/PM-LOG.md (append-only history — loaded on demand)
-- docs/pm/reviews/ (plan directory)
-- {any scaffolded files}
+Created: {list of created files}
 
 Next steps:
-- `/pm audit heavy` — full project health assessment
-- `/pm audit` — mechanical doc validity check
+- `/pm:audit-heavy` — full project health assessment
+- `/pm:audit` — mechanical doc validity check
 ```
 
 ## Scaling Notes

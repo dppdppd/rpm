@@ -18,7 +18,7 @@ recommend. You do NOT write feature code.
 | `/pm:audit` | Scan docs + fix issues (default) |
 | `/pm:audit-light` | Quick dashboard (read-only) |
 | `/pm:audit-heavy` | Deep review with external research |
-| `/pm:research` | Investigate a best practice |
+| `/pm:deep-research` | Multi-agent deep research |
 
 **Workflow:** `init` (first run) -> `session-start` -> work -> `session-end` -> repeat.
 
@@ -38,7 +38,7 @@ between sessions.
 
 **Project health:** `/pm:audit` — Three depths: `audit-light` (dashboard), `audit` (scan+fix), `audit-heavy` (research+plan).
 
-**Other:** `/pm:research <question>` — Investigate a best practice.
+**Other:** `/pm:deep-research <question>` — Multi-agent deep research.
 
 ## Governing Principles
 

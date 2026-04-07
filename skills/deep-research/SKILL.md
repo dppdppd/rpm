@@ -1,17 +1,17 @@
 ---
-name: research
-description: "Exhaustive multi-agent research on any topic. Parallel search, URL fetching, gap analysis, adversarial validation, citation audit. Use when user runs /pm:research."
+name: deep-research
+description: "Exhaustive multi-agent research on any topic. Parallel search, URL fetching, gap analysis, adversarial validation, citation audit. Use when user runs /pm:deep-research or when any task requires external knowledge before proceeding."
 argument-hint: "<research question or topic>"
 allowed-tools: ["Read", "Write", "Bash(curl:*)", "Bash(mkdir:*)", "Agent", "WebSearch", "Glob", "Grep"]
 ---
 
-# /pm research — Full Deep Research Protocol
+# /pm deep-research — Full Deep Research Protocol
 
 Exhaustive multi-agent research on any topic.
 
 **Research escalation rule:** During ANY /pm subcommand, if you encounter
 a question requiring external knowledge, pause and offer
-`/pm research <question>` before continuing.
+`/pm:deep-research <question>` before continuing.
 
 ## Design Principles
 
