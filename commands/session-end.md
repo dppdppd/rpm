@@ -66,6 +66,25 @@ it and note "no changes" in the Phase 3 report.
 - Update IN-PROGRESS items with current state
 - Add discovered TODOs
 
+### Commit the PM updates
+
+After writing the files, commit just the core PM bookkeeping as a
+dedicated commit — keeping it separate from any source-code changes
+the user may still have uncommitted.
+
+```bash
+# Stage only the files Phase 2 may have touched
+git add docs/pm/past/$(date +%Y-%m-%d).md docs/pm/PRESENT.md docs/pm/FUTURE.org 2>/dev/null
+
+# Commit only if something was actually staged
+git diff --cached --quiet || git commit -m "pm: session end — update past/present/future"
+```
+
+If nothing was staged (all three files were "no changes"), skip the
+commit silently. If the commit fails (e.g., pre-commit hook rejection),
+note it in the Phase 3 report and continue — do not block the session
+end on it.
+
 ---
 
 ## Phase 3: Present findings + action menu
