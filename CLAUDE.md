@@ -13,8 +13,10 @@ tracking, and deep research.
 - `.claude-plugin/` — `plugin.json` + `marketplace.json`
 - `plugin.json` — top-level plugin manifest (mirrored in
   `.claude-plugin/plugin.json`)
-- `command-version/` — historical/archived command snapshots; **not
-  loaded by the plugin**, do not treat as live source
+- `command-version/` — **non-plugin install variant** (drop into
+  `~/.claude/`): monolithic `pm.md` dispatcher routing to bodies in
+  `pm-commands/`. Maintained in parallel with `commands/` — keep in
+  sync when editing commands
 - `docs/pm/` — PM context, log, reviews, past/present/future trackers
 
 ## Editing the plugin
@@ -26,6 +28,9 @@ tracking, and deep research.
   the plugin and running the command in a real Claude Code session.
 - Recent commit style: short conventional-ish prefixes (`chore:`,
   `audit:`, `Rename …`). One commit per deliverable.
+- When editing `commands/*.md`, mirror the change into
+  `command-version/pm-commands/*.md` (strip frontmatter; rewrite
+  `/pm:foo` refs as `/pm foo` dispatcher style).
 
 ## Workflow
 - Plan → edit → verify → commit. No spec ceremony for command-sized

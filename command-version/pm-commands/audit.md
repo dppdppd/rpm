@@ -5,15 +5,12 @@ one based on audit history.
 
 ## Step 0: Check recency, then present menu
 
-Find when each mode was last run. Run in parallel:
+Find when each mode was last run. In parallel:
 
-```bash
-grep -nE "audit (light|standard|heavy)" docs/pm/PM-LOG.md 2>/dev/null | tail -30
-ls -t docs/pm/reviews/*.md 2>/dev/null | head -5
-```
+- Grep `docs/pm/PM-LOG.md` for `audit (light|standard|heavy)` — take the
+  most recent `YYYY-MM-DD` per mode
+- Glob `docs/pm/reviews/*.md` — presence implies heavy mode has run
 
-From the output, extract the most recent date for each mode (look for
-`YYYY-MM-DD` near `audit light`/`audit standard`/`audit heavy`).
 Anything not found is "never".
 
 **Pick the recommendation** using this rule:
@@ -25,87 +22,68 @@ Anything not found is "never".
 
 If multiple modes tie, prefer the one that's been longest since last run.
 
-Print this menu (substituting real dates and marking the recommended row
-with ⭐) and STOP. Wait for the user to reply `1`, `2`, or `3`:
+Print this compact menu (substitute real dates, mark the recommended
+line with ⭐), then STOP and wait for `1`, `2`, or `3`:
 
 ```
 ## /pm audit — pick a depth
 
-| # | Mode | What it does | Output | Last run |
-|---|------|--------------|--------|----------|
-| 1 | light | Quick staleness dashboard: file existence, mod dates, broken refs, CLAUDE.md size, NOT_IMPLEMENTED stubs. | Findings table + 1-line PM-LOG entry | {date or never} |
-| 2 | standard | Mechanical scan (docs, coherence, LLM-effectiveness, session drift) → scored findings → fix what you pick. | Scored fix queue, doc edits, PM-LOG detail, PM.md row | {date or never} |
-| 3 | heavy | Full consultant review. Investigate → research (multiple /pm deep-research agents) → judge across 6 dimensions. | Executive summary, plan + full report in `reviews/` | {date or never} |
+1. **Light** — quick staleness dashboard. Last run: {date or never}.
+2. **Standard** — mechanical scan + scored fix queue. Last run: {date or never}.
+3. **Heavy** — full consultant review with research agents. Last run: {date or never}.
 
-⭐ Recommended: **{mode}** — {one-line reason based on recency rule}
-
-Reply `1`, `2`, or `3`.
+⭐ Recommended: **{mode}**
 ```
 
 When the user replies, jump to the matching mode below.
 
 ---
 
-## Shared: Interactive Findings Menu
+## Shared: Findings Menu
 
-Used by **light** and **standard** modes whenever findings are presented.
-Each row starts unmarked (`·`). The user marks rows fix/skip, can inspect
-any row for details, and executes from the bottom row.
+Used by **light** and **standard** modes to present findings. Print a
+compact numbered list, then wait for a reply. No marks, no execute
+phase, no elaborate grammar.
 
-### Display
+### Format
 
 ```
 ## Audit findings — {date} ({N} findings)
 
-| # |   | Finding                                | Priority | Effort |
-|---|---|----------------------------------------|----------|--------|
-| 1 | · | {title}                                | HIGH     | Small  |
-| 2 | · | {title}                                | HIGH     | Small  |
-| 3 | · | {title}                                | MED      | Medium |
-| e | ▶ | **Execute marked actions**             |          |        |
+1. [{PRIORITY}] {title}
+2. [{PRIORITY}] {title}
+3. [{PRIORITY}] {title}
 
-Mark   `<#>y` fix · `<#>x` skip · `yy` all fix · `xx` all skip
-Inspect `<#>` (number alone) — full details, then redraw
-Execute `e`  ·  Cancel `q`
+Reply: `fix 1 2 4` · `all` · `none` · `<#>?` for details
 ```
 
-Symbols: `·` unmarked · `✓` fix · `✗` skip. In standard mode replace the
-`Priority` column with `Score` (0–100).
+In standard mode, use `({score})` instead of `[{PRIORITY}]` in each row.
 
-### Reply grammar
+### Reply grammar (interpret liberally)
 
-| Input | Effect |
-|-------|--------|
-| `<#>y` | Mark row # as fix (✓) |
-| `<#>x` | Mark row # as skip (✗) |
-| `<#>` (bare number) | Inspect — show location, evidence, proposed fix; redraw menu. **Does not execute.** |
-| `yy` | Mark every row as fix |
-| `xx` | Mark every row as skip |
-| `1y 2x 3y` | Multiple ops in one reply, applied left-to-right, then redraw |
-| `e` / `execute` / `go` | Run the Execute step below with current marks |
-| `q` / `cancel` | Abort — no changes, log the run as cancelled |
+- `fix 1 2 4` / `1 2 4` / `1,2,4` → fix those rows
+- `all` / `fix all` → fix every finding
+- `none` / `skip all` / `cancel` → skip every finding; log as cancelled
+- `<#>?` / `<#>` alone / `tell me about 2` → show full details
+  (location, evidence, proposed fix) for that finding, then re-print
+  the list and wait for another reply
+- natural phrasings like `fix the first two` → map to the obvious action
 
-Interpret replies liberally: `y1`, `1 y`, `fix 1`, and `inspect 2` all
-map to the obvious action. When in doubt, ask.
-
-### Loop
-
-After any mark or inspect, redraw the updated menu and wait for the next
-reply. Only `e` or `q` exits the loop.
+When in doubt, ask.
 
 ### Execute
 
-When the user types `e`:
+Once the user confirms a fix set (anything but `none`/`cancel`):
 
-1. For each ✓ finding: apply the fix, verify, record result.
-2. For each ✗ or still-unmarked row: record as skipped.
-3. Display a result summary:
+1. For each fix: apply, verify, record result.
+2. For each skipped row: record as skipped.
+3. Print a compact summary:
 
    ```
-   | # | Result         | Finding |
-   |---|----------------|---------|
-   | 1 | ✅ fixed        | ...     |
-   | 2 | ⏭ skipped      | ...     |
+   | # | Result   | Finding |
+   |---|----------|---------|
+   | 1 | ✅ fixed | ...     |
+   | 2 | ⏭ skipped | ...    |
    | 3 | ❌ failed — {reason} | ... |
    ```
 
@@ -126,14 +104,13 @@ Scan the project inline (not a subagent):
 - Task tracker freshness (`FUTURE.org` or equivalent)
 
 Assemble findings as a priority-ordered list (HIGH / MED / LOW) and
-present via the **Shared: Interactive Findings Menu**. The user marks,
-inspects, and executes from that menu.
+present via the **Shared: Findings Menu**.
 
 ### Logging
 
-After the Execute step completes (or the user cancels with `q`), append
-one line to `docs/pm/PM-LOG.md` Audit History (create the `## Audit
-History` heading if missing):
+After the Execute step completes (or the user replies `none`/`cancel`),
+append one line to `docs/pm/PM-LOG.md` Audit History (create the
+`## Audit History` heading if missing):
 
 ```
 - YYYY-MM-DD — audit light — N surfaced, M fixed, K skipped
@@ -215,9 +192,9 @@ When the agent completes, score each finding:
 but don't bother the user.
 
 Present findings (sorted by score, highest first) via the **Shared:
-Interactive Findings Menu**. Use `Score` (0–100) instead of `Priority`
-in the menu table. Below the menu, note any low-confidence findings
-that were suppressed: `(N low-confidence findings logged but not shown)`.
+Findings Menu**. Use `({score})` instead of `[{priority}]` in each row.
+Below the menu, note any low-confidence findings that were suppressed:
+`(N low-confidence findings logged but not shown)`.
 
 ### Phase 3: Post-execute — hookify repeat offenders
 

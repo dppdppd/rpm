@@ -23,7 +23,7 @@ should be evaluated by re-running them in a real Claude Code session.
 | Subagents | `agents/*.md` (currently `audit-scanner.md`) |
 | Hooks | `hooks/hooks.json`, `hooks/session-start-reminder.sh` |
 | Skills | `skills/deep-research/` |
-| Archived command snapshots | `command-version/` (not loaded by plugin) |
+| Non-plugin install variant | `command-version/` (dispatcher + pm-commands/, kept in sync with `commands/`) |
 | README | `README.md` |
 | PM context | `docs/pm/PM.md` (this file) |
 | PM history | `docs/pm/PM-LOG.md` |
@@ -41,8 +41,8 @@ should emphasize:
    command rename or removal.
 3. **Version sync** — `plugin.json` and `.claude-plugin/plugin.json`
    carry the same version after edits.
-4. **Archive hygiene** — `command-version/` is historical; flag if it
-   contradicts current commands in a way that could mislead a reader.
+4. **`command-version/` sync** — non-plugin install variant maintained
+   in parallel with `commands/`. Flag any drift between the two trees.
 5. **Hook reliability** — `session-start-reminder.sh` runs every
    session start; failures here block onboarding.
 6. **No ADR ceremony** — user has rejected ADR scaffolding; do not
