@@ -1,16 +1,17 @@
 # claude-plugin-pm — Present State
 
 ## Project Status
-- **Current phase**: v1.0.5 — `/pm:audit` interactive menu landed
+- **Current phase**: iterating on `/pm:audit` menu UX
 - **Last updated**: 2026-04-08
 
 ## Completed Work
-- 2026-04-08 — v1.0.5: `/pm:audit` gains **Shared: Interactive Findings Menu** (x=skip, y=fix, number=inspect, `e`=execute); Light + Standard modes route findings through it
+- 2026-04-08 — `/pm:audit` menus simplified to compact numbered lists; AskUserQuestion removed
+- 2026-04-08 — `/pm:audit` gains **Shared: Findings Menu** (later simplified); Light + Standard modes route findings through it
 - 2026-04-08 — light audit run on self: 5 findings surfaced (stale docs refs, packages/ template residue, casing mismatch), all fixed in-session; depth-selector menu picked up `Output` column in place of `Writes?`/`Cost`
 - 2026-04-08 — `command-version/` (non-plugin install variant) brought in sync with the current plugin command surface
-- v1.0.4 — bump, marketplace manifest added, stale docs cleaned up
-- v1.0.3 — `howto` command renamed to `guide`, description improved
-- v1.0.2 — `pm:pm` command renamed to `pm:howto`
+- marketplace manifest added, stale docs cleaned up
+- `howto` command renamed to `guide`, description improved
+- `pm:pm` command renamed to `pm:howto`
 - audit commands consolidated into a single `/pm:audit` with
   recency-based depth recommendation
 - `init`/`audit`/`audit-heavy` moved from skills to commands

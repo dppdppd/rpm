@@ -6,6 +6,7 @@ Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
 ## Audit History
 
 - 2026-04-08 — audit light — 5 issues surfaced (2 high, 1 medium, 2 low), all fixed in-session
+- 2026-04-08 — audit light — 4 surfaced, 4 fixed, 0 skipped
 
 ## Sessions Reviewed
 

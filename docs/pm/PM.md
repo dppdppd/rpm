@@ -1,6 +1,6 @@
 ## Project Summary
 
-`pm` is a Claude Code plugin (v1.0.4) that provides a project-management
+`pm` is a Claude Code plugin that provides a project-management
 layer for LLM-assisted development: session lifecycle commands, doc
 auditing, task tracking, and deep research. It's pure markdown +
 shell — no build, test, or lint toolchain. Solo author (`dppdppd`).
