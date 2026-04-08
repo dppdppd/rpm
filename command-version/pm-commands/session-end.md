@@ -1,11 +1,13 @@
 # /pm session end — Full Instructions
 
-End the current work session in four phases:
-**Analyze → Present menu → Execute → Handoff**.
+End the current work session in five phases:
+**Analyze → Auto-apply core PM updates → Present menu → Execute → Handoff**.
 
-Do NOT proactively commit, write progress files, or update tasks.
-Survey what's available, present findings, wait for the user to pick
-which actions to take.
+Core PM bookkeeping (`docs/pm/past/YYYY-MM-DD.md`, `docs/pm/PRESENT.md`,
+`docs/pm/FUTURE.org`) is updated automatically — **no prompts, no diff
+approval**. Only ask the user about actions outside that scope:
+committing uncommitted items, recording findings (promoting learnings
+to permanent docs), and anything else specific to the session.
 
 ---
 
@@ -40,10 +42,31 @@ Look back through this conversation for:
 
 ---
 
-## Phase 2: Present findings + action menu
+## Phase 2: Auto-apply core PM updates
 
-Show the user a structured summary, then present a numbered menu of
-actions they can take. **Wait for the user to pick.**
+Apply these updates immediately without asking. No previews, no diff
+approval. If a particular file genuinely has nothing to update, skip
+it and note "no changes" in the Phase 3 report.
+
+### Update past log
+- Append to (or create) `docs/pm/past/YYYY-MM-DD.md`
+- Sections: Accomplished, Key Discoveries, What Didn't Work, Next
+
+### Update PRESENT.md
+- Update only the fields that actually changed this session
+
+### Update FUTURE.org
+- Mark completed tasks DONE with date
+- Update IN-PROGRESS items with current state
+- Add discovered TODOs
+
+---
+
+## Phase 3: Present findings + action menu
+
+Show a structured summary of the session and the core PM updates just
+applied, then present the non-PM action menu. **Wait for the user to
+pick.**
 
 ### Format
 
@@ -61,32 +84,29 @@ actions they can take. **Wait for the user to pick.**
 ### Discovered learnings
 - [Bullet list of learnings, corrections, patterns]
 
-### Future tracker state
-- Tasks to mark DONE: [list]
-- IN-PROGRESS to update: [list]
-- New TODOs to add: [list]
+### Core PM state updated
+- `docs/pm/past/YYYY-MM-DD.md` — [what was logged, or "no changes"]
+- `docs/pm/PRESENT.md` — [what changed, or "no changes"]
+- `docs/pm/FUTURE.org` — [what was marked/added, or "no changes"]
 
 ---
 
-## Available actions (pick any, multiple OK)
+## Actions (pick any, multiple OK)
 
 1. **Commit changes** — group and commit uncommitted files
-2. **Update past log** — write today's session notes to
-   `docs/pm/past/YYYY-MM-DD.md`
-3. **Update PRESENT.md** — refresh current project state if it changed
-4. **Update FUTURE.org** — mark DONE, update IN-PROGRESS, add TODOs
-5. **Promote learnings** — move session learnings to permanent docs
-   (CLAUDE.md, debugging guide, memory file, etc.)
-6. **Other** — anything else specific to this session
 
-Which actions? (e.g., "1,2,4", "all", "skip everything")
+2. **Record findings** — promote session learnings to permanent docs (CLAUDE.md, debugging guide, memory file, etc.)
+
+3. **Other** — anything else specific to this session
+
+Which actions? (e.g., `1,2` · `all` · `none`)
 ```
 
 Wait for the user's choice. Do not proceed without it.
 
 ---
 
-## Phase 3: Execute chosen actions
+## Phase 4: Execute chosen actions
 
 Only run the actions the user picked. For each action, ask any
 followup questions needed before acting.
@@ -99,39 +119,24 @@ followup questions needed before acting.
 - For commit message format, follow the project's existing style
   (check `git log --oneline -10`)
 
-### Action 2: Update past log
-- Append to or create `docs/pm/past/YYYY-MM-DD.md`
-- Sections: Accomplished, Key Discoveries, What Didn't Work, Next
-- Show the user the draft before writing
-
-### Action 3: Update PRESENT.md
-- Update only the fields that actually changed
-- Show diff before saving
-
-### Action 4: Update FUTURE.org
-- Mark completed tasks DONE with date
-- Update IN-PROGRESS items with current state
-- Add discovered TODOs
-- Show diff before saving
-
-### Action 5: Promote learnings
+### Action 2: Record findings
 - For each learning, ask:
   > "This session established [learning]. Should this become permanent
   > guidance in [CLAUDE.md / debugging-workflow.md / a memory file]?"
 - Only promote if the user agrees
 - Show the addition before writing
 
-### Action 6: Other
+### Action 3: Other
 - Handle whatever the user asks
 
 After each action, briefly confirm completion. After ALL chosen
-actions complete, move to Phase 4.
+actions complete, move to Phase 5.
 
 ---
 
-## Phase 4: Handoff
+## Phase 5: Handoff
 
-Only after Phase 3 is done. Present the handoff in this exact form:
+Only after Phase 4 is done. Present the handoff in this exact form:
 
 ```
 ## Session done
