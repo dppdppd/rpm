@@ -8,7 +8,7 @@ Project management layer for LLM-assisted development.
 |---------|-------------|
 | `/pm:pm` | Explain the plugin and list its commands |
 | `/pm:session-start` | Begin session: load context, pick task, state plan |
-| `/pm:session-end` | End session: commit, log progress, capture learnings |
+| `/pm:session-end` | End session: survey findings, present action menu, then handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit` | Audit project health |
 | `/pm:deep-research` | Multi-agent deep research |
@@ -25,13 +25,17 @@ claude --plugin-dir /path/to/claude-plugin-pm
 docs/pm/
 ├── PM.md              — PM context (loaded every session)
 ├── PM-LOG.md          — Append-only audit/review history
-├── TASKS.org          — Org-mode task tracker
-├── progress/
-│   ├── STATUS.md      — Project status
-│   └── YYYY-MM-DD.md  — Daily session logs
+├── PRESENT.md         — Current project state
+├── FUTURE.org         — Org-mode task tracker (planned work)
+├── past/              — Daily session logs (YYYY-MM-DD.md)
 ├── reviews/           — Audit plans and reports
-└── tasks/             — Detailed task files
+└── tasks/             — Detailed task files (optional)
 ```
+
+The three trackers map to the timeline:
+- **past/** — what happened (daily session notes from `/pm:session-end`)
+- **PRESENT.md** — where things stand now (project status)
+- **FUTURE.org** — what's planned (task tracker)
 
 ## Hooks
 

@@ -1,10 +1,4 @@
----
-description: "End a session — survey findings, present action menu, then handoff"
-argument-hint: ""
-allowed-tools: ["Read", "Write", "Edit", "Bash(git:*)", "Bash(rm:*)", "Glob", "Grep"]
----
-
-# Session End
+# /pm session end — Full Instructions
 
 End the current work session in four phases:
 **Analyze → Present menu → Execute → Handoff**.
@@ -152,7 +146,7 @@ can resume without re-investigation]
 
 To start a new session:
 1. Run `/clear` to clear this context
-2. Run `/pm:session-start` in the fresh session
+2. Run `/pm session start` in the fresh session
 ```
 
 Then clear the session marker:

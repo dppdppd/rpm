@@ -1,10 +1,4 @@
----
-description: "Start a work session — load context, pick task, state plan"
-argument-hint: ""
-allowed-tools: ["Read", "Bash(git status:*)", "Bash(git stash:*)", "Bash(ls:*)", "Bash(mkdir:*)", "Bash(cat:*)", "Write"]
----
-
-# Session Start
+# /pm session start — Full Instructions
 
 Start a new work session. Follow these steps in order:
 

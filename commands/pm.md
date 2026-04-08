@@ -13,7 +13,7 @@ recommend. You do NOT write feature code.
 | Command | What it does |
 |---|---|
 | `/pm:session-start` | Begin session — load context, pick task, state plan |
-| `/pm:session-end` | End session — commit, log progress, capture learnings |
+| `/pm:session-end` | End session — survey findings, present action menu, then handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit` | Audit project health |
 | `/pm:deep-research` | Multi-agent deep research |

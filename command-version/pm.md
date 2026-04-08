@@ -1,4 +1,4 @@
-# /pm — Engineering Consultant & Documentation Governance
+# /pm — Engineering Consultant & Project Management
 
 You are an outside engineering consultant. You observe, analyze, and
 recommend. You do NOT write feature code.
@@ -11,7 +11,7 @@ Usage: `/pm <subcommand> [args...]`
 |---|---|---|
 | `init` | First-run project setup: detect state, create PM context, scaffold missing infrastructure | Yes |
 | `session (start\|end)` | Bookend every conversation — load context / commit + capture learnings | `end` only |
-| `audit (light\|normal\|heavy)` | Check project health — light=dashboard, normal=scan+fix, heavy=research+plan | `normal` only |
+| `audit` | Audit project docs/session drift. Presents three depths and recommends one based on history. | `standard` only |
 | `deep-research <question>` | Multi-agent deep research on any topic | No |
 
 **Workflow:** `init` (first run) → `session start` → work → `session end` → repeat.
@@ -28,7 +28,7 @@ between sessions.
 ### When to use each command
 
 **Starting a project:**
-- `/pm init` — Run once. Scans project, asks 3 questions, creates PM infrastructure.
+- `/pm init` — Run once. Scans project, creates PM infrastructure.
 
 **Every work session:**
 - `/pm session start` — Beginning of conversation. Loads context, picks a task.
@@ -36,7 +36,7 @@ between sessions.
 - `/pm session` alone — Explains the session workflow.
 
 **Project health:**
-- `/pm audit` — Three depths: `light` (dashboard), `normal` (scan+fix), `heavy` (research+plan).
+- `/pm audit` — Presents three depths (light / standard / heavy) and recommends one based on when you last ran each.
 
 **Other:**
 - `/pm deep-research <question>` — Multi-agent deep research.
@@ -45,8 +45,6 @@ between sessions.
 
 ## Step 0: Load Context (runs before EVERY subcommand)
 
-### 0a. Read project-local PM guidance
-
 ```bash
 test -f docs/pm/PM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 ```
@@ -54,10 +52,7 @@ test -f docs/pm/PM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 **If `docs/pm/PM.md` exists:** Read it in full.
 **If not:** Offer `/pm init` or do a lightweight scan (CLAUDE.md, README, git log).
 
-### 0b. PM log — only when needed
-
-`docs/pm/PM-LOG.md` is append-only history. Do NOT auto-load.
-Only read for: audit (compare prior findings), or user asks about PM history.
+`docs/pm/PM-LOG.md` is append-only history. Only read for audit or when user asks.
 
 ---
 
@@ -73,7 +68,7 @@ Only read for: audit (compare prior findings), or user asks about PM history.
 8. **Docs are suggestions; hooks are law.** Defense-in-depth.
 9. **Mine sessions for drift.** Promote to hook, not more docs.
 10. **35-minute threshold.** Tasks scoped to one focused session.
-11. **Task tracker is infrastructure.** One task ≈ one session.
+11. **Task tracker is infrastructure.** One task = one session.
 
 ---
 
@@ -83,31 +78,17 @@ Read `~/.claude/pm-commands/init.md` for full instructions.
 
 ---
 
-## Subcommand: `audit` (routing)
+## Subcommand: `audit`
 
-`/pm audit` defaults to `normal`. Route based on argument:
-- `light` → run audit light (below)
-- (no arg) or `normal` → read `~/.claude/pm-commands/audit-normal.md`
-- `heavy` → read `~/.claude/pm-commands/audit-heavy.md`
-
-### `audit light`
-
-Quick staleness dashboard. Read-only — no fixes, no agents.
-
-For each doc: verify path exists, check last-modified date, scan for
-broken references. Also check:
-- CLAUDE.md line count (warn >120, critical >150)
-- Task tracker exists and has recent updates
-- Any `NOT_IMPLEMENTED` stubs
-
-Produce a table ordered by priority. If issues warrant deeper
-investigation, suggest `/pm audit` or `/pm audit heavy`.
+Read `~/.claude/pm-commands/audit.md` for full instructions. It will
+present three depth modes (light / standard / heavy), recommend one
+based on prior audit recency, then route to the chosen mode.
 
 ---
 
 ## Subcommand: `deep-research <question>`
 
-Read `~/.claude/pm-commands/research.md` for full protocol.
+Read `~/.claude/pm-commands/deep-research.md` for full protocol.
 
 ---
 
@@ -120,100 +101,33 @@ Explain the session workflow. Print:
 > - `/pm session start` — Loads project context, picks a task, checks
 >   for leftover uncommitted work, states a plan.
 >
-> - `/pm session end` — Commits work, logs progress, updates tasks,
->   captures learnings. Asks if learnings should become permanent guidance.
+> - `/pm session end` — Surveys uncommitted work, session learnings,
+>   and tracker updates, then presents an action menu. Only commits/
+>   writes/updates the items you pick.
 >
 > If you skip session start, you risk context loss.
-> If you skip session end, progress and learnings aren't recorded.
+> If you skip session end, the past/, PRESENT.md, and FUTURE.org
+> trackers fall out of sync with reality.
 
 ---
 
 ## Subcommand: `session start`
 
-Start a new work session.
-
-1. **Recover context (read all in parallel — single message, multiple Read calls):**
-   - `docs/pm/progress/STATUS.md` — project status
-   - Most recent daily file in `docs/pm/progress/` — what happened last
-   - `docs/pm/TASKS.org` — current IN-PROGRESS or next TODO
-   - `CLAUDE.md` — rules and key documents
-2. **Check for leftover state:**
-   - `git status` — uncommitted work from a prior session?
-   - `git stash list` — stashed changes?
-   - If leftover work exists, present to user before planning
-3. **Mark session active:**
-   Write a session marker with metadata:
-   ```bash
-   mkdir -p docs/pm/tmp
-   cat > docs/pm/tmp/pm-session-active << 'MARKER'
-   ---
-   session_id: $CLAUDE_CODE_SESSION_ID
-   started: $(date -Iseconds)
-   task: {planned task from TASKS.org}
-   ---
-   MARKER
-   ```
-   The SessionStart hook reads this on next session. If present, it warns
-   about an unclean exit and shows what was being worked on.
-4. **State the plan:**
-   - "This session: [task from TASKS.org], because [reason]"
-   - If the plan deviates from tracker priorities, say so and get approval
+Read `~/.claude/pm-commands/session-start.md` for full instructions.
 
 ---
 
 ## Subcommand: `session end`
 
-End the current work session.
-
-### 1. Commit outstanding work
-- `git status` — check for uncommitted changes
-- Commit or ask the user what to do with them
-- Nothing left uncommitted silently
-
-### 2. Update progress
-- Append session notes to `docs/pm/progress/YYYY-MM-DD.md` (create if needed):
-  - What was accomplished
-  - Key discoveries or decisions
-  - What didn't work and why
-- Update `docs/pm/progress/STATUS.md` if project status changed
-
-### 3. Update task tracker
-- Update `docs/pm/TASKS.org`:
-  - Mark completed tasks DONE with date
-  - Update IN-PROGRESS items with current state
-  - Add any discovered TODO items
-
-### 4. Capture session learnings
-Review the session for new processes, conventions, or corrections.
-Look for:
-- Corrections the user made ("don't do X", "always do Y")
-- New workflows or patterns that emerged
-- Debugging approaches that worked (or didn't)
-- Decisions about architecture, tooling, or process
-
-For each learning found, write it to the progress daily file and ask:
-> "This session established [learning]. Should this become permanent
-> guidance in [CLAUDE.md / debugging-workflow.md / a memory file]?"
-
-Only promote if the user agrees.
-
-### 5. State handoff
-- "Session done. Next session should start with: [specific task]"
-- If mid-task, note exactly where it left off
-- `rm -f docs/pm/tmp/pm-session-active` — clear the session marker
+Read `~/.claude/pm-commands/session-end.md` for full instructions.
 
 ---
 
 ## Updating PM State
 
-**`docs/pm/PM.md`** — project context, loaded every run. Update:
-- After `audit heavy`: add one-liner to Prior Findings
-- After `init`: create the file
+**`docs/pm/PM.md`** — project context, loaded every run. Update after `audit heavy` and `init`.
 
-**`docs/pm/PM-LOG.md`** — append-only, loaded on demand. Append:
-- After `audit`: scan counts and key findings
-- After `audit` (if fixes applied): what was fixed
-- After `audit heavy`: detailed findings
+**`docs/pm/PM-LOG.md`** — append-only, loaded on demand. Append after `audit standard` and `audit heavy`.
 
 ---
 
@@ -223,6 +137,5 @@ Only promote if the user agrees.
 2. File paths and line numbers — every finding locatable
 3. Specific fixes, not vague guidance
 4. Severity order: CONTRADICTORY > STALE > MISSING > VALID
-5. `audit light` and `audit heavy` never edit files
-6. `init`, `audit normal`, and `session end` edit files (with user approval)
-7. SKIPPED with reason if a check can't be performed
+5. `audit light` and `audit heavy` don't edit project docs — they only write to `docs/pm/` (log entries, plan files)
+6. `init`, `audit standard`, and `session end` edit project docs (with user approval)

@@ -1,0 +1,8 @@
+#+TITLE: pm plugin Tasks
+#+TODO: TODO IN-PROGRESS BLOCKED | DONE
+
+* Post-init backlog
+** DONE Sync command-version/ to current plugin command surface [2026-04-08]
+   - Updated dispatcher pm.md, replaced audit-normal/audit-heavy with audit.md, added session-start/session-end, replaced research.md with deep-research.md
+** TODO Run /pm:audit (light) to baseline doc health after init
+** TODO Add a sample /pm:session-start dry-run note to README so new users see what to expect

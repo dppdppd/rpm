@@ -1,10 +1,7 @@
----
-description: "Audit project docs/session drift. Presents three depths and recommends one based on audit history."
-argument-hint: ""
-allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent", "WebSearch"]
----
+# /pm audit — Full Instructions
 
-# /pm:audit
+Audit project docs/session drift. Presents three depths and recommends
+one based on audit history.
 
 ## Step 0: Check recency, then present menu
 
@@ -32,13 +29,13 @@ Print this menu (substituting real dates and marking the recommended row
 with ⭐) and STOP. Wait for the user to reply `1`, `2`, or `3`:
 
 ```
-## /pm:audit — pick a depth
+## /pm audit — pick a depth
 
 | # | Mode | What it does | Writes? | Cost | Last run |
 |---|------|--------------|---------|------|----------|
 | 1 | light | Quick staleness dashboard: file existence, mod dates, broken refs, CLAUDE.md size, NOT_IMPLEMENTED stubs. | Read-only | ~30s, no agents | {date or never} |
 | 2 | standard | Mechanical scan (docs, coherence, LLM-effectiveness, session drift) → scored findings → fix what you pick. | Edits with approval | Background agent | {date or never} |
-| 3 | heavy | Full consultant review. Investigate → research (multiple /deep-research agents) → judge across 6 dimensions. | Writes plan file | Multiple agents, expensive | {date or never} |
+| 3 | heavy | Full consultant review. Investigate → research (multiple /pm deep-research agents) → judge across 6 dimensions. | Writes plan file | Multiple agents, expensive | {date or never} |
 
 ⭐ Recommended: **{mode}** — {one-line reason based on recency rule}
 
@@ -236,7 +233,7 @@ Then **probe deeper**:
 ### Phase 2: Research (bring outside expertise)
 
 For each analysis dimension, identify what you DON'T know. Launch
-`/deep-research` agents in parallel (min 2). Wait for ALL to complete.
+`/pm deep-research` agents in parallel (min 2). Wait for ALL to complete.
 
 Example questions (adapt to project):
 

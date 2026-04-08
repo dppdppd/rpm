@@ -1,9 +1,3 @@
----
-description: "First-run project setup — detect state, create PM context, scaffold missing infrastructure"
-argument-hint: ""
-allowed-tools: ["Read", "Write", "Bash(ls:*)", "Bash(mkdir:*)", "Bash(git:*)", "Glob", "Grep"]
----
-
 # /pm init — Full Instructions
 
 First-run setup. Creates PM context for a project. Run once per project.
@@ -169,7 +163,7 @@ Create `docs/pm/PRESENT.md` for current project state:
 ### Past directory (if none exists)
 
 Create `docs/pm/past/` for daily session logs (`YYYY-MM-DD.md` files
-written by `/pm:session-end`).
+written by `/pm session end`).
 
 ### Future tracker (if none exists)
 
@@ -221,7 +215,7 @@ Execute only what the user selects. After completing:
 Created: {list of created files}
 
 Next steps:
-- `/pm:audit` — audit project health (pick a depth from the menu)
+- `/pm audit` — audit project health (pick a depth from the menu)
 ```
 
 ## Scaling Notes
