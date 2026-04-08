@@ -4,8 +4,11 @@
 layer for LLM-assisted development: session lifecycle commands, doc
 auditing, task tracking, and deep research. It's pure markdown +
 shell — no build, test, or lint toolchain. Solo author (`dppdppd`).
-Stage: actively iterating on command surface; recently consolidated
-audit commands and renamed `pm` → `howto` → `guide` → settled shape.
+Stage: actively iterating on command surface — audit recently
+consolidated into a single `/pm:audit` with depth selection.
+
+Current command surface: `/pm:pm` (entry), `/pm:init`,
+`/pm:session-start`, `/pm:session-end`, `/pm:audit`, `/pm:deep-research`.
 
 The repo dogfoods its own `/pm:*` commands, so changes to the plugin
 should be evaluated by re-running them in a real Claude Code session.

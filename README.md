@@ -28,8 +28,7 @@ docs/pm/
 ├── PRESENT.md         — Current project state
 ├── FUTURE.org         — Org-mode task tracker (planned work)
 ├── past/              — Daily session logs (YYYY-MM-DD.md)
-├── reviews/           — Audit plans and reports
-└── tasks/             — Detailed task files (optional)
+└── reviews/           — Audit plans and reports
 ```
 
 The three trackers map to the timeline:

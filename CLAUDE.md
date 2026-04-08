@@ -15,7 +15,7 @@ tracking, and deep research.
   `.claude-plugin/plugin.json`)
 - `command-version/` — historical/archived command snapshots; **not
   loaded by the plugin**, do not treat as live source
-- `docs/pm/` — PM context, log, reviews, progress, tasks
+- `docs/pm/` — PM context, log, reviews, past/present/future trackers
 
 ## Editing the plugin
 - Commands are pure markdown with YAML frontmatter (`description`,

@@ -34,11 +34,11 @@ with ⭐) and STOP. Wait for the user to reply `1`, `2`, or `3`:
 ```
 ## /pm:audit — pick a depth
 
-| # | Mode | What it does | Writes? | Cost | Last run |
-|---|------|--------------|---------|------|----------|
-| 1 | light | Quick staleness dashboard: file existence, mod dates, broken refs, CLAUDE.md size, NOT_IMPLEMENTED stubs. | Read-only | ~30s, no agents | {date or never} |
-| 2 | standard | Mechanical scan (docs, coherence, LLM-effectiveness, session drift) → scored findings → fix what you pick. | Edits with approval | Background agent | {date or never} |
-| 3 | heavy | Full consultant review. Investigate → research (multiple /deep-research agents) → judge across 6 dimensions. | Writes plan file | Multiple agents, expensive | {date or never} |
+| # | Mode | What it does | Output | Last run |
+|---|------|--------------|--------|----------|
+| 1 | light | Quick staleness dashboard: file existence, mod dates, broken refs, CLAUDE.md size, NOT_IMPLEMENTED stubs. | Findings table + 1-line PM-LOG entry | {date or never} |
+| 2 | standard | Mechanical scan (docs, coherence, LLM-effectiveness, session drift) → scored findings → fix what you pick. | Scored fix queue, doc edits, PM-LOG detail, PM.md row | {date or never} |
+| 3 | heavy | Full consultant review. Investigate → research (multiple /deep-research agents) → judge across 6 dimensions. | Executive summary, plan + full report in `reviews/` | {date or never} |
 
 ⭐ Recommended: **{mode}** — {one-line reason based on recency rule}
 
@@ -64,7 +64,7 @@ Produce a table ordered by priority. If issues warrant deeper
 investigation, suggest `standard` or `heavy`.
 
 **Log the run:** append one line to `docs/pm/PM-LOG.md` (create the file
-with an `## Audit history` heading if missing):
+with an `## Audit History` heading if missing):
 
 ```
 - YYYY-MM-DD — audit light — N issues surfaced
@@ -198,7 +198,7 @@ deny with message: "{explanation}"
 
 After fixing (or choosing "none"):
 
-- Append a one-line run marker to `docs/pm/PM-LOG.md` audit history:
+- Append a one-line run marker to `docs/pm/PM-LOG.md` Audit History:
   `- YYYY-MM-DD — audit standard — N findings, M fixed`
 - Append findings detail below the marker
 - Add one-liner to `docs/pm/PM.md` Prior Findings table
@@ -220,7 +220,7 @@ Read project state in parallel:
 - `git log --oneline -30` and `git diff --stat`
 - CLAUDE.md, `PRESENT.md`, recent `past/` daily logs, debugging/parity logs
 - Memory files (feedback type especially)
-- `grep -rn NOT_IMPLEMENTED packages/`
+- `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
 - `docs/pm/PM.md` (project-specific PM context)
 - Prior consultant reviews if they exist
 
@@ -287,7 +287,7 @@ Don't defer questions to the plan file.
 
 #### 2. Log the run
 
-Append one line to `docs/pm/PM-LOG.md` audit history:
+Append one line to `docs/pm/PM-LOG.md` Audit History:
 
 ```
 - YYYY-MM-DD — audit heavy — N findings, plan saved to reviews/YYYY-MM-DD-plan.md
