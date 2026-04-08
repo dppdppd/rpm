@@ -1,5 +1,5 @@
 ---
-description: "Project management — session lifecycle, auditing, task tracking"
+description: "Show all /pm commands and how to use them"
 argument-hint: ""
 ---
 
