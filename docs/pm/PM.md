@@ -8,7 +8,9 @@ Stage: actively iterating on command surface — audit recently
 consolidated into a single `/pm:audit` with depth selection.
 
 Current command surface: `/pm:pm` (entry), `/pm:init`,
-`/pm:session-start`, `/pm:session-end`, `/pm:audit`, `/pm:deep-research`.
+`/pm:session-start`, `/pm:session-end`, `/pm:audit`. Plus a
+`deep-research` skill (no slash command — auto-triggers on research
+questions).
 
 The repo dogfoods its own `/pm:*` commands, so changes to the plugin
 should be evaluated by re-running them in a real Claude Code session.
@@ -20,7 +22,7 @@ should be evaluated by re-running them in a real Claude Code session.
 | Plugin manifest | `plugin.json`, `.claude-plugin/plugin.json` |
 | Marketplace manifest | `.claude-plugin/marketplace.json` |
 | Slash commands | `commands/*.md` |
-| Subagents | `agents/*.md` (currently `audit-scanner.md`) |
+| Subagents | `agents/*.md` (currently `auditor.md`) |
 | Hooks | `hooks/hooks.json`, `hooks/session-start-reminder.sh` |
 | Skills | `skills/deep-research/` |
 | Non-plugin install variant | `command-version/` (dispatcher + pm-commands/, kept in sync with `commands/`) |
@@ -53,3 +55,4 @@ should emphasize:
 | Date | Key Finding |
 |------|-------------|
 | 2026-04-08 | `/pm:init` ran on plugin's own repo. ADR scaffolding removed from `commands/init.md` per user direction. |
+| 2026-04-08 | audit standard — PRESENT.md staleness cleaned, audit.md Heavy mode slash syntax fixed, deep-research skill/command distinction noted in CLAUDE.md. Also: `auditor` rename + findings menu format update (bold quick-phrase headings). |

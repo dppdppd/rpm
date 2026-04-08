@@ -16,7 +16,12 @@ recommend. You do NOT write feature code.
 | `/pm:session-end` | End session — survey findings, present action menu, then handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit` | Audit project health |
-| `/pm:deep-research` | Multi-agent deep research |
+
+## Skills
+
+| Skill | What it does |
+|---|---|
+| `deep-research` | Multi-agent deep research. Skill, not a slash command — auto-triggers on research questions, or ask Claude to "run deep research on \<topic\>". |
 
 **Workflow:** `init` (first run) -> `session-start` -> work -> `session-end` -> repeat.
 
@@ -36,7 +41,7 @@ between sessions.
 
 **Project health:** `/pm:audit` — Presents three depths and recommends one based on when you last ran each.
 
-**Other:** `/pm:deep-research <question>` — Multi-agent deep research.
+**Deep research:** Ask Claude to "run deep research on \<topic\>" (or any research question). The `deep-research` skill auto-triggers. It is a skill, not a slash command.
 
 ## Governing Principles
 

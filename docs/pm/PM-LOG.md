@@ -7,6 +7,11 @@ Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
 
 - 2026-04-08 — audit light — 5 issues surfaced (2 high, 1 medium, 2 low), all fixed in-session
 - 2026-04-08 — audit light — 4 surfaced, 4 fixed, 0 skipped
+- 2026-04-08 — audit standard — 3 findings, 3 fixed, 0 skipped (+ auditor rename and deep-research correction handled in same session)
+  - PRESENT.md Completed Work referenced nonexistent `progress/STATUS.md` and `TASKS.org`, and stale `howto`/`pm:pm` rename history → cleaned up
+  - User-facing docs incorrectly presented `/pm:deep-research` as a slash command. Reality: deep-research is a **skill** (`skills/deep-research/SKILL.md`), not a slash command — there is no `commands/deep-research.md` and no `/pm:deep-research` slash command. Corrected `README.md`, `commands/pm.md`, `CLAUDE.md`, `docs/pm/PM.md`, `skills/deep-research/SKILL.md`, and `commands/audit.md` Heavy mode Phase 2 to describe it accurately.
+  - Also this scan: auditor renamed mid-audit (`agents/audit-scanner.md` → `agents/auditor.md`, frontmatter + refs in CLAUDE.md, docs/pm/PM.md)
+  - Also this scan: Shared Findings Menu format updated — bold quick-phrase headings, blank line between options (mirrored to `command-version/`)
 
 ## Sessions Reviewed
 

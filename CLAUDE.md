@@ -7,9 +7,11 @@ tracking, and deep research.
 ## Layout
 - `commands/` — slash commands (`init`, `session-start`, `session-end`,
   `audit`, `pm`)
-- `agents/` — subagents (currently `audit-scanner.md`)
+- `agents/` — subagents (currently `auditor.md`)
 - `hooks/` — `hooks.json` + `session-start-reminder.sh`
-- `skills/` — `deep-research/`
+- `skills/` — `deep-research/` (skill, **not a slash command** — no
+  `/pm:deep-research`; auto-triggers on research questions. Edit the
+  skill, not `commands/`.)
 - `.claude-plugin/` — `plugin.json` + `marketplace.json`
 - `plugin.json` — top-level plugin manifest (mirrored in
   `.claude-plugin/plugin.json`)

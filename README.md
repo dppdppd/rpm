@@ -11,7 +11,12 @@ Project management layer for LLM-assisted development.
 | `/pm:session-end` | End session: survey findings, present action menu, then handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit` | Audit project health |
-| `/pm:deep-research` | Multi-agent deep research |
+
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| `deep-research` | Multi-agent deep research. Auto-triggers on questions needing external knowledge, or ask Claude to "run deep research on \<topic\>". Not a slash command. |
 
 ## Installation
 

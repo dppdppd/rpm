@@ -53,12 +53,17 @@ phase, no elaborate grammar.
 ```
 ## Audit findings — {date} ({N} findings)
 
-1. [{PRIORITY}] {title}
-2. [{PRIORITY}] {title}
-3. [{PRIORITY}] {title}
+1. **{quick phrase}** — {description} [{PRIORITY}]
+
+2. **{quick phrase}** — {description} [{PRIORITY}]
+
+3. **{quick phrase}** — {description} [{PRIORITY}]
 
 Reply: `fix 1 2 4` · `all` · `none` · `<#>?` for details
 ```
+
+Each option leads with a bolded 2–4 word phrase (no line break after),
+then the full finding inline. Blank line between options.
 
 In standard mode, use `({score})` instead of `[{PRIORITY}]` in each row.
 
@@ -269,8 +274,10 @@ Then **probe deeper**:
 
 ### Phase 2: Research (bring outside expertise)
 
-For each analysis dimension, identify what you DON'T know. Launch
-`/deep-research` agents in parallel (min 2). Wait for ALL to complete.
+For each analysis dimension, identify what you DON'T know. Invoke the
+`deep-research` skill (multi-agent research) in parallel — min 2 dimensions.
+Wait for ALL to complete. Note: `deep-research` is a skill in this plugin,
+not a slash command.
 
 Example questions (adapt to project):
 

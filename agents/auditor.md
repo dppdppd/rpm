@@ -1,5 +1,5 @@
 ---
-name: audit-scanner
+name: auditor
 model: sonnet
 description: >
   Background agent that scans project documentation for staleness,

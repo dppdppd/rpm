@@ -50,12 +50,17 @@ phase, no elaborate grammar.
 ```
 ## Audit findings — {date} ({N} findings)
 
-1. [{PRIORITY}] {title}
-2. [{PRIORITY}] {title}
-3. [{PRIORITY}] {title}
+1. **{quick phrase}** — {description} [{PRIORITY}]
+
+2. **{quick phrase}** — {description} [{PRIORITY}]
+
+3. **{quick phrase}** — {description} [{PRIORITY}]
 
 Reply: `fix 1 2 4` · `all` · `none` · `<#>?` for details
 ```
+
+Each option leads with a bolded 2–4 word phrase (no line break after),
+then the full finding inline. Blank line between options.
 
 In standard mode, use `({score})` instead of `[{PRIORITY}]` in each row.
 
