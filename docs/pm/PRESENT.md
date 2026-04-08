@@ -1,10 +1,12 @@
 # claude-plugin-pm — Present State
 
 ## Project Status
-- **Current phase**: Iterating on command surface (post-1.0.4)
+- **Current phase**: v1.0.5 — `/pm:audit` interactive menu landed
 - **Last updated**: 2026-04-08
 
 ## Completed Work
+- 2026-04-08 — v1.0.5: `/pm:audit` gains **Shared: Interactive Findings Menu** (x=skip, y=fix, number=inspect, `e`=execute); Light + Standard modes route findings through it
+- 2026-04-08 — light audit run on self: 5 findings surfaced (stale docs refs, packages/ template residue, casing mismatch), all fixed in-session; depth-selector menu picked up `Output` column in place of `Writes?`/`Cost`
 - 2026-04-08 — `command-version/` (non-plugin install variant) brought in sync with the current plugin command surface
 - v1.0.4 — bump, marketplace manifest added, stale docs cleaned up
 - v1.0.3 — `howto` command renamed to `guide`, description improved

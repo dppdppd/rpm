@@ -49,26 +49,100 @@ When the user replies, jump to the matching mode below.
 
 ---
 
+## Shared: Interactive Findings Menu
+
+Used by **light** and **standard** modes whenever findings are presented.
+Each row starts unmarked (`·`). The user marks rows fix/skip, can inspect
+any row for details, and executes from the bottom row.
+
+### Display
+
+```
+## Audit findings — {date} ({N} findings)
+
+| # |   | Finding                                | Priority | Effort |
+|---|---|----------------------------------------|----------|--------|
+| 1 | · | {title}                                | HIGH     | Small  |
+| 2 | · | {title}                                | HIGH     | Small  |
+| 3 | · | {title}                                | MED      | Medium |
+| e | ▶ | **Execute marked actions**             |          |        |
+
+Mark   `<#>y` fix · `<#>x` skip · `yy` all fix · `xx` all skip
+Inspect `<#>` (number alone) — full details, then redraw
+Execute `e`  ·  Cancel `q`
+```
+
+Symbols: `·` unmarked · `✓` fix · `✗` skip. In standard mode replace the
+`Priority` column with `Score` (0–100).
+
+### Reply grammar
+
+| Input | Effect |
+|-------|--------|
+| `<#>y` | Mark row # as fix (✓) |
+| `<#>x` | Mark row # as skip (✗) |
+| `<#>` (bare number) | Inspect — show location, evidence, proposed fix; redraw menu. **Does not execute.** |
+| `yy` | Mark every row as fix |
+| `xx` | Mark every row as skip |
+| `1y 2x 3y` | Multiple ops in one reply, applied left-to-right, then redraw |
+| `e` / `execute` / `go` | Run the Execute step below with current marks |
+| `q` / `cancel` | Abort — no changes, log the run as cancelled |
+
+Interpret replies liberally: `y1`, `1 y`, `fix 1`, and `inspect 2` all
+map to the obvious action. When in doubt, ask.
+
+### Loop
+
+After any mark or inspect, redraw the updated menu and wait for the next
+reply. Only `e` or `q` exits the loop.
+
+### Execute
+
+When the user types `e`:
+
+1. For each ✓ finding: apply the fix, verify, record result.
+2. For each ✗ or still-unmarked row: record as skipped.
+3. Display a result summary:
+
+   ```
+   | # | Result         | Finding |
+   |---|----------------|---------|
+   | 1 | ✅ fixed        | ...     |
+   | 2 | ⏭ skipped      | ...     |
+   | 3 | ❌ failed — {reason} | ... |
+   ```
+
+Then continue to the mode's logging step.
+
+---
+
 ## Mode: Light
 
-Read-only for project docs — no fixes, no agents.
+Quick staleness scan — no background agent, no deep research.
 
-For each doc in the project: verify path exists, check last-modified
-date, scan for broken references. Also check:
+Scan the project inline (not a subagent):
 
+- All `.md` / `.org` docs: existence, mod date, line count
 - CLAUDE.md line count (warn >120, critical >150)
-- Task tracker exists and has recent updates
-- Any `NOT_IMPLEMENTED` stubs
+- Broken file references (anything in backticks that looks like a path)
+- `NOT_IMPLEMENTED` stubs
+- Task tracker freshness (`FUTURE.org` or equivalent)
 
-Produce a table ordered by priority. If issues warrant deeper
-investigation, suggest `standard` or `heavy`.
+Assemble findings as a priority-ordered list (HIGH / MED / LOW) and
+present via the **Shared: Interactive Findings Menu**. The user marks,
+inspects, and executes from that menu.
 
-**Log the run:** append one line to `docs/pm/PM-LOG.md` (create the file
-with an `## Audit History` heading if missing):
+### Logging
+
+After the Execute step completes (or the user cancels with `q`), append
+one line to `docs/pm/PM-LOG.md` Audit History (create the `## Audit
+History` heading if missing):
 
 ```
-- YYYY-MM-DD — audit light — N issues surfaced
+- YYYY-MM-DD — audit light — N surfaced, M fixed, K skipped
 ```
+
+Cancelled runs log as `N surfaced, 0 fixed, cancelled`.
 
 ---
 
@@ -130,7 +204,7 @@ Report format:
 ### Session Drift table
 ```
 
-### Phase 2: Score and filter findings
+### Phase 2: Score findings, present menu
 
 When the agent completes, score each finding:
 
@@ -143,34 +217,16 @@ When the agent completes, score each finding:
 **Only present findings scoring ≥ 60.** Below that, log to PM-LOG.md
 but don't bother the user.
 
-Present as a numbered menu, ordered by score:
+Present findings (sorted by score, highest first) via the **Shared:
+Interactive Findings Menu**. Use `Score` (0–100) instead of `Priority`
+in the menu table. Below the menu, note any low-confidence findings
+that were suppressed: `(N low-confidence findings logged but not shown)`.
 
-```
-## Audit — YYYY-MM-DD (N findings above threshold)
+### Phase 3: Post-execute — hookify repeat offenders
 
-| # | Finding | Score | Effort |
-|---|---------|-------|--------|
-| 1 | Screenshot hook allows wrong directory | 95 | Small |
-| 2 | 48 specs unlisted in inventory | 85 | Small |
-| ... | ... | ... | ... |
-
-(N low-confidence findings logged but not shown)
-
-Which to fix? (e.g., "1", "1,2", "all", "none", or ask about any)
-```
-
-### Phase 3: Fix and enforce
-
-Handle the response:
-
-- **Number(s) or "all":** Fix those issues now. For each:
-  read the finding, execute the fix, verify, report result.
-- **"none":** Save findings to `docs/pm/reviews/YYYY-MM-DD-plan.md`.
-- **Question:** Explain the finding in detail, re-prompt.
-
-**After each fix, check if the finding indicates a repeated violation.**
-If a CLAUDE.md rule was violated and this is the 2nd+ time it's been
-flagged, offer to create a hookify rule:
+After the menu's Execute step completes, for each ✓ fix that addresses
+a CLAUDE.md rule violation flagged **2+ times across audits**, offer
+to codify it:
 
 > "This rule has been violated before. Want me to create a hook to
 > enforce it? I'll write a `.claude/hookify.{name}.local.md` rule."
@@ -196,10 +252,11 @@ deny with message: "{explanation}"
 
 ### Phase 4: Log results
 
-After fixing (or choosing "none"):
+After the Execute step (or a cancelled run):
 
 - Append a one-line run marker to `docs/pm/PM-LOG.md` Audit History:
-  `- YYYY-MM-DD — audit standard — N findings, M fixed`
+  `- YYYY-MM-DD — audit standard — N findings, M fixed, K skipped`
+  (cancelled runs: `N findings, cancelled`)
 - Append findings detail below the marker
 - Add one-liner to `docs/pm/PM.md` Prior Findings table
 - Update Sessions Reviewed table if session drift was checked
