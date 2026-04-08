@@ -6,13 +6,11 @@ Project management layer for LLM-assisted development.
 
 | Command | Description |
 |---------|-------------|
-| `/pm` | Guide — explains all commands |
+| `/pm:pm` | Explain the plugin and list its commands |
 | `/pm:session-start` | Begin session: load context, pick task, state plan |
 | `/pm:session-end` | End session: commit, log progress, capture learnings |
 | `/pm:init` | First-run project setup |
-| `/pm:audit` | Scan docs + fix issues |
-| `/pm:audit-light` | Quick dashboard (read-only) |
-| `/pm:audit-heavy` | Deep review with external research |
+| `/pm:audit` | Audit project health |
 | `/pm:deep-research` | Multi-agent deep research |
 
 ## Installation

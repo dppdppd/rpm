@@ -233,8 +233,7 @@ Execute only what the user selects. After completing:
 Created: {list of created files}
 
 Next steps:
-- `/pm:audit-heavy` — full project health assessment
-- `/pm:audit` — mechanical doc validity check
+- `/pm:audit` — audit project health (pick a depth from the menu)
 ```
 
 ## Scaling Notes

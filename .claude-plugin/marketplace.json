@@ -1,0 +1,13 @@
+{
+  "name": "dppdppd-plugins",
+  "owner": {
+    "name": "dppdppd"
+  },
+  "plugins": [
+    {
+      "name": "pm",
+      "description": "Project management layer for LLM-assisted development.",
+      "source": "./."
+    }
+  ]
+}
