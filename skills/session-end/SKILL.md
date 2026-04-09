@@ -75,6 +75,16 @@ this message — do NOT re-run these checks as tool calls.
   Phase 2 needs to create today's log.
 - `session_marker` — whether `docs/pm/~pm-session-active` exists.
   Phase 5 will remove it only if it exists.
+- `specs_inventory` — if a spec dir exists, `total` / `listed` /
+  `unlisted` counts against `PRESENT.md`. `unlisted > 0` is a
+  drift signal — PRESENT.md isn't enumerating all specs. Up to
+  10 `unlisted_sample=` lines identify which. `status=no_spec_dir`
+  means the project has no spec directory (no action).
+- `pm_docs_staleness` — `file=<path> days=<N>` pairs for loose
+  log/tracker/inventory files under `docs/` and `docs/pm/`. Flag
+  as possible drift if `days > 3` AND the session touched related
+  work — the file may need an entry. `days=0` means freshly
+  updated (no action). `count=0` means nothing to check.
 
 ### 1b. Fire remaining reads in parallel
 
@@ -87,8 +97,9 @@ sequence them:
 - Call `TaskList` — native task state for reconciliation
 
 (The scan in 1a has already covered git state, CLAUDE.md size,
-NOT_IMPLEMENTED, broken refs, today's daily log existence, and
-the session marker. Do not duplicate those checks.)
+NOT_IMPLEMENTED, broken refs, today's daily log existence, the
+session marker, spec inventory drift, and loose log/tracker
+staleness. Do not duplicate those checks.)
 
 ### 1c. Synthesize the conversation (concurrent with 1b)
 

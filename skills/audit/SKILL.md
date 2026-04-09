@@ -1,14 +1,14 @@
 ---
 name: audit
-description: On-demand audit. Target `documents` scans docs + CLAUDE.md + memory + session drift via the pm:auditor subagent. Target `project` runs a full consultant review — code, architecture, inward + outward research, 7-dimension analysis, saved plan file. Routine doc-drift is handled automatically by /pm:session-end — run audit only when you have a specific concern.
+description: On-demand audit. Target `quick` runs the mechanical scan.sh only (zero-LLM drift check). Target `documents` scans docs + CLAUDE.md + memory + session drift via the pm:auditor subagent. Target `project` runs a full consultant review — code, architecture, inward + outward research, 7-dimension analysis, saved plan file. Routine doc-drift is handled automatically by /pm:session-end — run audit only when you have a specific concern.
 disable-model-invocation: true
-argument-hint: "documents | project"
+argument-hint: "quick | documents | project"
 allowed-tools: Read Write Edit Bash Glob Grep Agent WebSearch
 ---
 
 # /pm:audit
 
-On-demand audits. Two distinct targets, no depth menu, no recency
+On-demand audits. Three distinct targets, no depth menu, no recency
 recommendation. Routine doc-drift is handled automatically by
 `/pm:session-end` — run `/pm:audit` only when you have a specific
 concern that warrants a deeper look.
@@ -17,6 +17,8 @@ concern that warrants a deeper look.
 
 Parse `$ARGUMENTS`:
 
+- `quick` → run the **Quick** audit below (mechanical scan.sh only,
+  no LLM scan)
 - `documents` (or `docs`) → run the **Documents** audit below
 - `project` → run the **Project** audit described in
   [project-mode.md](project-mode.md). Read that file and follow it
@@ -27,6 +29,10 @@ Parse `$ARGUMENTS`:
   ```
   ## /pm:audit — pick a target
 
+  - `/pm:audit quick` — mechanical scan.sh only. Git state,
+    CLAUDE.md size, NOT_IMPLEMENTED, broken refs, daily-log gap,
+    session marker, spec inventory drift, log/tracker staleness.
+    Zero LLM tokens for the scan itself. ~5sec.
   - `/pm:audit documents` — scan docs + CLAUDE.md + memory + session
     drift via the pm:auditor subagent. Scored findings, hookify
     repeat offenders. ~3min.
@@ -36,6 +42,70 @@ Parse `$ARGUMENTS`:
 
   Routine doc-drift runs automatically at /pm:session-end.
   ```
+
+---
+
+## Target: Quick
+
+Mechanical drift scan only — no `pm:auditor` subagent, no LLM
+scan, no 110-doc walk. Runs `skills/session-end/scripts/scan.sh`
+via direct shell injection and interprets the output.
+
+Use when you want a fast "anything broken right now?" check
+between session-ends, or to verify a fix landed, without committing
+to a full documents audit.
+
+### Phase 1: Scan (auto-injected, no tool call needed)
+
+The `scan.sh` output below was produced by the shell before this
+skill body reached you. Its results are already in this message —
+do NOT re-run these checks as tool calls.
+
+!`${CLAUDE_PLUGIN_ROOT}/skills/session-end/scripts/scan.sh`
+
+Interpret the sections exactly as `skills/session-end/SKILL.md`
+Phase 1a describes — the interpretation rules are identical.
+
+### Phase 2: Assemble findings
+
+From the scan output, collect actionable items into a findings list:
+
+- `git` — only flag if the user seems unaware of uncommitted work
+- `claude_md` — flag if `status=warn` or `status=critical`
+- `not_implemented` — flag only real source stubs, suppress meta
+- `broken_refs` — always flag if `count > 0`
+- `daily_log` — flag if `today_exists=false` AND `commits_since > 0`
+- `session_marker` — informational, not a finding
+- `specs_inventory` — flag if `unlisted > 0`
+- `pm_docs_staleness` — flag if any `days > 3`
+
+### Phase 3: Present findings menu
+
+Present via the **Shared Findings Menu** format described in
+[findings-menu.md](findings-menu.md). Read that file for the exact
+format, reply grammar, and execute flow.
+
+Score each finding with `severity (0-40) + evidence (0-30) +
+fix clarity (0-30)`. For scan.sh findings, evidence is generally
+"single clear source" (20) since the scan is mechanical.
+
+If no findings, print:
+
+```
+## /pm:audit quick — no drift detected
+```
+
+and stop. Do NOT append to `PM-LOG.md` for clean runs — quick mode
+is meant to be cheap and invisible when nothing's wrong.
+
+### Phase 4: Log results (only if findings were present)
+
+Append a one-line run marker to `docs/pm/PM-LOG.md` Audit History:
+`- YYYY-MM-DD — audit quick — N findings, M fixed, K skipped`
+
+No findings detail beneath — keep quick mode's log footprint
+minimal. If the user wants detail, they can re-run or upgrade to
+`/pm:audit documents`.
 
 ---
 

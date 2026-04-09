@@ -154,3 +154,90 @@ if [ -f docs/pm/~pm-session-active ]; then
 else
   echo "exists=false"
 fi
+
+# ----------------------------------------------------------------
+echo
+echo "=== specs_inventory ==="
+# If a spec directory exists, verify PRESENT.md mentions each
+# spec file. Catches the "new specs added but PRESENT.md not
+# updated" drift pattern (HIGH finding in volta 2026-04-09 audit:
+# 17 top-level specs + 38 in docs/spec/traits/ unlisted).
+#
+# Searches common spec locations: specs/, spec/, docs/specs/,
+# docs/spec/ — recursive within each. Match is filename-scoped
+# (looks for `$base.md` or `spec(s)/$base` in PRESENT.md, not a
+# loose substring) to avoid false positives on common basenames.
+if [ ! -f docs/pm/PRESENT.md ]; then
+  echo "status=no_present_md"
+else
+  SPEC_LIST=$(find specs spec docs/specs docs/spec -type f -name '*.md' 2>/dev/null | sort)
+  if [ -z "$SPEC_LIST" ]; then
+    echo "status=no_spec_dir"
+  else
+    TOTAL=0
+    UNLISTED=0
+    UNLISTED_SAMPLES=""
+    while IFS= read -r f; do
+      [ -z "$f" ] && continue
+      TOTAL=$((TOTAL + 1))
+      base=$(basename "$f" .md)
+      if grep -qF "$base.md" docs/pm/PRESENT.md 2>/dev/null \
+         || grep -qF "specs/$base" docs/pm/PRESENT.md 2>/dev/null \
+         || grep -qF "spec/$base" docs/pm/PRESENT.md 2>/dev/null; then
+        continue
+      fi
+      UNLISTED=$((UNLISTED + 1))
+      if [ "$UNLISTED" -le 10 ]; then
+        UNLISTED_SAMPLES="${UNLISTED_SAMPLES}${base}"$'\n'
+      fi
+    done <<< "$SPEC_LIST"
+    LISTED=$((TOTAL - UNLISTED))
+    echo "total=$TOTAL"
+    echo "listed=$LISTED"
+    echo "unlisted=$UNLISTED"
+    if [ -n "$UNLISTED_SAMPLES" ]; then
+      while IFS= read -r sample; do
+        [ -z "$sample" ] && continue
+        echo "unlisted_sample=$sample"
+      done <<< "$UNLISTED_SAMPLES"
+    fi
+  fi
+fi
+
+# ----------------------------------------------------------------
+echo
+echo "=== pm_docs_staleness ==="
+# Staleness check for loose log/tracker/inventory files under
+# docs/ and docs/pm/ (top level only — past/ and reviews/ are
+# append-only). Emits days-since-last-commit for each match;
+# skill interprets. Catches the "parity-fix-log.md stale since
+# 2026-04-05 despite 8+ fixes since" pattern from the volta
+# 2026-04-09 audit.
+#
+# Excludes pm-meta files (PM-LOG.md, PM.md, PRESENT.md, FUTURE.org)
+# which are updated by pm itself and have their own checks.
+if git rev-parse --git-dir > /dev/null 2>&1; then
+  NOW_EPOCH=$(date +%s)
+  STALE_COUNT=0
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    [ ! -f "$f" ] && continue
+    base=$(basename "$f")
+    case "$base" in
+      PM-LOG.md|PM.md|PRESENT.md|FUTURE.org) continue ;;
+    esac
+    MTIME=$(git log -1 --format='%cI' -- "$f" 2>/dev/null)
+    [ -z "$MTIME" ] && continue
+    MTIME_DATE="${MTIME%T*}"
+    MTIME_EPOCH=$(date -d "$MTIME_DATE" +%s 2>/dev/null || echo 0)
+    [ "$MTIME_EPOCH" -eq 0 ] && continue
+    DAYS=$(( (NOW_EPOCH - MTIME_EPOCH) / 86400 ))
+    # Strip leading ./ for display
+    rel="${f#./}"
+    echo "file=$rel days=$DAYS"
+    STALE_COUNT=$((STALE_COUNT + 1))
+  done < <(find docs docs/pm -maxdepth 1 -type f \( -iname '*log*.md' -o -iname '*tracker*.md' -o -iname '*inventory*.md' \) 2>/dev/null)
+  echo "count=$STALE_COUNT"
+else
+  echo "count=0"
+fi
