@@ -46,6 +46,35 @@ install the plugin:
 /plugin install pm@dppdppd-plugins
 ```
 
+## What a session looks like
+
+Once installed, start your first session with `/pm:session-start`.
+It reads your project state, surfaces any leftover work, and states
+a plan before touching anything. A real session opener looks like:
+
+```
+> /pm:session-start
+
+Context loaded. Clean tree, no stashes, no leftover work.
+
+Recent state: last session (2026-04-08) shipped 8 audit findings
+and bumped version to 1.0.13.
+
+Open FUTURE.org TODOs:
+1. Add a sample /pm:session-start dry-run to README
+2. On publish: add homepage/repository fields  (blocked — unpublished)
+
+This session: TODO #1 — add a dry-run walkthrough to README.
+It's the only actionable item in the backlog and closes a real
+UX gap for new users. Proceed?
+```
+
+Nothing is committed, no files are written beyond a session marker
+at `docs/pm/tmp/pm-session-active`. You confirm the plan, work
+happens, then `/pm:session-end` surveys findings and presents a
+commit menu. Mid-session, `/pm:session-update` checkpoints
+progress to today's daily log without ending the session.
+
 ## Project Structure Created by /pm:init
 
 ```
