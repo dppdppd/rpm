@@ -6,3 +6,4 @@
    - Updated dispatcher pm.md, replaced audit-normal/audit-heavy with audit.md, added session-start/session-end, replaced research.md with deep-research.md
 ** DONE Run /pm:audit (light) to baseline doc health after init [2026-04-08]
 ** TODO Add a sample /pm:session-start dry-run note to README so new users see what to expect
+** TODO On publish: add homepage + repository fields to .claude-plugin/plugin.json, finalize marketplace install instructions in README
