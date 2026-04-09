@@ -1,11 +1,18 @@
 # claude-plugin-pm — Present State
 
 ## Project Status
-- **Current phase**: audit restructure shipped — split into `/pm:audit documents` + `/pm:audit project`, routine drift folded into `/pm:session-end`; project mode now runs mechanical scan alongside consultant review
-- **Last updated**: 2026-04-08
-- **Version**: 1.0.17
+- **Current phase**: skills-first migration 5/6 complete — `pm`, `init`, `audit` (decomposed), and the session trio all shipped as `skills/<name>/SKILL.md`; `command-version/` frozen; Phase 6 (remove legacy `commands/`) pending one dogfood cycle
+- **Last updated**: 2026-04-09
+- **Version**: 1.0.22
 
 ## Completed Work
+- 2026-04-09 — **skills migration phase 5: `command-version/` frozen** (1.0.22): chose option B — no ongoing mirror maintenance. `CLAUDE.md` Layout/Editing sections rewritten; `skills/` is now primary surface. `command-version/pm.md` gets a legacy-install header note. `3b37c88`.
+- 2026-04-09 — **skills migration phase 4: session trio** (1.0.21): `session-start`, `session-update`, `session-end` all shipped as skills. `session-end` has a pre-flight auto-invocation gate so Claude can proactively recommend wrapping up on long contexts without auto-committing. `61eca6b`.
+- 2026-04-09 — **skills migration phase 3: `/pm:audit` decomposed** (1.0.20): split into `skills/audit/SKILL.md` (routing + Documents mode) + `findings-menu.md` + `project-mode.md`. `disable-model-invocation: true`. `f8b0b1b`.
+- 2026-04-09 — **skills migration phase 2: `/pm:init`** (1.0.19): migrated to `skills/init/SKILL.md` with `disable-model-invocation: true` (destructive scaffolder). `9cf1438`.
+- 2026-04-09 — **skills migration phase 1: `/pm:pm`** (1.0.18): first migration. `skills/pm/SKILL.md` with auto-invocation on pm-overview questions. Legacy `commands/pm.md` kept for rollback; skill takes precedence per unification docs. `a7df55b`.
+- 2026-04-09 — **second `/pm:audit project` run**: 8 findings, plan + report saved. First project-target audit after the 1.0.17 scan-gap fix — validated that `pm:auditor` feeds Phase 4 as designed. User picked C (commit to phased migration) for S1. See `docs/pm/reviews/2026-04-09.md`. `c39cf0c`.
+- 2026-04-09 — **mechanical audit findings executed** (`f972ab8` + `28f337d`): PM.md version-sync contradiction fixed, `init.md` stale depth-menu text replaced, `CLAUDE.md` read-first guardrail added, `auditor.md` off-schema frontmatter cleaned up, ccpm disambiguation note added to `pm.md` + mirror.
 - 2026-04-08 — **project-mode scan gap closed** (1.0.17): `/pm:audit project` Phase 1 now launches `pm:auditor` in the background (plugin version) / runs the Documents scan inline (dispatcher version) so VALIDITY/COHERENCE/tracker findings become Phase 4 evidence. Closes the gap where a `project` run could silently miss broken refs that a `documents` run would catch.
 - 2026-04-08 — **audit restructure** (1.0.16): `/pm:audit` split into `documents` (doc + CLAUDE.md + memory + session-drift scan via `pm:auditor`) and `project` (full consultant review). Dropped `light` as a separate mode — its cheap checks are now automatic in `/pm:session-end` Phase 1e. Removed depth menu and recency recommendation. Mirror synced.
 - 2026-04-08 — session marker relocated to `docs/pm/~pm-session-active` (no more `mkdir -p`); added `.gitignore` entry. Plugin → 1.0.15 (`e65ff57`).

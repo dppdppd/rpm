@@ -12,3 +12,23 @@
    - One-time quirk observed this session. Marker persisted fine during normal session activity, but vanished between /exit and resume. Root cause unknown — possibly a cleanup process treating ~-prefixed files as backups, or installed hook still using old docs/pm/tmp/ path. Revisit if recurs.
 ** DONE /pm:audit project skips the mechanical VALIDITY/COHERENCE scan [2026-04-08]
    - Fixed by launching pm:auditor in background at start of Project Phase 1 (plugin version) and inlining the Documents scan spec into Project Phase 1 (dispatcher version). Mechanical findings are explicitly called out as Phase 4 evidence inputs. Plugin → 1.0.17.
+** DONE Second /pm:audit project run on plugin's own repo [2026-04-09]
+   - 8 findings, plan + report saved to reviews/2026-04-09*. First project-target audit after the 1.0.17 scan-gap fix — validated background pm:auditor scan feeding Phase 4 as designed. User picked option C (commit to phased skills migration) for S1.
+** DONE Execute mechanical audit findings A1-A5 + S3 [2026-04-09]
+   - A1: PM.md version-sync self-contradiction fixed
+   - A2: PM-LOG.md backfilled with 2 missing sessions (done during audit run)
+   - A3: commands/init.md stale "pick a depth from the menu" text replaced (+ mirror)
+   - A4: CLAUDE.md one-line read-first guardrail added
+   - A5: agents/auditor.md off-schema color/whenToUse fields removed
+   - S3: ccpm disambiguation note added to pm.md + mirror + skill
+** DONE Skills-first migration phases 1-5 [2026-04-09]
+   - Phase 1: /pm:pm → skills/pm/SKILL.md (1.0.18, a7df55b)
+   - Phase 2: /pm:init → skills/init/SKILL.md disable-model-invocation (1.0.19, 9cf1438)
+   - Phase 3: /pm:audit decomposed into SKILL.md + findings-menu.md + project-mode.md (1.0.20, f8b0b1b)
+   - Phase 4: session trio — session-start, session-update default-allow; session-end with pre-flight gate for proactive long-context recommendation (1.0.21, 61eca6b)
+   - Phase 5: command-version/ frozen, no more mirror maintenance, CLAUDE.md Layout/Editing rewritten (1.0.22, 3b37c88)
+   - Legacy commands/*.md preserved as rollback target
+** TODO Skills migration phase 6 — remove legacy commands/ at 2.0.0
+   - Deferred pending dogfooding the skills side for at least one session. After validation: delete commands/*.md (6 files), bump to 2.0.0, update CLAUDE.md Layout to remove commands/ line, final sweep for stale cross-references.
+** TODO Bundle deterministic bash scripts for session-end drift scan
+   - Task 4 from 2026-04-09 plan. Unblocked now that Phase 4 (session-end skill) has landed. Create skills/session-end/scripts/drift-scan.sh that emits JSON with broken_refs, claude_md_lines, not_implemented_matches, tracker_conflicts, stale_daily_log. session-end skill invokes the script first and only runs LLM analysis on surfaced findings. Medium effort. Pattern borrowed from ccpm's 14-script bundle.
