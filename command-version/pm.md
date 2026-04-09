@@ -26,6 +26,10 @@ Do NOT run any subcommand without an explicit argument.
 on, keeps documentation healthy, and makes sure knowledge isn't lost
 between sessions.
 
+_Not affiliated with ccpm (`github.com/automazeio/ccpm`) — that's a
+separate GitHub-Issues-based PM skill that also used to ship under a
+`/pm:*` prefix._
+
 ### When to use each command
 
 **Starting a project:**

@@ -55,5 +55,12 @@ tracking, and deep research.
 - Ask before: renaming user-facing commands, changing command
   argument shape, restructuring directories, adding new top-level
   scaffolding to what `/pm:init` generates
+- Read command body + referenced subagents/skills end-to-end before
+  proposing any rename or regrouping
 - **No ADRs.** This project does not use Architecture Decision
   Records — do not propose ADR templates or directories.
+
+## WebFetch
+Do not use WebFetch — it has no tool-level timeout and a hung
+request stalls the entire session (anthropics/claude-code#34565).
+Use `curl --max-time 30 -sL <url>` via Bash instead.
