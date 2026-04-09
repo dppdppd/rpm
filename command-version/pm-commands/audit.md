@@ -214,6 +214,15 @@ best-in-class.
 
 ### Phase 1: Investigate (gather evidence, don't opine yet)
 
+**Also run the mechanical Documents scan inline** — execute the
+Documents Phase 1 read-only audit spec above (DISCOVER / VALIDITY /
+COHERENCE / LLM-EFFECTIVENESS / FUTURE TRACKER checks) as part of
+this phase. Without this, a Project audit can silently miss broken
+file refs and tracker drift that a Documents audit would catch. Its
+findings become Phase 4 evidence inputs. (Dispatcher mode has no
+subagent mechanism — the plugin version launches `pm:auditor` in
+the background for the same effect.)
+
 Read project state in parallel:
 
 - `git log --oneline -30` and `git diff --stat`
@@ -285,6 +294,10 @@ spec-conformance findings.
 
 Evaluate across these dimensions. Every finding must cite Phase 1
 evidence AND either Phase 2 or Phase 3 research — ideally both.
+**Mechanical findings from the Phase 1 inline Documents scan count
+as Phase 1 evidence** — promote anything material into the
+dimension list below (VALIDITY → LLM Workflow; tracker drift →
+Session Discipline). Trivial hygiene drops out.
 
 1. **Process Health** — workflow followed? measure→change→measure?
 2. **Architecture & Code Health** — boundaries clean? complexity proportional?

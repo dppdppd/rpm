@@ -10,5 +10,5 @@
 ** TODO On publish: add homepage + repository fields to .claude-plugin/plugin.json, finalize marketplace install instructions in README
 ** TODO Investigate ~pm-session-active disappearance at /exit→resume boundary
    - One-time quirk observed this session. Marker persisted fine during normal session activity, but vanished between /exit and resume. Root cause unknown — possibly a cleanup process treating ~-prefixed files as backups, or installed hook still using old docs/pm/tmp/ path. Revisit if recurs.
-** TODO /pm:audit project skips the mechanical VALIDITY/COHERENCE scan
-   - Observed during 2026-04-08 audit restructure analysis. The `project` mode's Phase 1 "Investigate" reads PM docs for context but never runs the auditor subagent's structured scan. A project run can miss a broken file ref that a `documents` run would catch immediately. Consider: invoke pm:auditor as a subroutine during project Phase 1, or chain `/pm:audit documents` as a prerequisite to `/pm:audit project`.
+** DONE /pm:audit project skips the mechanical VALIDITY/COHERENCE scan [2026-04-08]
+   - Fixed by launching pm:auditor in background at start of Project Phase 1 (plugin version) and inlining the Documents scan spec into Project Phase 1 (dispatcher version). Mechanical findings are explicitly called out as Phase 4 evidence inputs. Plugin → 1.0.17.

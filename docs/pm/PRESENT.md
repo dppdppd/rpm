@@ -1,11 +1,12 @@
 # claude-plugin-pm — Present State
 
 ## Project Status
-- **Current phase**: audit restructure shipped — split into `/pm:audit documents` + `/pm:audit project`, routine drift folded into `/pm:session-end`
+- **Current phase**: audit restructure shipped — split into `/pm:audit documents` + `/pm:audit project`, routine drift folded into `/pm:session-end`; project mode now runs mechanical scan alongside consultant review
 - **Last updated**: 2026-04-08
-- **Version**: 1.0.16
+- **Version**: 1.0.17
 
 ## Completed Work
+- 2026-04-08 — **project-mode scan gap closed** (1.0.17): `/pm:audit project` Phase 1 now launches `pm:auditor` in the background (plugin version) / runs the Documents scan inline (dispatcher version) so VALIDITY/COHERENCE/tracker findings become Phase 4 evidence. Closes the gap where a `project` run could silently miss broken refs that a `documents` run would catch.
 - 2026-04-08 — **audit restructure** (1.0.16): `/pm:audit` split into `documents` (doc + CLAUDE.md + memory + session-drift scan via `pm:auditor`) and `project` (full consultant review). Dropped `light` as a separate mode — its cheap checks are now automatic in `/pm:session-end` Phase 1e. Removed depth menu and recency recommendation. Mirror synced.
 - 2026-04-08 — session marker relocated to `docs/pm/~pm-session-active` (no more `mkdir -p`); added `.gitignore` entry. Plugin → 1.0.15 (`e65ff57`).
 - 2026-04-08 — README gains "What a session looks like" dry-run example; plugin → 1.0.14 (`c2475ce`).
