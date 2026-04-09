@@ -5,5 +5,8 @@
 ** DONE Sync command-version/ to current plugin command surface [2026-04-08]
    - Updated dispatcher pm.md, replaced audit-normal/audit-heavy with audit.md, added session-start/session-end, replaced research.md with deep-research.md
 ** DONE Run /pm:audit (light) to baseline doc health after init [2026-04-08]
-** TODO Add a sample /pm:session-start dry-run note to README so new users see what to expect
+** DONE Add a sample /pm:session-start dry-run note to README so new users see what to expect [2026-04-08]
+   - Shipped in c2475ce as a new "What a session looks like" README section.
 ** TODO On publish: add homepage + repository fields to .claude-plugin/plugin.json, finalize marketplace install instructions in README
+** TODO Investigate ~pm-session-active disappearance at /exit→resume boundary
+   - One-time quirk observed this session. Marker persisted fine during normal session activity, but vanished between /exit and resume. Root cause unknown — possibly a cleanup process treating ~-prefixed files as backups, or installed hook still using old docs/pm/tmp/ path. Revisit if recurs.

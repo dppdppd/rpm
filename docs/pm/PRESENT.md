@@ -34,4 +34,4 @@
 _(none — plugin uses no spec workflow)_
 
 ## Known Issues
-_(none open)_
+- **Session marker disappeared once at `/exit`→resume boundary** — observed 2026-04-08 between marker creation at 17:16 and resume at 17:21. Marker recreated and persisted fine through the rest of the session. Root cause unknown. Tracked in `FUTURE.org`.
