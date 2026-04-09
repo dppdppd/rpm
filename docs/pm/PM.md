@@ -44,8 +44,10 @@ should emphasize:
    command rename or removal.
 3. **Version sync** — bump `version` in `.claude-plugin/plugin.json`
    after meaningful changes. No root mirror.
-4. **`command-version/` sync** — non-plugin install variant maintained
-   in parallel with `commands/`. Flag any drift between the two trees.
+4. **`command-version/` is frozen** — legacy dispatcher install, no
+   longer mirrored from `skills/` or `commands/`. Drift against the
+   plugin side is expected. Flag only regressions within
+   `command-version/` itself.
 5. **Hook reliability** — `session-start-reminder.sh` runs every
    session start; failures here block onboarding.
 6. **No ADR ceremony** — user has rejected ADR scaffolding; do not

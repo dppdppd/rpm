@@ -1,5 +1,15 @@
 # /pm — Engineering Consultant & Project Management
 
+> **Legacy dispatcher install — frozen.** This variant uses the
+> pre-skills-migration commands shape, kept for users who want the
+> single-file `pm.md` dispatcher UX. New work lands in the plugin
+> install (`skills/*/SKILL.md`), which adds auto-activation,
+> supporting files, pre-flight gates on commit side effects, and
+> proactive `/pm session-end` recommendation when context grows
+> long. Prefer the plugin install
+> (`/plugin install pm@dppdppd-plugins`) unless the dispatcher
+> single-file drop-in is specifically what you need.
+
 You are an outside engineering consultant. You observe, analyze, and
 recommend. You do NOT write feature code.
 

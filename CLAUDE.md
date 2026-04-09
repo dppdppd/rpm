@@ -5,39 +5,33 @@ Project-management layer for LLM-assisted development. Provides
 tracking, and deep research.
 
 ## Layout
-- `commands/` — slash commands (`init`, `session-start`,
-  `session-update`, `session-end`, `audit`, `pm`)
-- `agents/` — subagents (currently `auditor.md`)
+- `skills/` — primary command surface (`pm`, `init`, `audit`,
+  `session-start`, `session-update`, `session-end`, `deep-research`);
+  each is a directory with `SKILL.md`
+- `commands/` — legacy directory kept during skills migration for
+  rollback; do not add new commands
+- `agents/` — subagents (currently `auditor.md`, namespaced
+  `pm:auditor`)
 - `hooks/` — `hooks.json` + `session-start-reminder.sh`
-- `skills/` — `deep-research/` (skill, **not a slash command** — no
-  `/pm:deep-research`; auto-triggers on research questions. Edit the
-  skill, not `commands/`.)
 - `.claude-plugin/` — canonical plugin manifest (`plugin.json`) and
   `marketplace.json`
-- `command-version/` — **non-plugin install variant** (drop into
-  `~/.claude/`): monolithic `pm.md` dispatcher routing to bodies in
-  `pm-commands/`. Maintained in parallel with `commands/` — keep in
-  sync when editing commands
+- `command-version/` — **legacy dispatcher install, frozen.** Drop
+  into `~/.claude/` as monolithic `pm.md` dispatcher. No longer
+  mirrored from `skills/` or `commands/`.
 - `docs/pm/` — PM context, log, reviews, past/present/future trackers
 
 ## Editing the plugin
-- Commands are pure markdown with YAML frontmatter (`description`,
-  `argument-hint`, `allowed-tools`)
+- Primary surface is `skills/<name>/SKILL.md`. Frontmatter:
+  `name`, `description`, optional `argument-hint`, `allowed-tools`,
+  `disable-model-invocation`, `user-invocable`, `context`, etc.
+- `commands/*.md` is legacy — do not add new commands
 - After meaningful changes, bump `version` in
   `.claude-plugin/plugin.json`
 - No build, test, or lint toolchain. Verify changes by re-installing
-  the plugin and running the command in a real Claude Code session.
+  the plugin and running the skill in a real Claude Code session.
 - Recent commit style: short conventional-ish prefixes (`chore:`,
-  `audit:`, `Rename …`). One commit per deliverable.
-- When editing `commands/*.md`, mirror the change into
-  `command-version/pm-commands/*.md` (strip frontmatter; rewrite
-  `/pm:foo` refs as `/pm foo` dispatcher style).
-- Dispatcher lacks the subagent and skill mechanisms. When a plugin
-  command invokes a subagent (`pm:auditor`) or skill
-  (`deep-research`), the dispatcher mirror must inline the spec
-  inside the command body instead. Pattern examples:
-  `command-version/pm-commands/audit.md` (Documents scan inline),
-  `command-version/pm-commands/deep-research.md` (skill inlined).
+  `audit:`, `pm:`). One commit per deliverable.
+- `command-version/` is frozen — no mirror maintenance
 
 ## Workflow
 - Plan → edit → verify → commit. No spec ceremony for command-sized
