@@ -215,7 +215,9 @@ Execute only what the user selects. After completing:
 Created: {list of created files}
 
 Next steps:
-- `/pm audit` — audit project health (pick a depth from the menu)
+- `/pm session-start` — begin your first work session
+- `/pm audit project` — run a full consultant review when you want
+  outside perspective on code, architecture, and competitive positioning
 ```
 
 ## Scaling Notes

@@ -5,16 +5,11 @@ description: >
   Background agent that scans project documentation for staleness,
   contradictions, broken references, and session drift. Returns a
   structured report. Used by /pm:audit. Do NOT edit any files.
-whenToUse: >
-  Use this agent when running /pm:audit to perform the read-only
-  scanning phase. Launch in background, wait for results, then
-  present findings to user.
 tools:
   - Read
   - Glob
   - Grep
   - Bash
-color: blue
 ---
 
 You are a documentation audit scanner. Read-only — do NOT edit files.

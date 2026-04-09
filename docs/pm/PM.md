@@ -42,8 +42,8 @@ should emphasize:
 2. **Documentation drift** — README, `commands/pm.md`, and individual
    command bodies all describe the same surface. Check after every
    command rename or removal.
-3. **Version sync** — `plugin.json` and `.claude-plugin/plugin.json`
-   carry the same version after edits.
+3. **Version sync** — bump `version` in `.claude-plugin/plugin.json`
+   after meaningful changes. No root mirror.
 4. **`command-version/` sync** — non-plugin install variant maintained
    in parallel with `commands/`. Flag any drift between the two trees.
 5. **Hook reliability** — `session-start-reminder.sh` runs every
