@@ -188,6 +188,6 @@ To start a new session:
 ```
 
 Then clear the session marker:
-- `rm -f docs/pm/tmp/pm-session-active`
+- `rm -f docs/pm/~pm-session-active`
 
 That's the end. Do not continue the conversation after this.

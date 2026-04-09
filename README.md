@@ -70,7 +70,7 @@ UX gap for new users. Proceed?
 ```
 
 Nothing is committed, no files are written beyond a session marker
-at `docs/pm/tmp/pm-session-active`. You confirm the plan, work
+at `docs/pm/~pm-session-active`. You confirm the plan, work
 happens, then `/pm:session-end` surveys findings and presents a
 commit menu. Mid-session, `/pm:session-update` checkpoints
 progress to today's daily log without ending the session.

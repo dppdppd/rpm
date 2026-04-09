@@ -16,8 +16,7 @@ Start a new work session. Follow these steps in order:
 3. **Mark session active:**
    Write a session marker with metadata:
    ```bash
-   mkdir -p docs/pm/tmp
-   cat > docs/pm/tmp/pm-session-active << MARKER
+   cat > docs/pm/~pm-session-active << MARKER
    ---
    session_id: ${CLAUDE_CODE_SESSION_ID:-unknown}
    started: $(date -Iseconds)

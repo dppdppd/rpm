@@ -3,7 +3,7 @@
 # stdout goes to Claude as context
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
-MARKER="$PROJECT_DIR/docs/pm/tmp/pm-session-active"
+MARKER="$PROJECT_DIR/docs/pm/~pm-session-active"
 
 if [ -f "$MARKER" ]; then
   echo "WARNING: Previous session did not run /pm:session-end."

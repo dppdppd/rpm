@@ -13,7 +13,7 @@ before a risky operation or right before context gets crowded.
 ## Phase 1: Analyze (read-only)
 
 ### 1a. Confirm the session is active
-- Check that `docs/pm/tmp/pm-session-active` exists. If missing,
+- Check that `docs/pm/~pm-session-active` exists. If missing,
   warn that `/pm session start` was not run and stop — there is no
   session to update.
 
