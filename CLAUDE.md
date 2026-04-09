@@ -5,16 +5,15 @@ Project-management layer for LLM-assisted development. Provides
 tracking, and deep research.
 
 ## Layout
-- `commands/` — slash commands (`init`, `session-start`, `session-end`,
-  `audit`, `pm`)
+- `commands/` — slash commands (`init`, `session-start`,
+  `session-update`, `session-end`, `audit`, `pm`)
 - `agents/` — subagents (currently `auditor.md`)
 - `hooks/` — `hooks.json` + `session-start-reminder.sh`
 - `skills/` — `deep-research/` (skill, **not a slash command** — no
   `/pm:deep-research`; auto-triggers on research questions. Edit the
   skill, not `commands/`.)
-- `.claude-plugin/` — `plugin.json` + `marketplace.json`
-- `plugin.json` — top-level plugin manifest (mirrored in
-  `.claude-plugin/plugin.json`)
+- `.claude-plugin/` — canonical plugin manifest (`plugin.json`) and
+  `marketplace.json`
 - `command-version/` — **non-plugin install variant** (drop into
   `~/.claude/`): monolithic `pm.md` dispatcher routing to bodies in
   `pm-commands/`. Maintained in parallel with `commands/` — keep in
@@ -24,8 +23,8 @@ tracking, and deep research.
 ## Editing the plugin
 - Commands are pure markdown with YAML frontmatter (`description`,
   `argument-hint`, `allowed-tools`)
-- After meaningful changes, bump `version` in **both** `plugin.json`
-  and `.claude-plugin/plugin.json` — they must match
+- After meaningful changes, bump `version` in
+  `.claude-plugin/plugin.json`
 - No build, test, or lint toolchain. Verify changes by re-installing
   the plugin and running the command in a real Claude Code session.
 - Recent commit style: short conventional-ish prefixes (`chore:`,

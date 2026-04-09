@@ -8,6 +8,7 @@ Project management layer for LLM-assisted development.
 |---------|-------------|
 | `/pm:pm` | Explain the plugin and list its commands |
 | `/pm:session-start` | Begin session: load context, pick task, state plan |
+| `/pm:session-update` | Mid-session checkpoint: append progress, refresh PRESENT.md |
 | `/pm:session-end` | End session: survey findings, present action menu, then handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit` | Audit project health |
@@ -20,8 +21,29 @@ Project management layer for LLM-assisted development.
 
 ## Installation
 
+This plugin is currently unpublished. Install from a local clone.
+
+### Session-scoped (quick trial)
+
 ```bash
 claude --plugin-dir /path/to/claude-plugin-pm
+```
+
+### Persistent local install
+
+```
+/plugin marketplace add /path/to/claude-plugin-pm
+/plugin install pm@dppdppd-plugins
+```
+
+### Marketplace install (when published)
+
+Once published, add the marketplace by its source identifier, then
+install the plugin:
+
+```
+/plugin marketplace add <owner>/<repo>
+/plugin install pm@dppdppd-plugins
 ```
 
 ## Project Structure Created by /pm:init
