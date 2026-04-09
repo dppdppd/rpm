@@ -55,10 +55,18 @@ it and note "no changes" in the Phase 3 report.
 ### Update PRESENT.md
 - Update only the fields that actually changed this session
 
-### Update FUTURE.org
-- Mark completed tasks DONE with date
+### Update FUTURE.org (with native task reconciliation)
+- Mark completed tasks DONE with today's date
 - Update IN-PROGRESS items with current state
 - Add discovered TODOs
+- **Reconcile with native tasks.** Read the current `TaskList`:
+  - For each native task **completed this session**, mark the
+    corresponding `FUTURE.org` entry DONE with today's date. If no
+    matching entry exists, append a DONE line.
+  - For each native task still **in-progress or pending** created
+    this session without a `FUTURE.org` counterpart, append as
+    TODO (or IN-PROGRESS if active).
+  - **Do not delete** native tasks — they persist for the next session.
 
 ### Commit the PM updates
 

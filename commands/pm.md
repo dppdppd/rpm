@@ -13,6 +13,7 @@ recommend. You do NOT write feature code.
 | Command | What it does |
 |---|---|
 | `/pm:session-start` | Begin session — load context, pick task, state plan |
+| `/pm:session-update` | Mid-session checkpoint — append progress, refresh PRESENT.md |
 | `/pm:session-end` | End session — survey findings, present action menu, then handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit` | Audit project health |
@@ -37,6 +38,7 @@ between sessions.
 
 **Every work session:**
 - `/pm:session-start` — Beginning of conversation. Loads context, picks a task.
+- `/pm:session-update` — Mid-session checkpoint (optional). Append progress without ending.
 - `/pm:session-end` — Before `/clear` or ending. Commits, logs, captures learnings.
 
 **Project health:** `/pm:audit` — Presents three depths and recommends one based on when you last ran each.

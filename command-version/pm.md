@@ -10,7 +10,7 @@ Usage: `/pm <subcommand> [args...]`
 | Subcommand | What it does | Edits files? |
 |---|---|---|
 | `init` | First-run project setup: detect state, create PM context, scaffold missing infrastructure | Yes |
-| `session (start\|end)` | Bookend every conversation — load context / commit + capture learnings | `end` only |
+| `session (start\|update\|end)` | Bookend every conversation — load context / mid-session checkpoint / commit + capture learnings | `end` and `update` |
 | `audit` | Audit project docs/session drift. Presents three depths and recommends one based on history. | `standard` only |
 | `deep-research <question>` | Multi-agent deep research on any topic | No |
 
@@ -32,6 +32,7 @@ between sessions.
 
 **Every work session:**
 - `/pm session start` — Beginning of conversation. Loads context, picks a task.
+- `/pm session update` — Mid-session checkpoint (optional). Append progress without ending.
 - `/pm session end` — Before `/clear` or ending. Commits, logs, captures learnings.
 - `/pm session` alone — Explains the session workflow.
 
@@ -114,6 +115,12 @@ Explain the session workflow. Print:
 ## Subcommand: `session start`
 
 Read `~/.claude/pm-commands/session-start.md` for full instructions.
+
+---
+
+## Subcommand: `session update`
+
+Read `~/.claude/pm-commands/session-update.md` for full instructions.
 
 ---
 
