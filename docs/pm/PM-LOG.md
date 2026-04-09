@@ -12,6 +12,14 @@ Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
   - User-facing docs incorrectly presented `/pm:deep-research` as a slash command. Reality: deep-research is a **skill** (`skills/deep-research/SKILL.md`), not a slash command — there is no `commands/deep-research.md` and no `/pm:deep-research` slash command. Corrected `README.md`, `commands/pm.md`, `CLAUDE.md`, `docs/pm/PM.md`, `skills/deep-research/SKILL.md`, and `commands/audit.md` Heavy mode Phase 2 to describe it accurately.
   - Also this scan: auditor renamed mid-audit (`agents/audit-scanner.md` → `agents/auditor.md`, frontmatter + refs in CLAUDE.md, docs/pm/PM.md)
   - Also this scan: Shared Findings Menu format updated — bold quick-phrase headings, blank line between options (mirrored to `command-version/`)
+- 2026-04-08 — audit heavy — 8 findings, plan saved to reviews/2026-04-08-plan.md
+  - Phase 2 (Inward Research): plugin manifest/install flow + plugin subagent invocation (code.claude.com/docs).
+  - Phase 3 (Outward Research, added mid-run after user flagged the gap): competitive analysis against `claude-sessions` (iannuttall), Superpowers (obra), Cline Memory Bank, Docs Guardian, Claude Code native Tasks (Jan 2025), Spec Kit, Kiro.
+  - High: README install instructions wrong (shows dev-mode only); `/pm:audit` Standard Phase 1 never invokes its own `pm:auditor` subagent (dead code, diverged prompts); Heavy mode itself lacked explicit outward-research phase (meta-finding).
+  - Medium: duplicate `plugin.json` (root + `.claude-plugin/`) — canonical is `.claude-plugin/` only; no `/pm:session-update` mid-session command (competitive gap vs `claude-sessions`); no integration with Claude Code native `TaskCreate/TaskUpdate` (free functionality ignored).
+  - Low: `plugin.json` missing `license`/`keywords` and no LICENSE file (MIT chosen); `deep-research` skill pollutes project-root `research/`, should live under `docs/pm/research/`.
+  - User input: repo unpublished → skip `homepage`/`repository`; MIT license; approved deleting root `plugin.json`; approved all 8 findings for execution.
+  - Executed this session: all 8 findings applied in-place. Heavy mode in `commands/audit.md` restructured to five phases (Investigate → Inward Research → Outward Research → Analyze → Refine); new `/pm:session-update` command created and propagated through docs; `session-start`/`session-end` now hydrate and reconcile native tasks with `FUTURE.org`. Version bumped to 1.0.13.
 
 ## Sessions Reviewed
 
