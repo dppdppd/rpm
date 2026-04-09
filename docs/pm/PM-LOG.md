@@ -20,6 +20,16 @@ Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
   - Low: `plugin.json` missing `license`/`keywords` and no LICENSE file (MIT chosen); `deep-research` skill pollutes project-root `research/`, should live under `docs/pm/research/`.
   - User input: repo unpublished → skip `homepage`/`repository`; MIT license; approved deleting root `plugin.json`; approved all 8 findings for execution.
   - Executed this session: all 8 findings applied in-place. Heavy mode in `commands/audit.md` restructured to five phases (Investigate → Inward Research → Outward Research → Analyze → Refine); new `/pm:session-update` command created and propagated through docs; `session-start`/`session-end` now hydrate and reconcile native tasks with `FUTURE.org`. Version bumped to 1.0.13.
+- 2026-04-08 — audit restructure (1.0.16) — documents+project split, light depth dropped, drift scan folded into `/pm:session-end` Phase 1e. Commit `0a93738`.
+- 2026-04-08 — audit: project-mode scan gap closed (1.0.17) — `/pm:audit project` Phase 1 now launches `pm:auditor` in background (plugin) / inlines Documents scan (dispatcher). VALIDITY/COHERENCE findings feed Phase 4 as evidence. Commit `c6f3492`.
+- 2026-04-09 — audit project — 8 findings, plan saved to reviews/2026-04-09-plan.md
+  - Phase 2 (Inward): skills unification (`.claude/commands/` merged into `skills/`, deprecation tracking `anthropics/claude-code#37447`); plugin agent frontmatter schema.
+  - Phase 3 (Outward): `automazeio/ccpm` — migrated off `/pm:*` slash commands to Agent Skill, preserves legacy on v1 branch; 14 deterministic bash scripts for zero-token status ops. `iannuttall/claude-sessions` re-examined (no change).
+  - High (strategic): skills-first migration path — user picked option C, phased migration planned.
+  - Medium (mechanical): `docs/pm/PM.md` self-contradicts on version sync (pm:auditor confidence 87); `PM-LOG.md` missing 2 post-1.0.13 sessions (this entry closes that gap). Medium (competitive): deterministic scripts for session-end hygiene, borrowed from ccpm pattern.
+  - Low: `commands/init.md:218` + mirror still reference removed audit depth menu; `feedback_read_before_renaming` partially codified in CLAUDE.md; ccpm `/pm:*` naming-collision disambiguation; `agents/auditor.md` frontmatter uses off-schema `color`/`whenToUse` fields.
+  - User input: picked option C (commit to phased skills migration) for Finding S1. No other questions required developer input.
+  - First Project-target audit after the 1.0.17 scan-gap fix. Validated the fix — 4 mechanical findings (A1–A4) came from the background `pm:auditor` scan, confirming the subagent feeds Phase 4 as designed.
 
 ## Sessions Reviewed
 
