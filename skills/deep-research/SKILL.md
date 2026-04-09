@@ -27,7 +27,7 @@ a question requiring external knowledge, pause and offer to invoke the
 ## Directory Structure
 
 ```
-research/<topic-slug>/
+docs/pm/research/<topic-slug>/
 ├── progress.md
 ├── websearch/          # One file per dimension
 ├── fetched/            # Extracted URL content

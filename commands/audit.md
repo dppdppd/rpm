@@ -134,57 +134,13 @@ Mechanical doc validity check, then fix what's broken.
 
 ### Phase 1: Scan (background agent)
 
-Launch a background agent to scan without editing:
+Launch the `pm:auditor` subagent in background
+(`subagent_type: "pm:auditor"`). It returns a structured audit report
+containing a scan summary, findings (each scored 0–100), and a session
+drift table. The scan spec lives in `agents/auditor.md` — do not
+duplicate it here.
 
-```
-Read-only audit. Do NOT edit files.
-
-1. DISCOVER: Scan for all .md files (root, docs/, .claude/, specs/).
-   Get line counts and last-modified dates.
-
-2. VALIDITY: For each doc, verify:
-   - File path references resolve on disk
-   - Status claims match actual state
-   - Cross-references are bidirectional
-   - Commands/endpoints still exist
-   Labels: VALID | STALE | CONTRADICTORY | MISSING
-
-3. COHERENCE: Verify docs agree with each other:
-   - Status alignment across trackers
-   - Index accuracy (every entry resolves)
-   - Deferred work consistency (grep NOT_IMPLEMENTED vs doc claims)
-
-4. LLM-EFFECTIVENESS:
-   - CLAUDE.md under 150 lines?
-   - Structure score (% tables/lists vs prose)
-   - Duplication scan
-   - Hook coverage: every hard CLAUDE.md rule has a hook?
-
-5. GUIDANCE ALIGNMENT: Read all memory files of type "feedback".
-   For each, check if codified in CLAUDE.md, tier-2 docs, skills, hooks.
-   Classify: CODIFIED | PARTIAL | GAP | STALE
-
-6. GAP ANALYSIS: Simulate critical workflows (build, test, deploy,
-   add feature). Would the LLM succeed using only docs?
-
-7. FUTURE TRACKER & SESSION DISCIPLINE:
-   - `FUTURE.org` (or equivalent) exists and consistent with `PRESENT.md`?
-   - IN-PROGRESS items dated? Stale (>3 sessions)?
-   - CLAUDE.md instruction count (warn >120, critical >150)
-
-8. SESSION DRIFT: Mine recent sessions for undocumented changes.
-   Session data: ~/.claude/projects/$(pwd | sed 's|/|-|g; s|^-||')/*.jsonl
-   For unreviewed sessions (most recent first, max 5):
-   - Extract user messages and file-modifying tool calls
-   - Classify drift as JUSTIFIED or UNJUSTIFIED
-   For unjustified: recommend hook > CLAUDE.md > wording
-
-Report format:
-## Audit Report — {date}
-### Summary: N scanned, N valid, N stale, N contradictory, N missing
-### Findings (each with Confidence 0-100)
-### Session Drift table
-```
+Wait for the subagent to complete, then proceed to Phase 2.
 
 ### Phase 2: Score findings, present menu
 
@@ -250,7 +206,11 @@ After the Execute step (or a cancelled run):
 Full consultant review with external research. You are NOT an expert
 in this project's domain — investigate before judging.
 
-**Three phases: Investigate → Research → Judge.** Do not skip to judgment.
+**Five phases: Investigate → Inward Research → Outward Research →
+Analyze → Refine.** Do not skip phases. Outward research is
+**required**, not optional — without it you over-index on "does the
+project match its own spec?" and miss whether the spec itself is
+best-in-class.
 
 ### Phase 1: Investigate (gather evidence, don't opine yet)
 
@@ -272,24 +232,61 @@ Then **probe deeper**:
 - **Build health**: `turbo build` (or project's build command)
 - **Dependency freshness**: check package.json for outdated deps
 
-### Phase 2: Research (bring outside expertise)
+### Phase 2: Inward Research (validate against authoritative sources)
 
-For each analysis dimension, identify what you DON'T know. Invoke the
-`deep-research` skill (multi-agent research) in parallel — min 2 dimensions.
-Wait for ALL to complete. Note: `deep-research` is a skill in this plugin,
-not a slash command.
+Goal: confirm the project's current approach aligns with authoritative
+references for its stack, frameworks, and domain.
 
-Example questions (adapt to project):
+For each dimension the project touches, identify what you DON'T know
+*about how it's supposed to work*. Research against authoritative
+docs (vendor docs, RFCs, spec repos). **Min 2 dimensions.**
 
-- Architecture best practices for this stack
-- Testing strategies for this app type
-- LLM workflow best practices at this project's scale
-- Domain-specific: how do similar projects handle this?
+Either:
 
-### Phase 3: Analyze (now you can judge)
+- Use WebSearch / WebFetch directly for narrow lookups, or
+- Invoke the `deep-research` skill in parallel for complex,
+  multi-angle topics. (`deep-research` is a skill in this plugin,
+  not a slash command.)
+
+Example inward questions:
+
+- Is the plugin manifest schema current with vendor docs?
+- Does our testing strategy match the framework's recommended approach?
+- Are we using current API versions / avoiding deprecated patterns?
+- Architecture best practices for this stack?
+
+### Phase 3: Outward Research (competitive analysis — REQUIRED)
+
+Goal: compare the project against real alternatives. This is where
+you find out whether the spec *itself* is best-in-class, not just
+whether the project matches its own spec. Skipping this phase is the
+single biggest failure mode of Heavy mode.
+
+**Discover 3–5 direct competitors or comparable tools.** For at least
+**2**, actually `WebFetch` their docs or README — do not rely on
+search-result titles or summaries.
+
+For each competitor, note:
+
+- **What they do** — one-sentence summary of their approach
+- **What they do better** — specific features/patterns worth stealing
+- **What we do better** — things they lack that we should preserve
+- **Verdict** — adopt, reject, or flag as complementary (with rationale)
+
+Example outward queries (adapt to project):
+
+- "What other tools in {this domain} exist as of {year}?"
+- "How does {competitor A} handle {our core concern}?"
+- "What do best-in-class {category} tools do that we don't?"
+
+If a competitor has a feature worth adopting, emit it as a **gap
+finding** in Phase 4. Gap findings carry equal weight to
+spec-conformance findings.
+
+### Phase 4: Analyze (now you can judge)
 
 Evaluate across these dimensions. Every finding must cite Phase 1
-evidence AND Phase 2 research.
+evidence AND either Phase 2 or Phase 3 research — ideally both.
 
 1. **Process Health** — workflow followed? measure→change→measure?
 2. **Architecture & Code Health** — boundaries clean? complexity proportional?
@@ -297,10 +294,12 @@ evidence AND Phase 2 research.
 4. **Risk & Compliance** — untested paths? boundary violations?
 5. **Strategic Direction** — time on highest-value work? critical path?
 6. **Session Discipline** — tracker maintained? sessions scoped?
+7. **Competitive Gaps** — features/patterns from Phase 3 the project
+   should adopt or explicitly reject (with rationale).
 
 If `docs/pm/PM.md` defines project-specific focus areas, evaluate those too.
 
-### Phase 4: Ask questions and refine
+### Phase 5: Ask questions and refine
 
 If aspects require developer input, ask now — before writing the plan.
 Don't defer questions to the plan file.
@@ -316,7 +315,8 @@ Don't defer questions to the plan file.
 [1-2 sentences]
 
 ### Research Conducted
-- **[Topic]** — [what you asked, learned, how it changed assessment]
+- **Inward — [Topic]** — [what you asked, learned, how it changed assessment]
+- **Outward — [Competitor]** — [what they do, what you learned]
 
 ### Findings
 - **[Title] (Severity)** — [2-3 sentences: what, why, research context]
@@ -342,15 +342,15 @@ Append one line to `docs/pm/PM-LOG.md` Audit History:
 # PM Plan — YYYY-MM-DD
 
 ## Context
-[what was reviewed, what research was conducted]
+[what was reviewed, what inward + outward research was conducted]
 
 ## Tasks
 ### Task 1: [title]
 - **Severity:** Critical | High | Medium | Low
-- **Dimension:** Process | Architecture | LLM Workflow | Risk | Strategy
+- **Dimension:** Process | Architecture | LLM Workflow | Risk | Strategy | Session Discipline | Competitive
 - **What's wrong:** [evidence]
 - **Why it matters:** [impact]
-- **Research says:** [finding]
+- **Research says:** [inward docs + outward competitors, both if relevant]
 - **Fix:** [concrete steps]
 - **Effort:** Small | Medium | Large
 

@@ -247,7 +247,11 @@ After the Execute step (or a cancelled run):
 Full consultant review with external research. You are NOT an expert
 in this project's domain — investigate before judging.
 
-**Three phases: Investigate → Research → Judge.** Do not skip to judgment.
+**Five phases: Investigate → Inward Research → Outward Research →
+Analyze → Refine.** Do not skip phases. Outward research is
+**required**, not optional — without it you over-index on "does the
+project match its own spec?" and miss whether the spec itself is
+best-in-class.
 
 ### Phase 1: Investigate (gather evidence, don't opine yet)
 
@@ -269,22 +273,59 @@ Then **probe deeper**:
 - **Build health**: `turbo build` (or project's build command)
 - **Dependency freshness**: check package.json for outdated deps
 
-### Phase 2: Research (bring outside expertise)
+### Phase 2: Inward Research (validate against authoritative sources)
 
-For each analysis dimension, identify what you DON'T know. Launch
-`/pm deep-research` agents in parallel (min 2). Wait for ALL to complete.
+Goal: confirm the project's current approach aligns with authoritative
+references for its stack, frameworks, and domain.
 
-Example questions (adapt to project):
+For each dimension the project touches, identify what you DON'T know
+*about how it's supposed to work*. Research against authoritative
+docs (vendor docs, RFCs, spec repos). **Min 2 dimensions.**
 
-- Architecture best practices for this stack
-- Testing strategies for this app type
-- LLM workflow best practices at this project's scale
-- Domain-specific: how do similar projects handle this?
+Either:
 
-### Phase 3: Analyze (now you can judge)
+- Use WebSearch / WebFetch directly for narrow lookups, or
+- Launch `/pm deep-research` in parallel for complex, multi-angle topics.
+
+Example inward questions:
+
+- Is the plugin manifest schema current with vendor docs?
+- Does our testing strategy match the framework's recommended approach?
+- Are we using current API versions / avoiding deprecated patterns?
+- Architecture best practices for this stack?
+
+### Phase 3: Outward Research (competitive analysis — REQUIRED)
+
+Goal: compare the project against real alternatives. This is where
+you find out whether the spec *itself* is best-in-class, not just
+whether the project matches its own spec. Skipping this phase is the
+single biggest failure mode of Heavy mode.
+
+**Discover 3–5 direct competitors or comparable tools.** For at least
+**2**, actually `WebFetch` their docs or README — do not rely on
+search-result titles or summaries.
+
+For each competitor, note:
+
+- **What they do** — one-sentence summary of their approach
+- **What they do better** — specific features/patterns worth stealing
+- **What we do better** — things they lack that we should preserve
+- **Verdict** — adopt, reject, or flag as complementary (with rationale)
+
+Example outward queries (adapt to project):
+
+- "What other tools in {this domain} exist as of {year}?"
+- "How does {competitor A} handle {our core concern}?"
+- "What do best-in-class {category} tools do that we don't?"
+
+If a competitor has a feature worth adopting, emit it as a **gap
+finding** in Phase 4. Gap findings carry equal weight to
+spec-conformance findings.
+
+### Phase 4: Analyze (now you can judge)
 
 Evaluate across these dimensions. Every finding must cite Phase 1
-evidence AND Phase 2 research.
+evidence AND either Phase 2 or Phase 3 research — ideally both.
 
 1. **Process Health** — workflow followed? measure→change→measure?
 2. **Architecture & Code Health** — boundaries clean? complexity proportional?
@@ -292,10 +333,12 @@ evidence AND Phase 2 research.
 4. **Risk & Compliance** — untested paths? boundary violations?
 5. **Strategic Direction** — time on highest-value work? critical path?
 6. **Session Discipline** — tracker maintained? sessions scoped?
+7. **Competitive Gaps** — features/patterns from Phase 3 the project
+   should adopt or explicitly reject (with rationale).
 
 If `docs/pm/PM.md` defines project-specific focus areas, evaluate those too.
 
-### Phase 4: Ask questions and refine
+### Phase 5: Ask questions and refine
 
 If aspects require developer input, ask now — before writing the plan.
 Don't defer questions to the plan file.
