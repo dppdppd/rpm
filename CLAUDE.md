@@ -32,6 +32,12 @@ tracking, and deep research.
 - When editing `commands/*.md`, mirror the change into
   `command-version/pm-commands/*.md` (strip frontmatter; rewrite
   `/pm:foo` refs as `/pm foo` dispatcher style).
+- Dispatcher lacks the subagent and skill mechanisms. When a plugin
+  command invokes a subagent (`pm:auditor`) or skill
+  (`deep-research`), the dispatcher mirror must inline the spec
+  inside the command body instead. Pattern examples:
+  `command-version/pm-commands/audit.md` (Documents scan inline),
+  `command-version/pm-commands/deep-research.md` (skill inlined).
 
 ## Workflow
 - Plan → edit → verify → commit. No spec ceremony for command-sized
