@@ -5,40 +5,38 @@ Project-management layer for LLM-assisted development. Provides
 tracking, and deep research.
 
 ## Layout
-- `skills/` — primary command surface (`pm`, `init`, `audit`,
+- `skills/` — command surface (`pm`, `init`, `audit`,
   `session-start`, `session-update`, `session-end`, `deep-research`);
-  each is a directory with `SKILL.md`
-- `commands/` — legacy directory kept during skills migration for
-  rollback; do not add new commands
+  each is a directory with `SKILL.md` plus optional supporting files
 - `agents/` — subagents (currently `auditor.md`, namespaced
   `pm:auditor`)
 - `hooks/` — `hooks.json` + `session-start-reminder.sh`
 - `.claude-plugin/` — canonical plugin manifest (`plugin.json`) and
   `marketplace.json`
 - `command-version/` — **legacy dispatcher install, frozen.** Drop
-  into `~/.claude/` as monolithic `pm.md` dispatcher. No longer
-  mirrored from `skills/` or `commands/`.
+  into `~/.claude/` as monolithic `pm.md` dispatcher. Not maintained.
 - `docs/pm/` — PM context, log, reviews, past/present/future trackers
 
 ## Editing the plugin
 - Primary surface is `skills/<name>/SKILL.md`. Frontmatter:
   `name`, `description`, optional `argument-hint`, `allowed-tools`,
   `disable-model-invocation`, `user-invocable`, `context`, etc.
-- `commands/*.md` is legacy — do not add new commands
+- Bundle deterministic ops as bash scripts under
+  `skills/<name>/scripts/` and invoke via `${CLAUDE_SKILL_DIR}`
+  (see `skills/session-end/scripts/scan.sh` for the pattern).
 - After meaningful changes, bump `version` in
-  `.claude-plugin/plugin.json`
+  `.claude-plugin/plugin.json`.
 - No build, test, or lint toolchain. Verify changes by re-installing
   the plugin and running the skill in a real Claude Code session.
 - Recent commit style: short conventional-ish prefixes (`chore:`,
   `audit:`, `pm:`). One commit per deliverable.
-- `command-version/` is frozen — no mirror maintenance
 
 ## Workflow
-- Plan → edit → verify → commit. No spec ceremony for command-sized
+- Plan → edit → verify → commit. No spec ceremony for skill-sized
   changes.
-- Keep README, `commands/pm.md`, and individual command bodies in
-  sync when renaming or removing commands — they all describe the
-  same surface.
+- Keep README, `skills/pm/SKILL.md`, and individual skill bodies in
+  sync when renaming or removing a slash command — they all describe
+  the same surface.
 - Update `docs/pm/PM-LOG.md` after audits or noteworthy sessions.
 - Use `/pm:session-start` at the start of a real work session to
   load context and pick a task.

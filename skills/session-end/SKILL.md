@@ -62,10 +62,10 @@ this message — do NOT re-run these checks as tool calls.
 - `claude_md` — line count + status (`ok` / `warn` >120 / `critical`
   >150). Only raise as a finding if `warn` or `critical`.
 - `not_implemented` — count and up to 20 matches. Meta-references
-  inside audit/session-end command or skill bodies (matches on
-  files under `commands/`, `skills/audit/`, `skills/session-end/`,
-  `command-version/`, `agents/auditor.md`) are expected and should
-  be **suppressed**. Only flag real stubs in source.
+  inside audit/session-end skill bodies (matches on files under
+  `skills/audit/`, `skills/session-end/`, `command-version/`,
+  `agents/auditor.md`) are expected and should be **suppressed**.
+  Only flag real stubs in source.
 - `broken_refs` — backticked path references in `CLAUDE.md`,
   `README.md`, `docs/pm/PM.md` that don't resolve on disk.
   `count > 0` is always actionable. (`PRESENT.md`, `PM-LOG.md`,
