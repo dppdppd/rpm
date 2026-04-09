@@ -1,11 +1,14 @@
 # claude-plugin-pm — Present State
 
 ## Project Status
-- **Current phase**: session-lifecycle + audit extensions from first Heavy review shipped; waiting on commit + publish
+- **Current phase**: audit restructure shipped — split into `/pm:audit documents` + `/pm:audit project`, routine drift folded into `/pm:session-end`
 - **Last updated**: 2026-04-08
-- **Version**: 1.0.13
+- **Version**: 1.0.16
 
 ## Completed Work
+- 2026-04-08 — **audit restructure** (1.0.16): `/pm:audit` split into `documents` (doc + CLAUDE.md + memory + session-drift scan via `pm:auditor`) and `project` (full consultant review). Dropped `light` as a separate mode — its cheap checks are now automatic in `/pm:session-end` Phase 1e. Removed depth menu and recency recommendation. Mirror synced.
+- 2026-04-08 — session marker relocated to `docs/pm/~pm-session-active` (no more `mkdir -p`); added `.gitignore` entry. Plugin → 1.0.15 (`e65ff57`).
+- 2026-04-08 — README gains "What a session looks like" dry-run example; plugin → 1.0.14 (`c2475ce`).
 - 2026-04-08 — first `/pm:audit heavy` run on self: 8 findings, all executed in-session. See `docs/pm/reviews/2026-04-08.md` and `…-plan.md`.
 - 2026-04-08 — new `/pm:session-update` command (mid-session checkpoint, competitive gap vs `claude-sessions`). Propagated through all command tables.
 - 2026-04-08 — `/pm:audit` Heavy mode restructured into 5 phases (Investigate → Inward Research → Outward Research → Analyze → Refine). Outward research now REQUIRED; added `Competitive Gaps` analyze dimension.

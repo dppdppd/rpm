@@ -11,7 +11,8 @@ Usage: `/pm <subcommand> [args...]`
 |---|---|---|
 | `init` | First-run project setup: detect state, create PM context, scaffold missing infrastructure | Yes |
 | `session (start\|update\|end)` | Bookend every conversation — load context / mid-session checkpoint / commit + capture learnings | `end` and `update` |
-| `audit` | Audit project docs/session drift. Presents three depths and recommends one based on history. | `standard` only |
+| `audit documents` | On-demand deep scan of docs + CLAUDE.md + memory + session drift. Scored findings. | `documents` only |
+| `audit project` | On-demand full consultant review: code, architecture, inward + outward research, plan file. | No |
 | `deep-research <question>` | Multi-agent deep research on any topic | No |
 
 **Workflow:** `init` (first run) → `session start` → work → `session end` → repeat.
@@ -37,7 +38,9 @@ between sessions.
 - `/pm session` alone — Explains the session workflow.
 
 **Project health:**
-- `/pm audit` — Presents three depths (light / standard / heavy) and recommends one based on when you last ran each.
+- Routine doc-drift runs automatically at `/pm session end` (broken refs, CLAUDE.md size, tracker consistency).
+- `/pm audit documents` — on-demand deep scan of docs + CLAUDE.md + memory + session drift. Scored findings, hookify repeat offenders.
+- `/pm audit project` — on-demand full consultant review: code, architecture, inward research (authoritative docs), outward research (competitors), 7-dimension analysis, saved plan file.
 
 **Other:**
 - `/pm deep-research <question>` — Multi-agent deep research.
@@ -81,9 +84,10 @@ Read `~/.claude/pm-commands/init.md` for full instructions.
 
 ## Subcommand: `audit`
 
-Read `~/.claude/pm-commands/audit.md` for full instructions. It will
-present three depth modes (light / standard / heavy), recommend one
-based on prior audit recency, then route to the chosen mode.
+Read `~/.claude/pm-commands/audit.md` for full instructions. It
+takes one argument: `documents` or `project`. Empty or unrecognized
+argument → print the usage block and stop. No depth menu, no
+recency recommendation.
 
 ---
 
@@ -132,9 +136,9 @@ Read `~/.claude/pm-commands/session-end.md` for full instructions.
 
 ## Updating PM State
 
-**`docs/pm/PM.md`** — project context, loaded every run. Update after `audit heavy` and `init`.
+**`docs/pm/PM.md`** — project context, loaded every run. Update after `audit project` and `init`.
 
-**`docs/pm/PM-LOG.md`** — append-only, loaded on demand. Append after `audit standard` and `audit heavy`.
+**`docs/pm/PM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
 
 ---
 
@@ -144,5 +148,5 @@ Read `~/.claude/pm-commands/session-end.md` for full instructions.
 2. File paths and line numbers — every finding locatable
 3. Specific fixes, not vague guidance
 4. Severity order: CONTRADICTORY > STALE > MISSING > VALID
-5. `audit light` and `audit heavy` don't edit project docs — they only write to `docs/pm/` (log entries, plan files)
-6. `init`, `audit standard`, and `session end` edit project docs (with user approval)
+5. `audit project` doesn't edit project docs — it only writes to `docs/pm/` (log entries, report, plan file)
+6. `init`, `audit documents`, and `session end` edit project docs (with user approval for audit; automatic for session-end's drift fixes)

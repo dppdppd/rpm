@@ -14,9 +14,10 @@ recommend. You do NOT write feature code.
 |---|---|
 | `/pm:session-start` | Begin session — load context, pick task, state plan |
 | `/pm:session-update` | Mid-session checkpoint — append progress, refresh PRESENT.md |
-| `/pm:session-end` | End session — survey findings, present action menu, then handoff |
+| `/pm:session-end` | End session — drift scan, survey findings, action menu, handoff |
 | `/pm:init` | First-run project setup |
-| `/pm:audit` | Audit project health |
+| `/pm:audit documents` | Scan docs + CLAUDE.md + memory + session drift via `pm:auditor` |
+| `/pm:audit project` | Full consultant review: code, architecture, inward + outward research |
 
 ## Skills
 
@@ -41,7 +42,10 @@ between sessions.
 - `/pm:session-update` — Mid-session checkpoint (optional). Append progress without ending.
 - `/pm:session-end` — Before `/clear` or ending. Commits, logs, captures learnings.
 
-**Project health:** `/pm:audit` — Presents three depths and recommends one based on when you last ran each.
+**Project health:**
+- Routine doc-drift runs automatically at `/pm:session-end` (broken refs, CLAUDE.md size, tracker consistency).
+- `/pm:audit documents` — on-demand deep scan of docs + CLAUDE.md + memory + session drift (via `pm:auditor` subagent, scored findings, hookify repeat offenders).
+- `/pm:audit project` — on-demand full consultant review: code, architecture, inward research (authoritative docs), outward research (competitors), 7-dimension analysis, saved plan file.
 
 **Deep research:** Ask Claude to "run deep research on \<topic\>" (or any research question). The `deep-research` skill auto-triggers. It is a skill, not a slash command.
 
@@ -72,9 +76,9 @@ test -f docs/pm/PM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 
 ## Updating PM State
 
-**`docs/pm/PM.md`** — project context, loaded every run. Update after `audit heavy` and `init`.
+**`docs/pm/PM.md`** — project context, loaded every run. Update after `audit project` and `init`.
 
-**`docs/pm/PM-LOG.md`** — append-only, loaded on demand. Append after `audit standard` and `audit heavy`.
+**`docs/pm/PM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
 
 ## Output Rules
 
@@ -82,5 +86,5 @@ test -f docs/pm/PM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 2. File paths and line numbers — every finding locatable
 3. Specific fixes, not vague guidance
 4. Severity order: CONTRADICTORY > STALE > MISSING > VALID
-5. `audit light` and `audit heavy` don't edit project docs — they only write to `docs/pm/` (log entries, plan files)
-6. `init`, `audit standard`, and `session-end` edit project docs (with user approval)
+5. `audit project` doesn't edit project docs — it only writes to `docs/pm/` (log entries, report, plan file)
+6. `init`, `audit documents`, and `session-end` edit project docs (with user approval for audit; automatic for session-end's drift fixes)

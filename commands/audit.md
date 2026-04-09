@@ -1,71 +1,60 @@
 ---
-description: "Audit project docs/session drift. Presents three depths and recommends one based on audit history."
-argument-hint: ""
+description: "On-demand project audit. Pick a target: documents (docs + LLM workflow + session drift) or project (full consultant review)."
+argument-hint: "documents | project"
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent", "WebSearch"]
 ---
 
 # /pm:audit
 
-## Step 0: Check recency, then present menu
+On-demand audits. Two distinct targets, no depth menu, no recency
+recommendation. Routine doc-drift is handled automatically by
+`/pm:session-end` — run `/pm:audit` only when you have a specific
+concern that warrants a deeper look.
 
-Find when each mode was last run. In parallel:
+## Routing
 
-- Grep `docs/pm/PM-LOG.md` for `audit (light|standard|heavy)` — take the
-  most recent `YYYY-MM-DD` per mode
-- Glob `docs/pm/reviews/*.md` — presence implies heavy mode has run
+Parse `$ARGUMENTS`:
 
-Anything not found is "never".
+- `documents` (or `docs`) → run the **Documents** audit below
+- `project` → run the **Project** audit below
+- empty or unrecognized → print the usage block and stop:
 
-**Pick the recommendation** using this rule:
+  ```
+  ## /pm:audit — pick a target
 
-- No audit history at all → recommend **light** (start cheap)
-- Last audit was **light** → recommend **standard** (fix what light surfaced)
-- Last audit was **standard** → recommend **heavy** (periodic deep review)
-- Last audit was **heavy** → recommend **light** (routine check; heavy is expensive)
+  - `/pm:audit documents` — scan docs + CLAUDE.md + memory + session
+    drift via the pm:auditor subagent. Scored findings, hookify
+    repeat offenders. ~3min.
+  - `/pm:audit project` — full consultant review: code, architecture,
+    inward + outward research, 7-dimension analysis, saved plan file.
+    ~30min+.
 
-If multiple modes tie, prefer the one that's been longest since last run.
-
-Print this compact menu (substitute real dates, mark the recommended
-line with ⭐), then STOP and wait for `1`, `2`, or `3`:
-
-```
-## /pm:audit — pick a depth
-
-1. **Light** — quick staleness dashboard. Last run: {date or never}.
-2. **Standard** — mechanical scan + scored fix queue. Last run: {date or never}.
-3. **Heavy** — full consultant review with research agents. Last run: {date or never}.
-
-⭐ Recommended: **{mode}**
-```
-
-When the user replies, jump to the matching mode below.
+  Routine doc-drift runs automatically at /pm:session-end.
+  ```
 
 ---
 
 ## Shared: Findings Menu
 
-Used by **light** and **standard** modes to present findings. Print a
-compact numbered list, then wait for a reply. No marks, no execute
-phase, no elaborate grammar.
+Used by **Documents** mode to present findings. Print a compact
+numbered list, then wait for a reply.
 
 ### Format
 
 ```
 ## Audit findings — {date} ({N} findings)
 
-1. **{quick phrase}** — {description} [{PRIORITY}]
+1. **{quick phrase}** — {description} ({score})
 
-2. **{quick phrase}** — {description} [{PRIORITY}]
+2. **{quick phrase}** — {description} ({score})
 
-3. **{quick phrase}** — {description} [{PRIORITY}]
+3. **{quick phrase}** — {description} ({score})
 
 Reply: `fix 1 2 4` · `all` · `none` · `<#>?` for details
 ```
 
 Each option leads with a bolded 2–4 word phrase (no line break after),
 then the full finding inline. Blank line between options.
-
-In standard mode, use `({score})` instead of `[{PRIORITY}]` in each row.
 
 ### Reply grammar (interpret liberally)
 
@@ -99,38 +88,11 @@ Then continue to the mode's logging step.
 
 ---
 
-## Mode: Light
+## Target: Documents
 
-Quick staleness scan — no background agent, no deep research.
-
-Scan the project inline (not a subagent):
-
-- All `.md` / `.org` docs: existence, mod date, line count
-- CLAUDE.md line count (warn >120, critical >150)
-- Broken file references (anything in backticks that looks like a path)
-- `NOT_IMPLEMENTED` stubs
-- Task tracker freshness (`FUTURE.org` or equivalent)
-
-Assemble findings as a priority-ordered list (HIGH / MED / LOW) and
-present via the **Shared: Findings Menu**.
-
-### Logging
-
-After the Execute step completes (or the user replies `none`/`cancel`),
-append one line to `docs/pm/PM-LOG.md` Audit History (create the
-`## Audit History` heading if missing):
-
-```
-- YYYY-MM-DD — audit light — N surfaced, M fixed, K skipped
-```
-
-Cancelled runs log as `N surfaced, 0 fixed, cancelled`.
-
----
-
-## Mode: Standard
-
-Mechanical doc validity check, then fix what's broken.
+Scan docs, CLAUDE.md, memory files, trackers, and recent session
+jsonl logs for drift. Runs via the `pm:auditor` subagent. Scored,
+confidence-gated, hookifies repeat offenders.
 
 ### Phase 1: Scan (background agent)
 
@@ -156,9 +118,8 @@ When the agent completes, score each finding:
 but don't bother the user.
 
 Present findings (sorted by score, highest first) via the **Shared:
-Findings Menu**. Use `({score})` instead of `[{priority}]` in each row.
-Below the menu, note any low-confidence findings that were suppressed:
-`(N low-confidence findings logged but not shown)`.
+Findings Menu**. Below the menu, note any low-confidence findings that
+were suppressed: `(N low-confidence findings logged but not shown)`.
 
 ### Phase 3: Post-execute — hookify repeat offenders
 
@@ -193,7 +154,7 @@ deny with message: "{explanation}"
 After the Execute step (or a cancelled run):
 
 - Append a one-line run marker to `docs/pm/PM-LOG.md` Audit History:
-  `- YYYY-MM-DD — audit standard — N findings, M fixed, K skipped`
+  `- YYYY-MM-DD — audit documents — N findings, M fixed, K skipped`
   (cancelled runs: `N findings, cancelled`)
 - Append findings detail below the marker
 - Add one-liner to `docs/pm/PM.md` Prior Findings table
@@ -201,7 +162,7 @@ After the Execute step (or a cancelled run):
 
 ---
 
-## Mode: Heavy
+## Target: Project
 
 Full consultant review with external research. You are NOT an expert
 in this project's domain — investigate before judging.
@@ -260,7 +221,7 @@ Example inward questions:
 Goal: compare the project against real alternatives. This is where
 you find out whether the spec *itself* is best-in-class, not just
 whether the project matches its own spec. Skipping this phase is the
-single biggest failure mode of Heavy mode.
+single biggest failure mode of Project mode.
 
 **Discover 3–5 direct competitors or comparable tools.** For at least
 **2**, actually `WebFetch` their docs or README — do not rely on
@@ -331,7 +292,7 @@ Don't defer questions to the plan file.
 Append one line to `docs/pm/PM-LOG.md` Audit History:
 
 ```
-- YYYY-MM-DD — audit heavy — N findings, plan saved to reviews/YYYY-MM-DD-plan.md
+- YYYY-MM-DD — audit project — N findings, plan saved to reviews/YYYY-MM-DD-plan.md
 ```
 
 #### 3. Plan file (saved to disk)

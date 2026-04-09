@@ -40,6 +40,29 @@ Look back through this conversation for:
 - Check if a daily file in `docs/pm/past/YYYY-MM-DD.md` already
   exists for today
 
+### 1e. Doc-drift quick scan (inline)
+
+Fast hygiene pass. This is the cheap automatic check that used to
+live in `/pm audit light`. Scope is small enough to run inline every
+session end.
+
+Check:
+- **Broken file references** — scan `CLAUDE.md`, `README.md`, and
+  `docs/pm/*.md` for backticked paths (`` `path/to/file` ``); verify
+  each resolves on disk
+- **CLAUDE.md size** — warn if line count > 120, critical if > 150
+- **`NOT_IMPLEMENTED` stubs** — `grep -rn NOT_IMPLEMENTED` across
+  source; compare count against any claims in `PRESENT.md`
+- **Tracker consistency** — any `PRESENT.md` "Completed Work" entry
+  that doesn't appear as DONE in `FUTURE.org`? Any `FUTURE.org` DONE
+  item that isn't reflected in `PRESENT.md`?
+- **Stale daily log** — most recent file in `docs/pm/past/` older
+  than 7 days while work has been committed since?
+
+Collect any findings into a `drift_findings` list for Phase 3. If
+nothing surfaces, the list is empty and Phase 3 reports "no drift".
+This is an observation pass only — no fixes yet.
+
 ---
 
 ## Phase 2: Auto-apply core PM updates
@@ -116,6 +139,9 @@ pick.**
 - `docs/pm/PRESENT.md` — [what changed, or "no changes"]
 - `docs/pm/FUTURE.org` — [what was marked/added, or "no changes"]
 
+### Doc-drift scan
+- [one-line per finding, or "no drift detected"]
+
 ---
 
 ## Actions (pick any, multiple OK)
@@ -124,7 +150,9 @@ pick.**
 
 2. **Record findings** — promote session learnings to permanent docs (CLAUDE.md, debugging guide, memory file, etc.)
 
-3. **Other** — anything else specific to this session
+3. **Fix drift** — apply the doc-drift findings from 1e (only shown if `drift_findings` is non-empty)
+
+4. **Other** — anything else specific to this session
 
 Which actions? (e.g., `1,2` · `all` · `none`)
 ```
@@ -153,7 +181,16 @@ followup questions needed before acting.
 - Only promote if the user agrees
 - Show the addition before writing
 
-### Action 3: Other
+### Action 3: Fix drift
+- For each `drift_findings` entry the user accepted, apply the
+  obvious fix (repair the broken ref, update the contradictory
+  tracker, etc.). For ambiguous drift (e.g. a NOT_IMPLEMENTED stub
+  whose implementation path isn't clear), surface it back to the
+  user instead of guessing.
+- After fixes land, note them in the today's past log under a
+  "Doc-drift fixes" subsection.
+
+### Action 4: Other
 - Handle whatever the user asks
 
 After each action, briefly confirm completion. After ALL chosen

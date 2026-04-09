@@ -5,12 +5,13 @@ layer for LLM-assisted development: session lifecycle commands, doc
 auditing, task tracking, and deep research. It's pure markdown +
 shell — no build, test, or lint toolchain. Solo author (`dppdppd`).
 Stage: actively iterating on command surface — audit recently
-consolidated into a single `/pm:audit` with depth selection.
+restructured into two targets (`documents`, `project`), with routine
+doc-drift folded into `/pm:session-end`.
 
 Current command surface: `/pm:pm` (entry), `/pm:init`,
 `/pm:session-start`, `/pm:session-update`, `/pm:session-end`,
-`/pm:audit`. Plus a `deep-research` skill (no slash command —
-auto-triggers on research questions).
+`/pm:audit documents`, `/pm:audit project`. Plus a `deep-research`
+skill (no slash command — auto-triggers on research questions).
 
 The repo dogfoods its own `/pm:*` commands, so changes to the plugin
 should be evaluated by re-running them in a real Claude Code session.
@@ -19,7 +20,7 @@ should be evaluated by re-running them in a real Claude Code session.
 
 | What | Where |
 |------|-------|
-| Plugin manifest | `plugin.json`, `.claude-plugin/plugin.json` |
+| Plugin manifest | `.claude-plugin/plugin.json` (canonical; no root mirror) |
 | Marketplace manifest | `.claude-plugin/marketplace.json` |
 | Slash commands | `commands/*.md` |
 | Subagents | `agents/*.md` (currently `auditor.md`) |

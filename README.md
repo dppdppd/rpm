@@ -9,9 +9,10 @@ Project management layer for LLM-assisted development.
 | `/pm:pm` | Explain the plugin and list its commands |
 | `/pm:session-start` | Begin session: load context, pick task, state plan |
 | `/pm:session-update` | Mid-session checkpoint: append progress, refresh PRESENT.md |
-| `/pm:session-end` | End session: survey findings, present action menu, then handoff |
+| `/pm:session-end` | End session: drift scan, survey findings, action menu, handoff |
 | `/pm:init` | First-run project setup |
-| `/pm:audit` | Audit project health |
+| `/pm:audit documents` | On-demand deep scan: docs + CLAUDE.md + memory + session drift |
+| `/pm:audit project` | On-demand consultant review: code, architecture, research, plan file |
 
 ## Skills
 
