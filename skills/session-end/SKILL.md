@@ -2,7 +2,7 @@
 name: session-end
 description: End the current pm work session. Five phases — analyze → auto-apply PM updates (past/present/future) → present action menu → execute → handoff. Commits PM bookkeeping. Invoke when the user signals wrap-up, OR recommend proactively when conversation context grows long enough to degrade response quality (long-context productivity drop-off). Auto-invocations MUST propose first and wait for confirmation before Phase 1 — do not auto-commit.
 argument-hint: ""
-allowed-tools: Read Write Edit Bash(git:*) Bash(rm:*) Glob Grep
+allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 ---
 
 # /pm:session-end
@@ -53,7 +53,7 @@ The `scan.sh` output below was produced by a shell script that ran
 **before** this skill body reached you. Its results are already in
 this message — do NOT re-run these checks as tool calls.
 
-!`${CLAUDE_SKILL_DIR}/scripts/scan.sh`
+!`bash "${CLAUDE_SKILL_DIR}/scripts/scan.sh"`
 
 **Interpreting the sections:**
 

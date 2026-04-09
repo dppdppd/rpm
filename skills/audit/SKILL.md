@@ -61,7 +61,7 @@ The `scan.sh` output below was produced by the shell before this
 skill body reached you. Its results are already in this message —
 do NOT re-run these checks as tool calls.
 
-!`${CLAUDE_PLUGIN_ROOT}/skills/session-end/scripts/scan.sh`
+!`bash "${CLAUDE_PLUGIN_ROOT}/skills/session-end/scripts/scan.sh"`
 
 Interpret the sections exactly as `skills/session-end/SKILL.md`
 Phase 1a describes — the interpretation rules are identical.

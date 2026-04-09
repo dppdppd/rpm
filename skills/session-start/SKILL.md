@@ -18,19 +18,22 @@ Start a new work session. Follow these steps in order:
 2. **Check for leftover state and tracker drift:**
    - `git status` — uncommitted work from a prior session?
    - `git stash list` — stashed changes?
-   - **PRESENT.md drift** — list any commits that have landed since
-     `PRESENT.md` was last updated:
-     ```bash
-     LAST=$(git log -1 --format=%H -- docs/pm/PRESENT.md 2>/dev/null)
-     [ -n "$LAST" ] && git log --oneline "${LAST}..HEAD" 2>/dev/null
-     ```
-     If output is non-empty, `PRESENT.md` may be stale (version
-     bumps or completed work from commits that didn't go through
-     `/pm:session-end`). Surface the commit list to the user and
-     ask whether to reconcile `PRESENT.md` + `FUTURE.org` before
-     picking a task — reconciliation is usually the right first
-     move because the rest of the session plan depends on the
-     trackers reflecting reality.
+   - **PRESENT.md drift** — in two sequential bash calls (do NOT
+     combine into a pipeline — the `LAST=$(…)` prefix breaks the
+     `Bash(git log:*)` permission match):
+
+     1. `git log -1 --format=%H -- docs/pm/PRESENT.md` — capture
+        the output as the hash of PRESENT.md's last-touching commit
+     2. `git log --oneline <hash>..HEAD` — substitute the hash
+        captured in step 1
+
+     If step 2's output is non-empty, `PRESENT.md` may be stale
+     (version bumps or completed work from commits that didn't go
+     through `/pm:session-end`). Surface the commit list to the
+     user and ask whether to reconcile `PRESENT.md` + `FUTURE.org`
+     before picking a task — reconciliation is usually the right
+     first move because the rest of the session plan depends on
+     the trackers reflecting reality.
    - If leftover work or tracker drift exists, present to user
      before planning.
 
