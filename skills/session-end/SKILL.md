@@ -45,17 +45,56 @@ and useful intervention — not an interruption.
 
 ---
 
-## Phase 1: Analyze (read-only, no edits)
+## Phase 1: Analyze (parallel, read-only)
 
-Gather findings without taking any action yet.
+### 1a. Mechanical scan (auto-injected, no tool call needed)
 
-### 1a. Check uncommitted state
-- `git status` — list modified, staged, untracked files
-- `git stash list` — note any stashes
-- Group files by category (source, docs, tests, tools, build artifacts)
+The `scan.sh` output below was produced by a shell script that ran
+**before** this skill body reached you. Its results are already in
+this message — do NOT re-run these checks as tool calls.
 
-### 1b. Review the session
-Look back through this conversation for:
+!`${CLAUDE_SKILL_DIR}/scripts/scan.sh`
+
+**Interpreting the sections:**
+
+- `git` — modified / untracked / staged file counts + stash count.
+  This is your Phase 1a uncommitted-state summary.
+- `claude_md` — line count + status (`ok` / `warn` >120 / `critical`
+  >150). Only raise as a finding if `warn` or `critical`.
+- `not_implemented` — count and up to 20 matches. Meta-references
+  inside audit/session-end command or skill bodies (matches on
+  files under `commands/`, `skills/audit/`, `skills/session-end/`,
+  `command-version/`, `agents/auditor.md`) are expected and should
+  be **suppressed**. Only flag real stubs in source.
+- `broken_refs` — backticked path references in `CLAUDE.md`,
+  `README.md`, `docs/pm/PM.md` that don't resolve on disk.
+  `count > 0` is always actionable. (`PRESENT.md`, `PM-LOG.md`,
+  and `past/*.md` are deliberately excluded as historical.)
+- `daily_log` — today's date, most recent log date, days since,
+  commits since. If `today_exists=false` and `commits_since > 0`,
+  Phase 2 needs to create today's log.
+- `session_marker` — whether `docs/pm/~pm-session-active` exists.
+  Phase 5 will remove it only if it exists.
+
+### 1b. Fire remaining reads in parallel
+
+In a SINGLE message, issue all of these concurrently — do NOT
+sequence them:
+
+- Read `docs/pm/FUTURE.org` — tasks to mark DONE, IN-PROGRESS
+  updates, new TODOs surfaced this session
+- Read `docs/pm/PRESENT.md` — which fields still reflect reality
+- Call `TaskList` — native task state for reconciliation
+
+(The scan in 1a has already covered git state, CLAUDE.md size,
+NOT_IMPLEMENTED, broken refs, today's daily log existence, and
+the session marker. Do not duplicate those checks.)
+
+### 1c. Synthesize the conversation (concurrent with 1b)
+
+While the 1b reads are in flight, look back through this session's
+conversation for:
+
 - **Accomplishments**: features built, bugs fixed, tests passing
 - **Decisions**: architectural choices, tradeoffs made
 - **Discoveries**: things you learned about the code/system
@@ -63,86 +102,59 @@ Look back through this conversation for:
   approaches that worked or didn't
 - **Mid-task state**: anything left unfinished
 
-### 1c. Check the future tracker
-- Read `docs/pm/FUTURE.org` (or equivalent)
-- Identify tasks that should be marked DONE
-- Identify IN-PROGRESS tasks that need a status update
-- Identify TODO items discovered during the session
+This is main-thread-only work (subagents can't see the parent
+conversation), so the win is running it CONCURRENTLY with the 1b
+tool calls, not sequentially after them.
 
-### 1d. Check the present tracker
-- Note whether `docs/pm/PRESENT.md` reflects current state
-- Check if a daily file in `docs/pm/past/YYYY-MM-DD.md` already
-  exists for today
+### 1d. Assemble `drift_findings`
 
-### 1e. Doc-drift quick scan (inline, no subagent)
-
-Fast hygiene pass. Do NOT launch the `pm:auditor` subagent — this is
-the cheap automatic check that used to live in `/pm:audit light`.
-Scope is small enough to run inline every session end.
-
-Check:
-- **Broken file references** — scan `CLAUDE.md`, `README.md`, and
-  `docs/pm/*.md` for backticked paths (`` `path/to/file` ``); verify
-  each resolves on disk
-- **CLAUDE.md size** — warn if line count > 120, critical if > 150
-- **`NOT_IMPLEMENTED` stubs** — `grep -rn NOT_IMPLEMENTED` across
-  source; compare count against any claims in `PRESENT.md`
-- **Tracker consistency** — any `PRESENT.md` "Completed Work" entry
-  that doesn't appear as DONE in `FUTURE.org`? Any `FUTURE.org` DONE
-  item that isn't reflected in `PRESENT.md`?
-- **Stale daily log** — most recent file in `docs/pm/past/` older
-  than 7 days while work has been committed since?
-
-Collect any findings into a `drift_findings` list for Phase 3. If
-nothing surfaces, the list is empty and Phase 3 reports "no drift".
-This is an observation pass only — no fixes yet.
+From the 1a scan output and the 1b tracker reads, collect any
+drift items that warrant user action into a `drift_findings`
+list for Phase 3 presentation. Suppress trivial meta-matches.
 
 ---
 
-## Phase 2: Auto-apply core PM updates
+## Phase 2: Auto-apply core PM updates (parallel writes)
 
-Apply these updates immediately without asking. No previews, no diff
-approval. If a particular file genuinely has nothing to update, skip
-it and note "no changes" in the Phase 3 report.
+Apply these updates immediately without asking. No previews, no
+diff approval. If a particular file genuinely has nothing to
+update, skip it and note "no changes" in the Phase 3 report.
 
-### Update past log
-- Append to (or create) `docs/pm/past/YYYY-MM-DD.md`
-- Sections: Accomplished, Key Discoveries, What Didn't Work, Next
+**In a SINGLE message, issue all three writes concurrently:**
 
-### Update PRESENT.md
-- Update only the fields that actually changed this session
+1. **Write** `docs/pm/past/YYYY-MM-DD.md` — append if exists,
+   create if not. Sections: Accomplished, Key Discoveries, What
+   Didn't Work, Next.
+2. **Edit** `docs/pm/PRESENT.md` — update only the fields that
+   actually changed this session.
+3. **Edit** `docs/pm/FUTURE.org` — mark completed tasks DONE with
+   today's date, update IN-PROGRESS items, append discovered TODOs.
+   Reconcile with native tasks per the rules below.
 
-### Update FUTURE.org (with native task reconciliation)
-- Mark completed tasks DONE with today's date
-- Update IN-PROGRESS items with current state
-- Add discovered TODOs
-- **Reconcile with native tasks.** Read the current `TaskList`:
-  - For each native task **completed this session**, mark the
-    corresponding `FUTURE.org` entry DONE with today's date. If no
-    matching entry exists, append a DONE line.
-  - For each native task still **in-progress or pending** created
-    this session without a `FUTURE.org` counterpart, append as
-    TODO (or IN-PROGRESS if active).
-  - **Do not delete** native tasks — they persist for the next session.
+### Native task reconciliation (within the FUTURE.org edit above)
+
+- For each native task **completed this session**, mark the
+  corresponding `FUTURE.org` entry DONE with today's date. If no
+  matching entry exists, append a DONE line.
+- For each native task still **in-progress or pending** created
+  this session without a `FUTURE.org` counterpart, append as
+  TODO (or IN-PROGRESS if active).
+- **Do not delete** native tasks — they persist for the next session.
 
 ### Commit the PM updates
 
-After writing the files, commit just the core PM bookkeeping as a
-dedicated commit — keeping it separate from any source-code changes
-the user may still have uncommitted.
+After all three writes land, commit the PM bookkeeping in a single
+bash invocation:
 
 ```bash
-# Stage only the files Phase 2 may have touched
 git add docs/pm/past/$(date +%Y-%m-%d).md docs/pm/PRESENT.md docs/pm/FUTURE.org 2>/dev/null
-
-# Commit only if something was actually staged
 git diff --cached --quiet || git commit -m "pm: session end — update past/present/future"
 ```
 
-If nothing was staged (all three files were "no changes"), skip the
-commit silently. If the commit fails (e.g., pre-commit hook rejection),
-note it in the Phase 3 report and continue — do not block the session
-end on it.
+If nothing was staged (all three were "no changes"), skip the
+commit silently. If the commit fails (e.g., pre-commit hook
+rejection), note it in the Phase 3 report and continue — do not
+block the session end on it.
 
 ---
 

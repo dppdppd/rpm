@@ -36,6 +36,12 @@ Then **probe deeper**:
 - **Actual vs claimed architecture**: grep for cross-package imports
 - **Build health**: `turbo build` (or project's build command)
 - **Dependency freshness**: check package.json for outdated deps
+- **Repetitive LLM work**: scan skills, commands, agent prompts,
+  and hooks for deterministic operations that run on every
+  invocation (file-existence checks, line counts, greps, simple
+  diffs, status summaries, JSON parsing). These are candidates
+  for bundling as bash scripts — each saves tokens on every call
+  and is more reliable than LLM re-implementation.
 
 ## Phase 2: Inward Research (validate against authoritative sources)
 
@@ -99,7 +105,13 @@ Discipline). Trivial hygiene drops out.
 
 1. **Process Health** — workflow followed? measure→change→measure?
 2. **Architecture & Code Health** — boundaries clean? complexity proportional?
-3. **LLM Workflow** — hooks/skills/memory effective? CLAUDE.md right size?
+3. **LLM Workflow** — hooks/skills/memory effective? CLAUDE.md right
+   size? **Any deterministic work (grep, wc, file-existence checks,
+   simple diffs, status summaries) done repeatedly by LLM workflows
+   that should be bundled as bash scripts?** Each bundled script
+   saves tokens on every invocation and is more reliable than
+   per-call LLM re-implementation. Example pattern: ccpm's 14-script
+   bundle for standup/status/next/blocked ops.
 4. **Risk & Compliance** — untested paths? boundary violations?
 5. **Strategic Direction** — time on highest-value work? critical path?
 6. **Session Discipline** — tracker maintained? sessions scoped?
