@@ -1,5 +1,5 @@
 {
-  "description": "PM plugin hooks for session lifecycle",
+  "description": "rpm hooks for session lifecycle",
   "hooks": {
     "SessionStart": [
       {
