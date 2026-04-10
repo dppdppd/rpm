@@ -193,7 +193,7 @@ permanent record.
 ### Local development
 
 ```bash
-claude --plugin-dir /path/to/rpm/plugin
+claude --plugin-dir /path/to/rpm
 ```
 
 Then start a new conversation and run `/rpm:init` to set up PM
