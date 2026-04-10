@@ -271,13 +271,16 @@ followup questions needed before acting.
   (check `git log --oneline -10`)
 
 ### Action 2: Record findings
-- Present all learnings as a numbered menu with a proposed
-  destination for each (CLAUDE.md, memory file, etc.):
+- Filter out learnings already captured (in code comments, specs,
+  existing memory files, etc.) — do NOT show them.
+- Present only unrecorded learnings as a single numbered menu with
+  a proposed destination for each:
   ```
-  1. [learning summary] → CLAUDE.md
-  2. [learning summary] → memory file
+  1. [learning summary] → memory file
+  2. [learning summary] → CLAUDE.md
   ```
   Then ask: "Which to promote? (e.g., `1,2` · `all` · `none`)"
+- One list, one question. Do not pre-filter, recommend, or renumber.
 - Only promote the ones the user picks
 - Show the addition before writing
 
