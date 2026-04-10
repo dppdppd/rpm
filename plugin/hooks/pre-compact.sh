@@ -1,11 +1,5 @@
 #!/bin/bash
-# PreCompact hook: checkpoint PM session state before context compaction.
-#
-# Two jobs:
-# 1. Save recovery snapshot to ~rpm-compact-state (for PostCompact)
-# 2. Append a mechanical checkpoint to today's daily log — modified
-#    files, active task, auto-captured learnings. This is the data a
-#    bash script can extract; LLM synthesis happens post-compact.
+# PreCompact hook: checkpoint session state before context compaction.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
@@ -16,7 +10,7 @@ TODAY=$(date +%Y-%m-%d)
 DAILY_LOG="$PM_DIR/past/$TODAY.md"
 NOW=$(date +%H:%M)
 
-# Only act if pm is initialized and a session is active
+# Only act if rpm is initialized and a session is active
 [ -d "$PM_DIR" ] || exit 0
 [ -f "$MARKER" ] || exit 0
 
@@ -38,7 +32,7 @@ fi
 
 # === Job 1: Save recovery snapshot ===
 {
-  echo "=== pm compact state ==="
+  echo "=== rpm_compact_state ==="
   echo "saved=$(date -Iseconds)"
   echo "task=$TASK"
   echo "branch=$BRANCH"
@@ -101,8 +95,11 @@ fi
   fi
 } >> "$DAILY_LOG" 2>/dev/null
 
-echo "PM: Pre-compaction checkpoint saved — recovery state + daily log updated."
+# Visible to user in terminal
+echo "rpm: checkpoint saved" >&2
+
+# Context for Claude
+echo "rpm: checkpoint saved"
 echo ""
 echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
 echo "  rpm: checkpoint saved — compaction OK"
-echo "This confirms to the user that PM state was preserved before compaction."

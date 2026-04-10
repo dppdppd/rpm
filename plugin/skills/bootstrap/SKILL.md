@@ -3,7 +3,7 @@ name: bootstrap
 description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (RPM.md, past/, present/, future/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
 disable-model-invocation: true
 argument-hint: ""
-allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Bash(git:*) Glob Grep
+allowed-tools: Read Write Bash(bash:*) Bash(mkdir:*) Bash(git:*) Glob Grep
 ---
 
 # /bootstrap — Full Instructions
@@ -14,18 +14,12 @@ overwrite. Merge in missing sections only.
 
 ## Phase 1: Detect Project State
 
-Determine silently (do NOT ask the user):
+!bash "${CLAUDE_SKILL_DIR}/scripts/detect.sh"
+
+Classify silently (do NOT ask the user):
 - **GREENFIELD**: Empty or near-empty directory
 - **EXISTING**: Has source code, build system, tests
 - **HAS_CLAUDE_MD**: Already has CLAUDE.md or AGENTS.md
-
-```bash
-ls src/ lib/ app/ main.* index.* *.py *.ts *.go *.rs 2>/dev/null
-ls package.json Cargo.toml go.mod pyproject.toml Makefile CMakeLists.txt 2>/dev/null
-ls -d test/ tests/ spec/ __tests__/ *_test.* *_spec.* 2>/dev/null
-ls CLAUDE.md AGENTS.md .claude/ .cursorrules 2>/dev/null
-git log --oneline -20 2>/dev/null
-```
 
 ## Phase 2: Gather Project Context
 
@@ -194,14 +188,7 @@ demonstrably struggles. Cap at 4. Communicate via typed artifacts.
 
 **Large (10+):** Module ownership, git worktrees for parallel agent isolation.
 
-## Phase 6: Create All Files
-
-Create all files from Phase 3 and Phase 4 that do not already exist.
-Do NOT prompt the user to select which files to create — all are
-required for the plugin to function. After creating files, proceed to
-Phase 7.
-
-## Phase 7: Permissions
+## Phase 6: Permissions
 
 rpm hooks and skills frequently read/write files under `docs/rpm/`.
 Without explicit permissions, every file operation prompts the user.
@@ -223,6 +210,13 @@ If yes: read `.claude/settings.local.json` (create if missing), merge
 `Read(./docs/rpm/**)` and `Edit(./docs/rpm/**)` into
 `permissions.allow`, and write the file back. Do not overwrite
 existing entries.
+
+## Phase 7: Create All Files
+
+Create all files from Phase 3 and Phase 4 that do not already exist.
+Do NOT prompt the user to select which files to create — all are
+required for the plugin to function. After creating files, proceed to
+Phase 8.
 
 ## Phase 8: Present and Confirm
 
