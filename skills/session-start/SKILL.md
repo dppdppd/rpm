@@ -2,43 +2,77 @@
 name: session-start
 description: Begin a new pm work session. Loads context from docs/pm/PRESENT.md, the most recent daily log in docs/pm/past/, FUTURE.org, and CLAUDE.md; checks for leftover uncommitted work; writes a session marker; states a plan; hydrates a native task for the picked FUTURE.org item. Use at the start of a fresh /clear'd conversation on a repo with pm infrastructure, or when the user says "let's start working", "begin session", "start a new pm session", or similar.
 argument-hint: ""
-allowed-tools: Read Write Bash(git status:*) Bash(git stash:*) Bash(git log:*) Bash(ls:*) Bash(mkdir:*) Bash(cat:*)
+allowed-tools: Read Write Bash(bash:*) Bash(cat:*) Glob TaskCreate
 ---
 
 # /pm:session-start
 
-Start a new work session. Follow these steps in order:
+Start a new work session. Follow these steps in order.
 
-1. **Recover context (read all in parallel — single message, multiple Read calls):**
-   - `docs/pm/PRESENT.md` — current project state
-   - Most recent daily file in `docs/pm/past/` — what happened last
-   - `docs/pm/FUTURE.org` — current IN-PROGRESS or next TODO
-   - `CLAUDE.md` — rules and key documents
+**Response rules:**
+- Questions go at the **end** of a response, never mid-stream.
+- When asking the user to choose, use a numbered menu.
+- Never present an action whose precondition is empty.
 
-2. **Check for leftover state and tracker drift:**
-   - `git status` — uncommitted work from a prior session?
-   - `git stash list` — stashed changes?
-   - **PRESENT.md drift** — in two sequential bash calls (do NOT
-     combine into a pipeline — the `LAST=$(…)` prefix breaks the
-     `Bash(git log:*)` permission match):
+---
 
-     1. `git log -1 --format=%H -- docs/pm/PRESENT.md` — capture
-        the output as the hash of PRESENT.md's last-touching commit
-     2. `git log --oneline <hash>..HEAD` — substitute the hash
-        captured in step 1
+## Phase 1: Mechanical scan (auto-injected, zero tool calls)
 
-     If step 2's output is non-empty, `PRESENT.md` may be stale
-     (version bumps or completed work from commits that didn't go
-     through `/pm:session-end`). Surface the commit list to the
-     user and ask whether to reconcile `PRESENT.md` + `FUTURE.org`
-     before picking a task — reconciliation is usually the right
-     first move because the rest of the session plan depends on
-     the trackers reflecting reality.
-   - If leftover work or tracker drift exists, present to user
-     before planning.
+The scan output below was produced by a shell script that ran
+**before** this skill body reached you. Do NOT re-run these checks.
 
-3. **Mark session active:**
-   Write a session marker with metadata:
+!`bash "${CLAUDE_SKILL_DIR}/scripts/scan.sh"`
+
+**Interpreting the sections:**
+
+- `latest_past` — `file=YYYY-MM-DD.md` or `file=none`. Use this
+  filename for the Phase 2 read of the most recent daily log.
+- `git` — modified / untracked / staged / stashes. If any > 0,
+  that's leftover work from a prior session.
+- `present_drift` — `drift_count=0` means PRESENT.md is current.
+  `drift_count > 0` lists commits since PRESENT.md was last
+  touched — trackers may need reconciliation before picking a task.
+- `session_marker` — if `exists=true`, a prior session didn't
+  run `/pm:session-end`. Marker contents are printed so you can
+  report what was in progress.
+
+---
+
+## Phase 2: Recover context (parallel reads — single message)
+
+Using the `latest_past` filename from Phase 1, fire all four reads
+concurrently in a SINGLE message:
+
+- `docs/pm/PRESENT.md`
+- `docs/pm/past/{file from latest_past}` (skip if `file=none`)
+- `docs/pm/FUTURE.org`
+- `CLAUDE.md`
+
+---
+
+## Phase 3: Present state + plan
+
+Synthesize the scan + reads into a single response. Include:
+
+- **Leftover state** (if any): uncommitted files, stashes, stale
+  session marker. Ask user how to handle.
+- **Tracker drift** (if `drift_count > 0`): list the commits and
+  ask whether to reconcile PRESENT.md + FUTURE.org before picking
+  a task. Reconciliation is usually the right first move.
+- **Session plan**: "This session: [task from FUTURE.org], because
+  [reason]". If the plan deviates from tracker priorities, say so.
+
+If there's nothing to resolve (clean state, no drift), go straight
+to the plan. End the response with any questions that need answers
+before proceeding.
+
+---
+
+## Phase 4: Mark session active + hydrate task
+
+After the user confirms (or if no confirmation was needed):
+
+1. Write the session marker:
    ```bash
    cat > docs/pm/~pm-session-active << MARKER
    ---
@@ -49,17 +83,8 @@ Start a new work session. Follow these steps in order:
    MARKER
    ```
 
-4. **State the plan:**
-   - "This session: [task from FUTURE.org], because [reason]"
-   - If the plan deviates from tracker priorities, say so and get approval
-
-5. **Hydrate native task tracker:**
-   For the picked task from `FUTURE.org`, create a matching native
-   task via `TaskCreate`:
+2. Create a native task via `TaskCreate`:
    - `subject` = the org heading text
    - `description` = task body (or a one-line restatement)
-   - `activeForm` = present-continuous phrase for the in-progress spinner
-   This gives you cross-session persistence and a visible
-   in-progress indicator. Create subtasks with `TaskCreate` as work
-   branches. **Leave existing native tasks from prior sessions
-   alone** — they're picked up by `/pm:session-end` reconciliation.
+   - `activeForm` = present-continuous phrase for the spinner
+   Leave existing native tasks from prior sessions alone.

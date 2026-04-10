@@ -1,6 +1,6 @@
 {
   "name": "pm",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Project management layer for LLM-assisted development. Session lifecycle, doc auditing, task tracking, and deep research.",
   "author": {
     "name": "dppdppd"
