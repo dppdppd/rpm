@@ -5,7 +5,7 @@ argument-hint: ""
 allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 ---
 
-# /pm:session-end
+# /rpm:session-end
 
 End the current work session in five phases:
 **Analyze → Auto-apply core PM updates → Present menu → Execute → Handoff**.
@@ -34,19 +34,19 @@ long enough to hurt response quality — **STOP before Phase 1** and
 propose session-end to the user first:
 
 > "Context is getting long / you seem ready to wrap up. Want me to
-> run `/pm:session-end`? It'll auto-update past/present/future,
+> run `/rpm:session-end`? It'll auto-update past/present/future,
 > surface uncommitted work, and present an action menu."
 
 Only proceed to Phase 1 after the user confirms. The reason: Phase 2
 auto-applies PM updates and commits them without further approval —
 that side effect must not happen on a false-positive auto-trigger.
 
-**If the user explicitly typed `/pm:session-end`**, skip this
+**If the user explicitly typed `/rpm:session-end`**, skip this
 pre-flight and proceed directly to Phase 1.
 
 **Research context for proactive recommendation:** LLM response
 quality degrades as context length grows (lost-in-the-middle,
-recency bias, context dilution). Recommending `/pm:session-end` +
+recency bias, context dilution). Recommending `/rpm:session-end` +
 `/clear` when context starts costing productivity is a legitimate
 and useful intervention — not an interruption.
 

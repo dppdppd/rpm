@@ -6,7 +6,7 @@ argument-hint: ""
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Bash(git:*) Glob Grep
 ---
 
-# /pm:init — Full Instructions
+# /rpm:init — Full Instructions
 
 First-run setup. Creates PM context for a project. Run once per project.
 If `docs/pm/PM.md` already exists, read it and **augment** — do not
@@ -171,7 +171,7 @@ Create `docs/pm/PRESENT.md` for current project state:
 ### Past directory (if none exists)
 
 Create `docs/pm/past/` for daily session logs (`YYYY-MM-DD.md` files
-written by `/pm:session-end`).
+written by `/rpm:session-end`).
 
 ### Future tracker (if none exists)
 
@@ -200,7 +200,7 @@ Do NOT create or modify files yet. Present all planned changes as a
 numbered checklist:
 
 ```
-## /pm:init — proposed changes
+## /rpm:init — proposed changes
 
 | # | Action | File |
 |---|--------|------|
@@ -218,13 +218,13 @@ Which to create? (e.g., "1", "1,2,3", "all", "none")
 Execute only what the user selects. After completing:
 
 ```
-## /pm:init complete
+## /rpm:init complete
 
 Created: {list of created files}
 
 Next steps:
 - Start a new conversation — PM context auto-loads via SessionStart hook
-- `/pm:audit project` — run a full consultant review when you want
+- `/rpm:audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
 ```
 

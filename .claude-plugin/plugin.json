@@ -1,10 +1,10 @@
 {
-  "name": "pm",
+  "name": "rpm",
   "version": "2.2.0",
-  "description": "Project management layer for LLM-assisted development. Session lifecycle, doc auditing, task tracking, and deep research.",
+  "description": "Your Relentless Product Manager. Tracks what shipped, what's next, and what's drifting — so you can focus on building.",
   "author": {
     "name": "dppdppd"
   },
   "license": "MIT",
-  "keywords": ["project-management", "pm", "sessions", "audit", "llm-workflow"]
+  "keywords": ["product-manager", "rpm", "pm", "sessions", "audit", "context", "llm-workflow"]
 }

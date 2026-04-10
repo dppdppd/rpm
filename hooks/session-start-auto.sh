@@ -1,5 +1,5 @@
 #!/bin/bash
-# SessionStart hook: auto-inject PM context so /pm:session-start
+# SessionStart hook: auto-inject PM context so /rpm:session-start
 # is no longer required. Outputs scan results + key file summaries
 # + instructions for Claude to pick up the PM workflow automatically.
 
@@ -11,18 +11,18 @@ PRESENT="$PM_DIR/PRESENT.md"
 
 # Only activate if pm is initialized
 if [ ! -d "$PM_DIR" ]; then
-  echo "REMINDER: This project has no docs/pm/ directory. Run /pm:init to set up PM infrastructure."
+  echo "REMINDER: This project has no docs/pm/ directory. Run /rpm:init to set up PM infrastructure."
   exit 0
 fi
 
 # --- Stale session check ---
 if [ -f "$MARKER" ]; then
-  echo "WARNING: Previous session did not run /pm:session-end."
+  echo "WARNING: Previous session did not run /rpm:session-end."
   echo "Session state from unclean exit:"
   echo ""
   cat "$MARKER"
   echo ""
-  echo "Recommend running /pm:session-end first to close the prior session, or ask the user if they want to continue where it left off."
+  echo "Recommend running /rpm:session-end first to close the prior session, or ask the user if they want to continue where it left off."
   exit 0
 fi
 
@@ -125,12 +125,12 @@ fi
 # --- Instructions for Claude ---
 echo ""
 echo "=== PM session instructions ==="
-echo "PM context has been auto-loaded. You are in a PM-managed project."
+echo "You are this project's AI product manager. Context has been auto-loaded."
 echo ""
 echo "Your job:"
-echo "1. Note any leftover state (uncommitted work, drift) and ask the user how to handle it."
+echo "1. Note any leftover state (uncommitted work, drift) and ask the developer how to handle it."
 echo "2. Propose a task from FUTURE.org (prefer TODO items, especially 'ready' ones with resolved blockers)."
-echo "3. Once the user confirms (or if clean state + obvious task), write the session marker:"
+echo "3. Once the developer confirms (or if clean state + obvious task), write the session marker:"
 echo "   cat > docs/pm/~pm-session-active << MARKER"
 echo "   ---"
 echo "   session_id: \${CLAUDE_CODE_SESSION_ID:-unknown}"
@@ -139,7 +139,7 @@ echo "   task: {chosen task}"
 echo "   ---"
 echo "   MARKER"
 echo "4. Create a native task via TaskCreate for the picked item."
-echo "5. Then begin working."
+echo "5. Then begin working. You track progress, capture learnings, and flag drift — the developer builds."
 echo ""
 echo "For full context, read: docs/pm/PRESENT.md, docs/pm/FUTURE.org, CLAUDE.md"
-echo "To end the session: /pm:session-end"
+echo "To end the session: /rpm:session-end"

@@ -1,22 +1,39 @@
-# pm — Claude Code Plugin
+# rpm — Your Relentless Product Manager
 
-Project management layer for LLM-assisted development.
+Tracks what shipped, what's next, and what's drifting — so you
+can focus on building.
 
-## Commands
+rpm sits in every session like a product manager sits in every
+standup: it knows what happened yesterday, what's planned today,
+and what's falling through the cracks. It doesn't write code — it
+keeps the project's memory intact, flags drift before it rots, and
+makes sure nothing gets lost between sessions.
 
-| Command | Description |
-|---------|-------------|
-| `/pm:pm` | Explain the plugin and list its commands |
-| `/pm:session-end` | End session: drift scan, survey findings, action menu, handoff |
-| `/pm:init` | First-run project setup |
-| `/pm:audit documents` | On-demand deep scan: docs + CLAUDE.md + memory + session drift |
-| `/pm:audit project` | On-demand consultant review: code, architecture, research, plan file |
+## What rpm does automatically
+
+- **Briefs you at the start** — SessionStart hook loads git state,
+  open tasks, daily log, and tracker drift. No command needed.
+- **Takes notes during work** — Stop hook captures learning signals
+  (root causes, discoveries, corrections) to a session journal.
+- **Checkpoints before you lose context** — PreCompact hook saves
+  progress to the daily log before compaction wipes the conversation.
+- **Nudges when you're going long** — reminds you to wrap up after
+  ~90 minutes.
+
+## What you run manually
+
+| Command | What rpm does |
+|---------|-------------------|
+| `/rpm:session-end` | Wraps up: updates trackers, presents findings, commits, hands off |
+| `/rpm:init` | First-run onboarding: scaffolds the PM infrastructure |
+| `/rpm:audit documents` | Deep doc scan: staleness, contradictions, broken refs, session drift |
+| `/rpm:audit project` | Full review: code, architecture, competitive research, plan file |
 
 ## Skills
 
-| Skill | Description |
-|-------|-------------|
-| `deep-research` | Multi-agent deep research. Auto-triggers on questions needing external knowledge, or ask Claude to "run deep research on \<topic\>". Not a slash command. |
+| Skill | What rpm does |
+|-------|-------------------|
+| `deep-research` | Multi-agent research. Auto-triggers on questions needing external knowledge. |
 
 ## Installation
 
@@ -32,7 +49,7 @@ claude --plugin-dir /path/to/claude-plugin-pm
 
 ```
 /plugin marketplace add /path/to/claude-plugin-pm
-/plugin install pm@dppdppd-plugins
+/plugin install rpm@dppdppd-plugins
 ```
 
 ### Marketplace install (when published)
@@ -42,15 +59,13 @@ install the plugin:
 
 ```
 /plugin marketplace add <owner>/<repo>
-/plugin install pm@dppdppd-plugins
+/plugin install rpm@dppdppd-plugins
 ```
 
 ## What a session looks like
 
-Once installed, sessions start automatically. The `SessionStart`
-hook injects your project's PM context — git state, open tasks,
-latest daily log, tracker drift — so Claude proposes a task and
-gets to work without ceremony. A real session opener looks like:
+Sessions start automatically — rpm briefs you the moment you
+open a conversation. A real session opener looks like:
 
 ```
 > let's work on the plugin
@@ -65,13 +80,12 @@ This session: TODO #2 — compaction guard. It's the highest
 priority unblocked item. Proceed?
 ```
 
-Nothing is committed, no files are written beyond a session marker
-at `docs/pm/~pm-session-active`. You confirm the task, work
-happens, then `/pm:session-end` surveys findings and presents a
-commit menu. Mid-session checkpoints happen automatically before
-context compaction — no manual step needed.
+rpm proposes a task and waits for you to confirm. Then you
+work. When you're done, `/rpm:session-end` wraps up — rpm
+updates the trackers, surfaces findings, and writes handoff notes
+for the next session.
 
-## Project Structure Created by /pm:init
+## Project Structure Created by /rpm:init
 
 ```
 docs/pm/
@@ -84,17 +98,19 @@ docs/pm/
 ```
 
 The three trackers map to the timeline:
-- **past/** — what happened (daily session notes from `/pm:session-end`)
+- **past/** — what happened (daily session notes from `/rpm:session-end`)
 - **PRESENT.md** — where things stand now (project status)
 - **FUTURE.org** — what's planned (task tracker)
 
-## Hooks
+## How it works
 
-- **SessionStart**: Auto-injects PM context (git state, open tasks,
-  daily log, tracker drift). Detects unclean exits from previous
-  sessions.
-- **PreCompact / PostCompact**: Checkpoints session state to daily
-  log before compaction; re-injects recovery state after.
-- **Stop**: Captures learning signals from assistant responses to
-  JSONL for session-end review.
-- **UserPromptSubmit**: Nudges for session-end after ~90 minutes.
+rpm runs on five Claude Code hooks — no background services, no
+databases, no external dependencies. Pure markdown + bash.
+
+| Hook | What rpm does |
+|------|-------------------|
+| **SessionStart** | Briefs you: git state, open tasks, daily log, tracker drift |
+| **PreCompact** | Checkpoints progress to daily log before context compaction |
+| **PostCompact** | Re-injects session state so you don't lose your place |
+| **Stop** | Captures learning signals from each response |
+| **UserPromptSubmit** | Nudges for wrap-up after ~90 minutes |

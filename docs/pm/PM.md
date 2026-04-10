@@ -1,23 +1,23 @@
 ## Project Summary
 
-`pm` is a Claude Code plugin that provides a project-management
-layer for LLM-assisted development: session lifecycle, doc auditing,
-task tracking, and deep research — all shipped as auto-loadable
-skills. Pure markdown + bash; no build, test, or lint toolchain.
+`pm` is a Claude Code plugin — your AI product manager. It tracks
+what shipped, what's next, and what's drifting: session lifecycle,
+doc auditing, task tracking, and deep research — all via hooks and
+auto-loadable skills. Pure markdown + bash; no build, test, or lint toolchain.
 Solo author (`dppdppd`). Stage: skills-first command surface
 (migrated from legacy `commands/*.md` in April 2026; legacy
 directory removed at 2.0.0). Deterministic ops (drift scan, git
 state) bundled as bash scripts under `skills/<name>/scripts/` at
 zero LLM token cost.
 
-Current command surface: `/pm:pm` (entry), `/pm:init`,
-`/pm:session-end`, `/pm:audit documents`, `/pm:audit project`.
+Current command surface: `/rpm:pm` (entry), `/rpm:init`,
+`/rpm:session-end`, `/rpm:audit documents`, `/rpm:audit project`.
 Plus a `deep-research` skill (no slash command — auto-triggers on
 research questions). Session context auto-loads via SessionStart
 hook; mid-session checkpoints fire automatically before context
 compaction (PreCompact hook).
 
-The repo dogfoods its own `/pm:*` commands, so changes to the plugin
+The repo dogfoods its own `/rpm:*` commands, so changes to the plugin
 should be evaluated by re-running them in a real Claude Code session.
 
 ## Key Files
@@ -61,5 +61,5 @@ should emphasize:
 
 | Date | Key Finding |
 |------|-------------|
-| 2026-04-08 | `/pm:init` ran on plugin's own repo. ADR scaffolding removed from init per user direction. |
+| 2026-04-08 | `/rpm:init` ran on plugin's own repo. ADR scaffolding removed from init per user direction. |
 | 2026-04-08 | audit standard — PRESENT.md staleness cleaned, audit.md Heavy mode slash syntax fixed, deep-research skill/command distinction noted in CLAUDE.md. Also: `auditor` rename + findings menu format update (bold quick-phrase headings). |

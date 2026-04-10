@@ -29,4 +29,4 @@ touch "$FLAG"
 
 HOURS=$(( ELAPSED_MIN / 60 ))
 MINS=$(( ELAPSED_MIN % 60 ))
-echo "SessionAge: ${HOURS}h${MINS}m. Context may be degrading. Recommend /pm:session-end when ready — auto-updates past/present/future, surfaces uncommitted work, and hands off cleanly."
+echo "SessionAge: ${HOURS}h${MINS}m. Context may be degrading. Recommend /rpm:session-end when ready — auto-updates past/present/future, surfaces uncommitted work, and hands off cleanly."

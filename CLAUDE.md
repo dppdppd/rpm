@@ -1,8 +1,8 @@
-# Project: pm — Claude Code Plugin
+# Project: rpm — Your Relentless Product Manager
 
-Project-management layer for LLM-assisted development. Provides
-`/pm:*` slash commands for session lifecycle, doc auditing, task
-tracking, and deep research.
+Relentless product manager for LLM-assisted development. Tracks
+what shipped, what's next, and what's drifting — via hooks,
+`/rpm:*` commands, doc auditing, and deep research.
 
 ## Layout
 - `skills/` — command surface (`pm`, `init`, `audit`,
@@ -46,14 +46,14 @@ tracking, and deep research.
   the same surface.
 - Update `docs/pm/PM-LOG.md` after audits or noteworthy sessions.
 - Session context auto-loads via the SessionStart hook. Just start
-  working — no `/pm:session-start` needed.
+  working — no `/rpm:session-start` needed.
 
 ## Guardrails
 - 3 attempts max to fix an issue, then STOP and report
 - Same error twice → change strategy, do not retry blindly
 - Ask before: renaming user-facing commands, changing command
   argument shape, restructuring directories, adding new top-level
-  scaffolding to what `/pm:init` generates
+  scaffolding to what `/rpm:init` generates
 - Read command body + referenced subagents/skills end-to-end before
   proposing any rename or regrouping
 - **No ADRs.** This project does not use Architecture Decision

@@ -1,4 +1,4 @@
-# /pm:audit project — Consultant Review
+# /rpm:audit project — Consultant Review
 
 Full consultant review with external research. You are NOT an expert
 in this project's domain — investigate before judging.
@@ -11,8 +11,8 @@ best-in-class.
 
 ## Phase 1: Investigate (gather evidence, don't opine yet)
 
-**At the start of Phase 1, launch `pm:auditor` in the background**
-(`subagent_type: "pm:auditor"`) so its structured scan runs in
+**At the start of Phase 1, launch `rpm:auditor` in the background**
+(`subagent_type: "rpm:auditor"`) so its structured scan runs in
 parallel with the reads below. Without this, a Project audit can
 silently miss broken file refs and tracker drift that a Documents
 audit would catch. Wait for the scan to return before Phase 4; its
@@ -98,7 +98,7 @@ spec-conformance findings.
 
 Evaluate across these dimensions. Every finding must cite Phase 1
 evidence AND either Phase 2 or Phase 3 research — ideally both.
-**Mechanical findings from the `pm:auditor` scan (Phase 1) count as
+**Mechanical findings from the `rpm:auditor` scan (Phase 1) count as
 Phase 1 evidence** — promote anything material into the dimension
 list below (VALIDITY → LLM Workflow; tracker drift → Session
 Discipline). Trivial hygiene drops out.
