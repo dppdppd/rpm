@@ -1,6 +1,6 @@
 # Shared: Findings Menu
 
-Used by `/rpm:audit documents` to present scored findings to the user
+Used by `/audit documents` to present scored findings to the user
 and wait for a reply. Referenced from `SKILL.md` Phase 2.
 
 ## Format

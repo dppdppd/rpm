@@ -1,16 +1,16 @@
 ---
 name: audit
-description: On-demand audit. Target `quick` runs the mechanical scan.sh only (zero-LLM drift check). Target `documents` scans docs + CLAUDE.md + memory + session drift via the rpm:auditor subagent. Target `project` runs a full consultant review — code, architecture, inward + outward research, 7-dimension analysis, saved plan file. Routine doc-drift is handled automatically by /rpm:session-end — run audit only when you have a specific concern.
+description: On-demand audit. Target `quick` runs the mechanical scan.sh only (zero-LLM drift check). Target `documents` scans docs + CLAUDE.md + memory + session drift via the rpm:auditor subagent. Target `project` runs a full consultant review — code, architecture, inward + outward research, 7-dimension analysis, saved plan file. Routine doc-drift is handled automatically by /session-end — run audit only when you have a specific concern.
 disable-model-invocation: true
 argument-hint: "quick | documents | project"
 allowed-tools: Read Write Edit Bash Glob Grep Agent WebSearch
 ---
 
-# /rpm:audit
+# /audit
 
 On-demand audits. Three distinct targets, no depth menu, no recency
 recommendation. Routine doc-drift is handled automatically by
-`/rpm:session-end` — run `/rpm:audit` only when you have a specific
+`/session-end` — run `/audit` only when you have a specific
 concern that warrants a deeper look.
 
 ## Routing
@@ -27,20 +27,20 @@ Parse `$ARGUMENTS`:
 - empty or unrecognized → print the usage block and stop:
 
   ```
-  ## /rpm:audit — pick a target
+  ## /audit — pick a target
 
-  - `/rpm:audit quick` — mechanical scan.sh only. Git state,
+  - `/audit quick` — mechanical scan.sh only. Git state,
     CLAUDE.md size, NOT_IMPLEMENTED, broken refs, daily-log gap,
     session marker, spec inventory drift, log/tracker staleness.
     Zero LLM tokens for the scan itself. ~5sec.
-  - `/rpm:audit documents` — scan docs + CLAUDE.md + memory + session
+  - `/audit documents` — scan docs + CLAUDE.md + memory + session
     drift via the rpm:auditor subagent. Scored findings, hookify
     repeat offenders. ~3min.
-  - `/rpm:audit project` — full consultant review: code, architecture,
+  - `/audit project` — full consultant review: code, architecture,
     inward + outward research, 7-dimension analysis, saved plan file.
     ~30min+.
 
-  Routine doc-drift runs automatically at /rpm:session-end.
+  Routine doc-drift runs automatically at /session-end.
   ```
 
 ---
@@ -92,7 +92,7 @@ fix clarity (0-30)`. For scan.sh findings, evidence is generally
 If no findings, print:
 
 ```
-## /rpm:audit quick — no drift detected
+## /audit quick — no drift detected
 ```
 
 and stop. Do NOT append to `past/RPM-LOG.md` for clean runs — quick mode
@@ -105,7 +105,7 @@ Append a one-line run marker to `docs/rpm/past/RPM-LOG.md` Audit History:
 
 No findings detail beneath — keep quick mode's log footprint
 minimal. If the user wants detail, they can re-run or upgrade to
-`/rpm:audit documents`.
+`/audit documents`.
 
 ---
 

@@ -4,7 +4,7 @@ model: sonnet
 description: >
   Background agent that scans project documentation for staleness,
   contradictions, broken references, and session drift. Returns a
-  structured report. Used by /rpm:audit. Do NOT edit any files.
+  structured report. Used by /audit. Do NOT edit any files.
 tools:
   - Read
   - Glob
