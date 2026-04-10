@@ -1,6 +1,6 @@
 ---
 name: rpm
-description: Explain the rpm plugin and list its /rpm:* commands. Use when the user asks what rpm is, how /rpm works, which rpm commands are available, or needs an overview of the session-lifecycle / audit / deep-research surface.
+description: Explain the rpm plugin and list its commands. Use when the user asks what rpm is, how /rpm works, which rpm commands are available, or needs an overview of the session-lifecycle / audit / deep-research surface.
 argument-hint: ""
 ---
 
@@ -20,10 +20,10 @@ recommend. You do NOT write feature code.
 
 | Command | What you do |
 |---|---|
-| `/rpm:session-end` | Wrap up — update trackers, present findings, commit, hand off |
-| `/rpm:bootstrap` | Onboard — scaffold PM infrastructure for a new project |
-| `/rpm:audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
-| `/rpm:audit project` | Full review — code, architecture, competitive research, plan file |
+| `/session-end` | Wrap up — update trackers, present findings, commit, hand off |
+| `/bootstrap` | Onboard — scaffold rpm infrastructure for a new project |
+| `/audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
+| `/audit project` | Full review — code, architecture, competitive research, plan file |
 
 | Skill | What you do |
 |---|---|
@@ -39,15 +39,15 @@ building.
 
 ## When to use each
 
-**New project:** `/rpm:bootstrap` — Run once. Scans project, creates PM infrastructure.
+**New project:** `/bootstrap` — Run once. Scans project, creates rpm infrastructure.
 
 **Every session:** Just start working. You brief the developer
 automatically, checkpoint before compaction, and capture learnings
-throughout. `/rpm:session-end` when it's time to wrap up.
+throughout. `/session-end` when it's time to wrap up.
 
 **Project health:** Routine drift checks run at session-end. For
-deeper analysis: `/rpm:audit documents` (doc scan) or
-`/rpm:audit project` (full consultant review with competitive
+deeper analysis: `/audit documents` (doc scan) or
+`/audit project` (full consultant review with competitive
 research).
 
 **Research:** The `deep-research` skill auto-triggers when the
@@ -74,13 +74,13 @@ test -f docs/rpm/RPM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 ```
 
 **If `docs/rpm/RPM.md` exists:** Read it in full.
-**If not:** Offer `/rpm:bootstrap` or do a lightweight scan (CLAUDE.md, README, git log).
+**If not:** Offer `/bootstrap` or do a lightweight scan (CLAUDE.md, README, git log).
 
 `docs/rpm/past/RPM-LOG.md` is append-only history. Only read for audit or when user asks.
 
-## Updating PM State
+## Updating rpm State
 
-**`docs/rpm/RPM.md`** — project context, loaded every run. Update after `audit project` and `bootstrap`.
+**`docs/rpm/RPM.md`** — project context, loaded every session. Update after `audit project` and `bootstrap`.
 
 **`docs/rpm/past/RPM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
 

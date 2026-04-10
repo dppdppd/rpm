@@ -1,16 +1,16 @@
 ---
 name: session-end
-description: End the current pm work session. Five phases — analyze → auto-apply PM updates (past/present/future) → present action menu → execute → handoff. Commits PM bookkeeping. Invoke when the user signals wrap-up, OR recommend proactively when conversation context grows long enough to degrade response quality (long-context productivity drop-off). Auto-invocations MUST propose first and wait for confirmation before Phase 1 — do not auto-commit.
+description: End the current rpm session. Five phases — analyze → auto-apply tracker updates (past/present/future) → present action menu → execute → handoff. Commits rpm bookkeeping. Invoke when the user signals wrap-up, OR recommend proactively when conversation context grows long enough to degrade response quality (long-context productivity drop-off). Auto-invocations MUST propose first and wait for confirmation before Phase 1 — do not auto-commit.
 argument-hint: ""
 allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 ---
 
-# /rpm:session-end
+# /session-end
 
 End the current work session in five phases:
-**Analyze → Auto-apply core PM updates → Present menu → Execute → Handoff**.
+**Analyze → Auto-apply tracker updates → Present menu → Execute → Handoff**.
 
-Core PM bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`, `docs/rpm/present/PRESENT.md`,
+Core rpm bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`, `docs/rpm/present/PRESENT.md`,
 `docs/rpm/future/FUTURE.org`) is updated automatically during Phase 2 — **no
 prompts, no diff approval**. Only ask the user about actions outside
 that scope: committing uncommitted items, recording findings
@@ -34,19 +34,19 @@ long enough to hurt response quality — **STOP before Phase 1** and
 propose session-end to the user first:
 
 > "Context is getting long / you seem ready to wrap up. Want me to
-> run `/rpm:session-end`? It'll auto-update past/present/future,
+> run `/session-end`? It'll auto-update past/present/future,
 > surface uncommitted work, and present an action menu."
 
 Only proceed to Phase 1 after the user confirms. The reason: Phase 2
-auto-applies PM updates and commits them without further approval —
+auto-applies tracker updates and commits them without further approval —
 that side effect must not happen on a false-positive auto-trigger.
 
-**If the user explicitly typed `/rpm:session-end`**, skip this
+**If the user explicitly typed `/session-end`**, skip this
 pre-flight and proceed directly to Phase 1.
 
 **Research context for proactive recommendation:** LLM response
 quality degrades as context length grows (lost-in-the-middle,
-recency bias, context dilution). Recommending `/rpm:session-end` +
+recency bias, context dilution). Recommending `/session-end` +
 `/clear` when context starts costing productivity is a legitimate
 and useful intervention — not an interruption.
 
@@ -149,7 +149,7 @@ list for Phase 3 presentation. Suppress trivial meta-matches.
 
 ---
 
-## Phase 2: Auto-apply core PM updates (parallel writes)
+## Phase 2: Auto-apply tracker updates (parallel writes)
 
 Apply these updates immediately without asking. No previews, no
 diff approval. If a particular file genuinely has nothing to
@@ -176,7 +176,7 @@ update, skip it and note "no changes" in the Phase 3 report.
   TODO (or IN-PROGRESS if active).
 - **Do not delete** native tasks — they persist for the next session.
 
-### Commit the PM updates + present findings (same response)
+### Commit tracker updates + present findings (same response)
 
 After all three writes land, combine the commit and the Phase 3
 findings presentation in a **single response** — the commit as a
@@ -185,7 +185,7 @@ round trip.
 
 ```bash
 git add docs/rpm/past/$(date +%Y-%m-%d).md docs/rpm/present/PRESENT.md docs/rpm/future/FUTURE.org 2>/dev/null
-git diff --cached --quiet || git commit -m "pm: session end — update past/present/future"
+git diff --cached --quiet || git commit -m "rpm: session end — update past/present/future"
 ```
 
 If nothing was staged (all three were "no changes"), skip the
@@ -198,8 +198,8 @@ the session end on it.
 ## Phase 3: Present findings + action menu
 
 **This output goes in the same response as the Phase 2 commit
-above.** Show a structured summary of the session and the core PM
-updates just applied, then present the non-PM action menu. **Wait
+above.** Show a structured summary of the session and the tracker
+updates just applied, then present the action menu. **Wait
 for the user to pick.**
 
 ### Format
@@ -218,7 +218,7 @@ for the user to pick.**
 ### Discovered learnings
 - [Bullet list of learnings, corrections, patterns]
 
-### Core PM state updated
+### Tracker updates
 - `docs/rpm/past/YYYY-MM-DD.md` — [what was logged, or "no changes"]
 - `docs/rpm/present/PRESENT.md` — [what changed, or "no changes"]
 - `docs/rpm/future/FUTURE.org` — [what was marked/added, or "no changes"]
@@ -319,7 +319,7 @@ can resume without re-investigation]
 
 To start a new session:
 1. Run `/clear` to clear this context
-2. Start a new conversation — PM context auto-loads
+2. Start a new conversation — rpm context auto-loads
 ```
 
 Do not continue the conversation after this.

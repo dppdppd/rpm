@@ -1,4 +1,4 @@
-# /rpm:audit project — Consultant Review
+# /audit project — Consultant Review
 
 Full consultant review with external research. You are NOT an expert
 in this project's domain — investigate before judging.
@@ -31,7 +31,7 @@ Read project state in parallel:
 - CLAUDE.md, `present/PRESENT.md`, recent `past/` daily logs, debugging/parity logs
 - Memory files (feedback type especially)
 - `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
-- `docs/rpm/RPM.md` (project-specific PM context)
+- `docs/rpm/RPM.md` (project-specific rpm context)
 - Prior consultant reviews if they exist
 
 Then **probe deeper**:
@@ -136,7 +136,7 @@ Don't defer questions to the plan file.
 ### 1. Executive summary (displayed to user)
 
 ```
-## PM Review — YYYY-MM-DD
+## rpm Review — YYYY-MM-DD
 
 ### Health
 [1-2 sentences]
@@ -166,7 +166,7 @@ Append one line to `docs/rpm/past/RPM-LOG.md` Audit History:
 `docs/rpm/reviews/YYYY-MM-DD-plan.md`:
 
 ```markdown
-# PM Plan — YYYY-MM-DD
+# rpm Plan — YYYY-MM-DD
 
 ## Context
 [what was reviewed, what inward + outward research was conducted]

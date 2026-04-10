@@ -59,10 +59,10 @@ Pure markdown and bash.
 
 | Command | What it does |
 |---------|-------------|
-| `/rpm:bootstrap` | First-run setup. Scans the project, asks 3 questions, scaffolds PM infrastructure. Run once. |
-| `/rpm:session-end` | Wraps up: auto-updates past/present/future trackers, surfaces findings, commits, writes handoff notes. |
-| `/rpm:audit documents` | Deep doc scan via background subagent: staleness, contradictions, broken refs, session drift. Scored findings. |
-| `/rpm:audit project` | Full consultant review: code health, architecture, competitive research against real alternatives, plan file. |
+| `/bootstrap` | First-run setup. Scans the project, asks 3 questions, scaffolds rpm infrastructure. Run once. |
+| `/session-end` | Wraps up: auto-updates past/present/future trackers, surfaces findings, commits, writes handoff notes. |
+| `/audit documents` | Deep doc scan via background subagent: staleness, contradictions, broken refs, session drift. Scored findings. |
+| `/audit project` | Full consultant review: code health, architecture, competitive research against real alternatives, plan file. |
 
 | Skill | What it does |
 |-------|-------------|
@@ -84,7 +84,7 @@ priority unblocked item. Proceed?
 ```
 
 rpm proposes a task and waits for confirmation. You work.
-When you're done, `/rpm:session-end` wraps up — updates the
+When you're done, `/session-end` wraps up — updates the
 trackers, surfaces uncommitted work and learnings, and writes
 handoff notes for the next session. The cycle repeats.
 
@@ -108,7 +108,7 @@ handoff notes for the next session. The cycle repeats.
  └──────────────────────────────────────────────────────┘
                           │
                           ▼
- ┌─ /rpm:session-end ──────────────────────────────────┐
+ ┌─ /session-end ──────────────────────────────────────┐
  │  Phase 1: Analyze (git, trackers, learnings)         │
  │  Phase 2: Auto-update past/present/future (no ask)   │
  │  Phase 3: Present findings + action menu             │
@@ -119,11 +119,11 @@ handoff notes for the next session. The cycle repeats.
 
 ## Project structure
 
-`/rpm:bootstrap` creates this:
+`/bootstrap` creates this:
 
 ```
 docs/rpm/
-├── RPM.md              — PM context (loaded every session)
+├── RPM.md              — rpm context (loaded every session)
 ├── past/
 │   ├── RPM-LOG.md      — Append-only audit/review history
 │   └── YYYY-MM-DD.md   — Daily session logs
@@ -146,18 +146,18 @@ state. No manual bookkeeping.
 
 ## Audit: three levels of scrutiny
 
-**Quick** — `/rpm:audit quick`. Runs a bash script. Zero LLM tokens.
+**Quick** — `/audit quick`. Runs a bash script. Zero LLM tokens.
 Checks git state, CLAUDE.md size, `NOT_IMPLEMENTED` stubs, broken
 refs, daily-log gaps, spec inventory drift. Takes ~5 seconds.
 
-**Documents** — `/rpm:audit documents`. Launches a background
+**Documents** — `/audit documents`. Launches a background
 subagent that scans every markdown file across 8 dimensions:
 validity, coherence, LLM-effectiveness, guidance alignment, gap
 analysis, future-tracker health, and session drift. Findings scored
 0–100; only ≥60 confidence presented. Offers to hookify repeat
 offenders.
 
-**Project** — `/rpm:audit project`. Full consultant review. Reads
+**Project** — `/audit project`. Full consultant review. Reads
 the codebase, validates against vendor docs, then *requires*
 competitive research against 3–5 real alternatives (fetches their
 actual docs, not search summaries). Analyzes across 7 dimensions
@@ -199,7 +199,7 @@ permanent record.
 claude --plugin-dir /path/to/rpm
 ```
 
-Then start a new conversation and run `/rpm:bootstrap` to set up PM
+Then start a new conversation and run `/bootstrap` to set up
 infrastructure for your project.
 
 ## Requirements

@@ -10,7 +10,7 @@ allowed-tools: ["Read", "Write", "Bash(curl:*)", "Bash(mkdir:*)", "Agent", "WebS
 Exhaustive multi-agent research on any topic. Invoked as a skill
 (auto-triggered via description match), not a slash command.
 
-**Research escalation rule:** During ANY /rpm:* command, if you encounter
+**Research escalation rule:** During ANY rpm command, if you encounter
 a question requiring external knowledge, pause and offer to invoke the
 `deep-research` skill before continuing.
 

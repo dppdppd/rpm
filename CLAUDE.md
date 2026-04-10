@@ -2,7 +2,7 @@
 
 Relentless product manager for LLM-assisted development. Tracks
 what shipped, what's next, and what's drifting — via hooks,
-`/rpm:*` commands, doc auditing, and deep research.
+slash commands, doc auditing, and deep research.
 
 ## Layout
 - `skills/` — command surface (`rpm`, `init`, `audit`,
@@ -29,7 +29,7 @@ what shipped, what's next, and what's drifting — via hooks,
 - No build, test, or lint toolchain. Verify changes by re-installing
   the plugin and running the skill in a real Claude Code session.
 - Recent commit style: short conventional-ish prefixes (`chore:`,
-  `audit:`, `pm:`). One commit per deliverable.
+  `audit:`, `rpm:`). One commit per deliverable.
 - To publish to GitHub (pushes only `plugin/` contents):
   `git subtree split --prefix=plugin -b plugin-only && git push origin plugin-only:master --force`
 
@@ -41,23 +41,22 @@ what shipped, what's next, and what's drifting — via hooks,
   the same surface.
 - Update `docs/rpm/past/RPM-LOG.md` after audits or noteworthy sessions.
 - Session context auto-loads via the SessionStart hook. Just start
-  working — no `/rpm:session-start` needed.
+  working — no `/session-start` needed.
 
 ## Guardrails
 - 3 attempts max to fix an issue, then STOP and report
 - Same error twice → change strategy, do not retry blindly
 - Ask before: renaming user-facing commands, changing command
   argument shape, restructuring directories, adding new top-level
-  scaffolding to what `/rpm:bootstrap` generates
+  scaffolding to what `/bootstrap` generates
 - Read command body + referenced subagents/skills end-to-end before
   proposing any rename or regrouping
 - **No ADRs.** This project does not use Architecture Decision
   Records — do not propose ADR templates or directories.
 
 ## Post-compaction recovery
-If context was compacted mid-session, read `docs/rpm/~rpm-compact-state`
-to recover the active task, git state, and tracker snapshot. The
-PreCompact hook saves this automatically.
+Read `docs/rpm/~rpm-compact-state` to recover the active task, git
+state, and tracker snapshot. The PreCompact hook saves this automatically.
 
 ## WebFetch
 Do not use WebFetch — it has no tool-level timeout and a hung

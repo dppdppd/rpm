@@ -6,9 +6,9 @@ argument-hint: ""
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Bash(git:*) Glob Grep
 ---
 
-# /rpm:bootstrap — Full Instructions
+# /bootstrap — Full Instructions
 
-First-run setup. Creates PM context for a project. Run once per project.
+First-run setup. Creates rpm context for a project. Run once per project.
 If `docs/rpm/RPM.md` already exists, read it and **augment** — do not
 overwrite. Merge in missing sections only.
 
@@ -37,17 +37,17 @@ Ask the user ONLY these questions (skip any answerable from codebase):
 
 Do NOT ask more than 3 questions.
 
-## Phase 3: Create PM Infrastructure
+## Phase 3: Create rpm Infrastructure
 
 Create or update these files:
 
-### 3a. `docs/rpm/RPM.md` — project-local PM context
+### 3a. `docs/rpm/RPM.md` — project-local rpm context
 
 ```markdown
-# {Project Name} — PM Context
+# {Project Name} — rpm Context
 
-Project-specific guidance for the `/pm` engineering consultant.
-Read by the global `/pm` skill at Step 0.
+Project-specific guidance for rpm.
+Read at Step 0 of every session.
 
 ## Project Summary
 {One paragraph: what, tech stack, stage, team size, key constraints}
@@ -67,19 +67,19 @@ For a startup: velocity vs quality tradeoffs.}
 |------|-------------|
 ```
 
-### 3b. `docs/rpm/past/RPM-LOG.md` — append-only PM history
+### 3b. `docs/rpm/past/RPM-LOG.md` — append-only history
 
 ```markdown
-# PM Log — {project name}
+# rpm Log — {project name}
 
-Append-only history of PM audits, reviews, and session reviews.
-Not loaded automatically — referenced from `docs/rpm/RPM.md` when needed.
+Append-only history of audits, reviews, and sessions.
+Referenced from `docs/rpm/RPM.md` when needed.
 
 ## Audit History
 
 ## Sessions Reviewed
 
-## PM Notes
+## Notes
 ```
 
 ### 3c. `docs/rpm/reviews/` — plan file directory
@@ -171,7 +171,7 @@ Create `docs/rpm/present/PRESENT.md` for current project state:
 ### Past directory (if none exists)
 
 Create `docs/rpm/past/` for daily session logs (`YYYY-MM-DD.md` files
-written by `/rpm:session-end`).
+written by `/session-end`).
 
 ### Future tracker (if none exists)
 
@@ -227,13 +227,13 @@ existing entries.
 ## Phase 8: Present and Confirm
 
 ```
-## /rpm:bootstrap complete
+## /bootstrap complete
 
 Created: {list of created files}
 
 Next steps:
-- Start a new conversation — PM context auto-loads via SessionStart hook
-- `/rpm:audit project` — run a full consultant review when you want
+- Start a new conversation — rpm context auto-loads via SessionStart hook
+- `/audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
 ```
 

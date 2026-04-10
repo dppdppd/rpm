@@ -87,7 +87,7 @@ echo "=== broken_refs ==="
 # project-relative path only if ALL hold:
 #   1. contains `/`
 #   2. does NOT start with `/`         (absolute paths / slash commands)
-#   3. does NOT contain `:`            (slash commands like /pm:audit, URLs)
+#   3. does NOT contain `:`            (URLs like http://...)
 #   4. first char is lowercase or `.`  (CamelCase means tool/identifier)
 #   5. no shell metacharacters or `~`
 #   6. not a known shell command prefix
@@ -214,8 +214,8 @@ echo "=== pm_docs_staleness ==="
 # 2026-04-05 despite 8+ fixes since" pattern from the volta
 # 2026-04-09 audit.
 #
-# Excludes pm-meta files (past/RPM-LOG.md, RPM.md, present/PRESENT.md, future/FUTURE.org)
-# which are updated by pm itself and have their own checks.
+# Excludes rpm-meta files (past/RPM-LOG.md, RPM.md, present/PRESENT.md, future/FUTURE.org)
+# which are updated by rpm itself and have their own checks.
 if git rev-parse --git-dir > /dev/null 2>&1; then
   NOW_EPOCH=$(date +%s)
   STALE_COUNT=0
