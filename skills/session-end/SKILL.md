@@ -101,6 +101,10 @@ sequence them:
 - Read `docs/pm/FUTURE.org` — tasks to mark DONE, IN-PROGRESS
   updates, new TODOs surfaced this session
 - Read `docs/pm/PRESENT.md` — which fields still reflect reality
+- Read `docs/pm/past/YYYY-MM-DD.md` (today's date) — **only if
+  `today_exists=true` in the 1a scan**. Phase 2 appends to this
+  file; reading it now means the Phase 2 writes can all fire in
+  parallel with no hidden pre-read.
 - Call `TaskList` — native task state for reconciliation
 
 (The scan in 1a has already covered git state, CLAUDE.md size,
@@ -159,10 +163,12 @@ update, skip it and note "no changes" in the Phase 3 report.
   TODO (or IN-PROGRESS if active).
 - **Do not delete** native tasks — they persist for the next session.
 
-### Commit the PM updates
+### Commit the PM updates + present findings (same response)
 
-After all three writes land, commit the PM bookkeeping in a single
-bash invocation:
+After all three writes land, combine the commit and the Phase 3
+findings presentation in a **single response** — the commit as a
+tool call, the findings as text output alongside it. This saves a
+round trip.
 
 ```bash
 git add docs/pm/past/$(date +%Y-%m-%d).md docs/pm/PRESENT.md docs/pm/FUTURE.org 2>/dev/null
@@ -171,16 +177,17 @@ git diff --cached --quiet || git commit -m "pm: session end — update past/pres
 
 If nothing was staged (all three were "no changes"), skip the
 commit silently. If the commit fails (e.g., pre-commit hook
-rejection), note it in the Phase 3 report and continue — do not
-block the session end on it.
+rejection), note it in the findings and continue — do not block
+the session end on it.
 
 ---
 
 ## Phase 3: Present findings + action menu
 
-Show a structured summary of the session and the core PM updates just
-applied, then present the non-PM action menu. **Wait for the user to
-pick.**
+**This output goes in the same response as the Phase 2 commit
+above.** Show a structured summary of the session and the core PM
+updates just applied, then present the non-PM action menu. **Wait
+for the user to pick.**
 
 ### Format
 
@@ -280,13 +287,11 @@ actions complete, move to Phase 5.
 
 ## Phase 5: Handoff
 
-Only after Phase 4 is done.
+Only after Phase 4 is done. **Single response** — the rm tool call
+and the handoff text go in the same message:
 
-First, clear the session marker:
-- `rm -f docs/pm/~pm-session-active`
-
-Then present the handoff — these must be the **very last lines**
-of output in the conversation:
+- Clear the session marker: `rm -f docs/pm/~pm-session-active`
+- Output the handoff text below as the **very last lines**:
 
 ```
 ## Session done
