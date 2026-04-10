@@ -24,6 +24,10 @@ tracking, and deep research.
 - Bundle deterministic ops as bash scripts under
   `skills/<name>/scripts/` and invoke via `${CLAUDE_SKILL_DIR}`
   (see `skills/session-end/scripts/scan.sh` for the pattern).
+- Auto-inject (`!…`) lines must use `bash "…"` wrapping:
+  `!bash "${CLAUDE_SKILL_DIR}/scripts/foo.sh"`, not bare
+  `!${CLAUDE_SKILL_DIR}/scripts/foo.sh`. The raw form expands
+  to an absolute path that won't match `Bash(bash:*)` rules.
 - After meaningful changes, bump `version` in
   `.claude-plugin/plugin.json`.
 - No build, test, or lint toolchain. Verify changes by re-installing
