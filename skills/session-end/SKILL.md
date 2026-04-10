@@ -17,6 +17,13 @@ that scope: committing uncommitted items, recording findings
 (promoting learnings to permanent docs), and anything else specific
 to the session.
 
+**Response rules:**
+- Questions go at the **end** of a response, never mid-stream.
+- When asking the user to choose, use a numbered menu (e.g.,
+  `1,2` · `all` · `none`).
+- Never present an action whose precondition is empty (e.g., don't
+  offer "Commit changes" when nothing is uncommitted).
+
 ---
 
 ## Pre-flight: Auto-invocation check
@@ -203,13 +210,25 @@ pick.**
 
 ## Actions (pick any, multiple OK)
 
-1. **Commit changes** — group and commit uncommitted files
+**Only list items that are actionable this session.** Omit any
+action whose precondition is empty (e.g., don't show "Commit
+changes" when there are no uncommitted files; don't show "Fix
+drift" when `drift_findings` is empty). Number the items that
+remain sequentially — the numbers are session-specific, not fixed.
 
-2. **Record findings** — promote session learnings to permanent docs (CLAUDE.md, debugging guide, memory file, etc.)
+Possible actions (include only when applicable):
 
-3. **Fix drift** — apply the doc-drift findings from 1e (only shown if `drift_findings` is non-empty)
+- **Commit changes** — group and commit uncommitted files
+  *(only if scan shows modified/untracked/staged > 0)*
 
-4. **Other** — anything else specific to this session
+- **Record findings** — promote session learnings to permanent docs
+  *(only if the Discovered learnings section is non-empty)*
+
+- **Fix drift** — apply the doc-drift findings
+  *(only if `drift_findings` is non-empty)*
+
+- **Other** — anything else specific to this session
+  *(always include as the last numbered item)*
 
 Which actions? (e.g., `1,2` · `all` · `none`)
 ```
@@ -232,10 +251,14 @@ followup questions needed before acting.
   (check `git log --oneline -10`)
 
 ### Action 2: Record findings
-- For each learning, ask:
-  > "This session established [learning]. Should this become permanent
-  > guidance in [CLAUDE.md / debugging-workflow.md / a memory file]?"
-- Only promote if the user agrees
+- Present all learnings as a numbered menu with a proposed
+  destination for each (CLAUDE.md, memory file, etc.):
+  ```
+  1. [learning summary] → CLAUDE.md
+  2. [learning summary] → memory file
+  ```
+  Then ask: "Which to promote? (e.g., `1,2` · `all` · `none`)"
+- Only promote the ones the user picks
 - Show the addition before writing
 
 ### Action 3: Fix drift
@@ -257,7 +280,13 @@ actions complete, move to Phase 5.
 
 ## Phase 5: Handoff
 
-Only after Phase 4 is done. Present the handoff in this exact form:
+Only after Phase 4 is done.
+
+First, clear the session marker:
+- `rm -f docs/pm/~pm-session-active`
+
+Then present the handoff — these must be the **very last lines**
+of output in the conversation:
 
 ```
 ## Session done
@@ -275,7 +304,4 @@ To start a new session:
 2. Run `/pm:session-start` in the fresh session
 ```
 
-Then clear the session marker:
-- `rm -f docs/pm/~pm-session-active`
-
-That's the end. Do not continue the conversation after this.
+Do not continue the conversation after this.
