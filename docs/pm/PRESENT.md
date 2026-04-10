@@ -1,11 +1,13 @@
 # claude-plugin-pm — Present State
 
 ## Project Status
-- **Current phase**: skills-first migration complete at 2.0.0. 2.1.x added drift detection, `/pm:audit quick`, fixed auto-inject permissions, and optimized session-start/session-end latency via scan.sh auto-inject. Next: dogfood 2.1.3 session-start in a fresh session.
+- **Current phase**: Renamed to **rpm** (Relentless Product Manager). Hook-driven session lifecycle at 2.2.0 — session-start and session-update replaced by hooks; 5 lifecycle hooks total. Next: dogfood hooks in a fresh session.
 - **Last updated**: 2026-04-10
-- **Version**: 2.1.3
+- **Version**: 2.2.0
 
 ## Completed Work
+- 2026-04-10 — **rename to rpm** (`d443ba6`): plugin renamed from pm to rpm (Relentless Product Manager). All command prefixes, skill directory, agent namespace updated. `docs/pm/` kept as-is.
+- 2026-04-10 — **hook-driven session lifecycle** (2.2.0, `c53f699`): 5 new hooks (SessionStart auto-inject, PreCompact checkpoint, PostCompact recovery, Stop learning capture, UserPromptSubmit nudge). Deleted session-start, session-update, and context-scouts skills. Added structured task deps (:ID:/:BLOCKED_BY:) with scan.sh validation. Competitive audit against 8 plugins informed feature priorities.
 - 2026-04-10 — **session-end latency optimizations** (`f605ead`): pre-read today's past log in Phase 1b to eliminate hidden dependency; merge Phase 2 commit + Phase 3 presentation into one response; merge Phase 5 rm + handoff into one response. ~4 tool-call rounds instead of ~6.
 - 2026-04-10 — **session-start scan.sh auto-inject** (2.1.3, `c17dbcf`): new `skills/session-start/scripts/scan.sh` bundles latest past-file lookup, git status/stash, and PRESENT.md drift check. Auto-injects before skill body loads, cutting session-start from ~5 sequential tool-call rounds to ~2. Rewrote SKILL.md to consume scan output and fire all reads in one parallel message.
 - 2026-04-10 — **session-end UX improvements** (`b50423a`): Phase 3 action menu omits empty items and renumbers dynamically. Phase 4 Record findings uses a single numbered menu instead of mid-response questions. Phase 5 runs rm before handoff text. Added top-level "Response rules" block.

@@ -53,18 +53,26 @@
    - No empty menu items, questions at end only, handoff instructions last. Commit `b50423a`.
 
 * Competitive-gap features [2026-04-10]
-** TODO Compaction guard — PreCompact/PostCompact hooks to preserve session state
+** DONE Compaction guard — PreCompact/PostCompact hooks to preserve session state [2026-04-10] (2.2.0)
    :PROPERTIES:
    :ID: compact-guard
    :END:
-   - PreCompact hook saves snapshot (active task, key decisions, current files) to temp file; PostCompact re-injects it. Prevents long pm sessions from losing context on mid-session compaction. Small effort — one script, two hook entries. Reliability fix. Inspired by pro-workflow.
-** TODO Auto learning capture on Stop hook
+   - PreCompact hook saves snapshot + checkpoints to daily log; PostCompact re-injects recovery state. Also handles mid-session checkpointing (replaced /pm:session-update). Commit `c53f699`.
+** DONE Auto learning capture on Stop hook [2026-04-10] (2.2.0)
    :PROPERTIES:
    :ID: learn-capture
    :END:
-   - Stop hook extracts learnings (corrections, confirmed approaches, patterns) from assistant's last response and appends to a lightweight store (JSONL under docs/pm/). Session-end then reviews/promotes rather than discovers from scratch. Compounds pm value across sessions without user friction. Inspired by pro-workflow.
-** TODO Structured task state with dependencies in FUTURE.org
+   - Stop hook greps for learning signals in assistant responses, appends to ~pm-learnings.jsonl. Session-end scan.sh reads and presents excerpts. Commit `c53f699`.
+** DONE Structured task state with dependencies in FUTURE.org [2026-04-10] (2.2.0)
    :PROPERTIES:
    :ID: task-deps
    :END:
-   - Add structured properties (:DEPENDS:, :BLOCKED_BY:) to org entries + scan.sh validation section. Enables dependency graph, per-task status machine, cycle detection. Becomes critical for multi-task sessions. Larger effort. Inspired by flow-next.
+   - :ID:/:BLOCKED_BY: property drawers with scan.sh validation in both session-start and session-end. Detects dangling refs, reports ready tasks. Commit `c53f699`.
+** DONE Automate session-start via SessionStart hook [2026-04-10] (2.2.0)
+   - SessionStart hook auto-injects PM context (git state, open tasks, daily log, drift, task deps). Replaced /pm:session-start skill entirely. Commit `c53f699`.
+** DONE Remove /pm:session-update — replaced by PreCompact checkpoint [2026-04-10] (2.2.0)
+   - Compaction is the right trigger for mid-session checkpoints. Skill deleted. Commit `c53f699`.
+** DONE Rename plugin from pm to rpm (Relentless Product Manager) [2026-04-10]
+   - All command prefixes, skill directory, agent namespace renamed. docs/pm/ kept. Commit `d443ba6`.
+** TODO Dogfood rpm hooks in a fresh session
+   - Verify: auto-start hook loads context, Stop hook captures learnings, PreCompact checkpoints, session-end consumes learnings + task deps.
