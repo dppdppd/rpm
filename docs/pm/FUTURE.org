@@ -1,5 +1,12 @@
 #+TITLE: pm plugin Tasks
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
+#+PROPERTY_FORMAT: Optional :PROPERTIES: drawer with :ID: and :BLOCKED_BY:
+#+EXAMPLE:
+#+  ** TODO Some task
+#+     :PROPERTIES:
+#+     :ID: some-task
+#+     :BLOCKED_BY: other-task
+#+     :END:
 
 * Post-init backlog
 ** DONE Sync command-version/ to current plugin command surface [2026-04-08]
@@ -44,3 +51,20 @@
    - Pre-read today's past log in Phase 1b, merge commit+presentation, merge rm+handoff. ~4 rounds instead of ~6. Commit `f605ead`.
 ** DONE Session-end UX improvements [2026-04-10]
    - No empty menu items, questions at end only, handoff instructions last. Commit `b50423a`.
+
+* Competitive-gap features [2026-04-10]
+** TODO Compaction guard — PreCompact/PostCompact hooks to preserve session state
+   :PROPERTIES:
+   :ID: compact-guard
+   :END:
+   - PreCompact hook saves snapshot (active task, key decisions, current files) to temp file; PostCompact re-injects it. Prevents long pm sessions from losing context on mid-session compaction. Small effort — one script, two hook entries. Reliability fix. Inspired by pro-workflow.
+** TODO Auto learning capture on Stop hook
+   :PROPERTIES:
+   :ID: learn-capture
+   :END:
+   - Stop hook extracts learnings (corrections, confirmed approaches, patterns) from assistant's last response and appends to a lightweight store (JSONL under docs/pm/). Session-end then reviews/promotes rather than discovers from scratch. Compounds pm value across sessions without user friction. Inspired by pro-workflow.
+** TODO Structured task state with dependencies in FUTURE.org
+   :PROPERTIES:
+   :ID: task-deps
+   :END:
+   - Add structured properties (:DEPENDS:, :BLOCKED_BY:) to org entries + scan.sh validation section. Enables dependency graph, per-task status machine, cycle detection. Becomes critical for multi-task sessions. Larger effort. Inspired by flow-next.

@@ -13,8 +13,6 @@ recommend. You do NOT write feature code.
 
 | Command | What it does |
 |---|---|
-| `/pm:session-start` | Begin session — load context, pick task, state plan |
-| `/pm:session-update` | Mid-session checkpoint — append progress, refresh PRESENT.md |
 | `/pm:session-end` | End session — drift scan, survey findings, action menu, handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit documents` | Scan docs + CLAUDE.md + memory + session drift via `pm:auditor` |
@@ -26,7 +24,7 @@ recommend. You do NOT write feature code.
 |---|---|
 | `deep-research` | Multi-agent deep research. Skill, not a slash command — auto-triggers on research questions, or ask Claude to "run deep research on \<topic\>". |
 
-**Workflow:** `init` (first run) -> `session-start` -> work -> `session-end` -> repeat.
+**Workflow:** `init` (once) -> work (session auto-loads) -> `session-end` -> repeat.
 
 ## What is /pm?
 
@@ -43,8 +41,8 @@ separate GitHub-Issues-based PM skill that also used to ship under a
 **Starting a project:** `/pm:init` — Run once. Scans project, creates PM infrastructure.
 
 **Every work session:**
-- `/pm:session-start` — Beginning of conversation. Loads context, picks a task.
-- `/pm:session-update` — Mid-session checkpoint (optional). Append progress without ending.
+- Session context auto-loads at start (SessionStart hook). Just start working.
+- Mid-session checkpoints fire automatically before context compaction (PreCompact hook).
 - `/pm:session-end` — Before `/clear` or ending. Commits, logs, captures learnings.
 
 **Project health:**

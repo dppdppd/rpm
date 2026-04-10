@@ -11,9 +11,11 @@ state) bundled as bash scripts under `skills/<name>/scripts/` at
 zero LLM token cost.
 
 Current command surface: `/pm:pm` (entry), `/pm:init`,
-`/pm:session-start`, `/pm:session-update`, `/pm:session-end`,
-`/pm:audit documents`, `/pm:audit project`. Plus a `deep-research`
-skill (no slash command — auto-triggers on research questions).
+`/pm:session-end`, `/pm:audit documents`, `/pm:audit project`.
+Plus a `deep-research` skill (no slash command — auto-triggers on
+research questions). Session context auto-loads via SessionStart
+hook; mid-session checkpoints fire automatically before context
+compaction (PreCompact hook).
 
 The repo dogfoods its own `/pm:*` commands, so changes to the plugin
 should be evaluated by re-running them in a real Claude Code session.
@@ -27,7 +29,7 @@ should be evaluated by re-running them in a real Claude Code session.
 | Skills (command surface) | `skills/<name>/SKILL.md` + supporting files |
 | Bundled scripts | `skills/<name>/scripts/*.sh` (e.g. `skills/session-end/scripts/scan.sh`) |
 | Subagents | `agents/*.md` (currently `auditor.md`) |
-| Hooks | `hooks/hooks.json`, `hooks/session-start-reminder.sh` |
+| Hooks | `hooks/hooks.json` + lifecycle scripts (auto-start, compact guard, learn capture, session nudge) |
 | Non-plugin install variant | `command-version/` (legacy dispatcher, frozen) |
 | README | `README.md` |
 | PM context | `docs/pm/PM.md` (this file) |
@@ -50,8 +52,8 @@ should emphasize:
    after meaningful changes. No root mirror.
 4. **`command-version/` is frozen** — legacy dispatcher install, not
    maintained. Flag only regressions within `command-version/` itself.
-5. **Hook reliability** — `session-start-reminder.sh` runs every
-   session start; failures here block onboarding.
+5. **Hook reliability** — `session-start-auto.sh` runs every
+   session start; failures here block context loading.
 6. **No ADR ceremony** — user has rejected ADR scaffolding; do not
    propose adding ADR templates or directories.
 

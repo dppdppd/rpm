@@ -6,11 +6,14 @@ tracking, and deep research.
 
 ## Layout
 - `skills/` — command surface (`pm`, `init`, `audit`,
-  `session-start`, `session-update`, `session-end`, `deep-research`);
+  `session-end`, `deep-research`);
   each is a directory with `SKILL.md` plus optional supporting files
 - `agents/` — subagents (currently `auditor.md`, namespaced
   `pm:auditor`)
-- `hooks/` — `hooks.json` + `session-start-reminder.sh`
+- `hooks/` — `hooks.json` + lifecycle scripts: `session-start-auto.sh`
+  (context injection), `pre-compact.sh` / `post-compact.sh` (state
+  preservation), `stop-learn-capture.sh` (learning extraction),
+  `prompt-session-nudge.sh` (checkpoint/wrap-up reminders)
 - `.claude-plugin/` — canonical plugin manifest (`plugin.json`) and
   `marketplace.json`
 - `command-version/` — **legacy dispatcher install, frozen.** Drop
@@ -42,8 +45,8 @@ tracking, and deep research.
   sync when renaming or removing a slash command — they all describe
   the same surface.
 - Update `docs/pm/PM-LOG.md` after audits or noteworthy sessions.
-- Use `/pm:session-start` at the start of a real work session to
-  load context and pick a task.
+- Session context auto-loads via the SessionStart hook. Just start
+  working — no `/pm:session-start` needed.
 
 ## Guardrails
 - 3 attempts max to fix an issue, then STOP and report
@@ -55,6 +58,11 @@ tracking, and deep research.
   proposing any rename or regrouping
 - **No ADRs.** This project does not use Architecture Decision
   Records — do not propose ADR templates or directories.
+
+## Post-compaction recovery
+If context was compacted mid-session, read `docs/pm/~pm-compact-state`
+to recover the active task, git state, and tracker snapshot. The
+PreCompact hook saves this automatically.
 
 ## WebFetch
 Do not use WebFetch — it has no tool-level timeout and a hung

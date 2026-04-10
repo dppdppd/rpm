@@ -223,7 +223,7 @@ Execute only what the user selects. After completing:
 Created: {list of created files}
 
 Next steps:
-- `/pm:session-start` — begin your first work session
+- Start a new conversation — PM context auto-loads via SessionStart hook
 - `/pm:audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
 ```

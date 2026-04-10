@@ -241,3 +241,93 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
 else
   echo "count=0"
 fi
+
+# ----------------------------------------------------------------
+echo
+echo "=== task_deps ==="
+# Validate FUTURE.org dependency graph: extract :ID: and :BLOCKED_BY:
+# from property drawers, check for dangling refs and cycles, and
+# report tasks that are ready (TODO with all blockers DONE).
+FUTURE="docs/pm/FUTURE.org"
+if [ -f "$FUTURE" ]; then
+  # Build maps: id→status, id→blocked_by list
+  # Parse sequentially: track current heading's status and ID
+  # sanitize: convert ID to valid bash var name (hyphens → underscores)
+  san() { echo "$1" | tr '-' '_'; }
+
+  CUR_STATUS=""
+  CUR_ID=""
+  CUR_BLOCKED=""
+  ALL_IDS=""
+  READY=""
+
+  while IFS= read -r line; do
+    # Heading line: ** STATUS Text
+    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) '; then
+      CUR_STATUS=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) .*/\1/')
+      CUR_ID=""
+      CUR_BLOCKED=""
+    fi
+    # Property: :ID: value
+    if echo "$line" | grep -qE '^\s+:ID:\s'; then
+      CUR_ID=$(echo "$line" | sed -E 's/^\s+:ID:\s+//' | tr -d ' ')
+      ALL_IDS="$ALL_IDS $CUR_ID"
+      eval "STATUS_$(san "$CUR_ID")=$CUR_STATUS"
+    fi
+    # Property: :BLOCKED_BY: value (space-separated list)
+    if echo "$line" | grep -qE '^\s+:BLOCKED_BY:\s'; then
+      CUR_BLOCKED=$(echo "$line" | sed -E 's/^\s+:BLOCKED_BY:\s+//')
+      eval "DEPS_$(san "$CUR_ID")=\"$CUR_BLOCKED\""
+    fi
+  done < "$FUTURE"
+
+  # Second pass: validate refs and find ready tasks
+  DEP_COUNT=0
+  DANGLING=""
+  for id in $ALL_IDS; do
+    eval "deps=\${DEPS_$(san "$id"):-}"
+    [ -z "$deps" ] && continue
+    DEP_COUNT=$((DEP_COUNT + 1))
+    eval "my_status=\${STATUS_$(san "$id"):-}"
+    ALL_DONE=true
+    for dep in $deps; do
+      if ! echo "$ALL_IDS" | grep -qwF "$dep"; then
+        DANGLING="$DANGLING $id→$dep"
+      else
+        eval "dep_status=\${STATUS_$(san "$dep"):-}"
+        [ "$dep_status" != "DONE" ] && ALL_DONE=false
+      fi
+    done
+    if [ "$my_status" = "TODO" ] || [ "$my_status" = "BLOCKED" ]; then
+      if $ALL_DONE; then
+        READY="$READY $id"
+      fi
+    fi
+  done
+
+  echo "ids=$(echo $ALL_IDS | wc -w | tr -d ' ')"
+  echo "with_deps=$DEP_COUNT"
+  [ -n "$DANGLING" ] && echo "dangling=$DANGLING"
+  [ -n "$READY" ] && echo "ready=$READY"
+  echo "status=ok"
+else
+  echo "status=no_future_org"
+fi
+
+# ----------------------------------------------------------------
+echo
+echo "=== learnings_capture ==="
+# Check for auto-captured learnings from the Stop hook
+LEARNINGS_FILE="docs/pm/~pm-learnings.jsonl"
+if [ -f "$LEARNINGS_FILE" ]; then
+  ENTRY_COUNT=$(wc -l < "$LEARNINGS_FILE" | tr -d ' ')
+  echo "file=$LEARNINGS_FILE"
+  echo "entries=$ENTRY_COUNT"
+  # Show last 10 excerpts for Phase 1c
+  tail -10 "$LEARNINGS_FILE" | while IFS= read -r line; do
+    EXCERPT=$(echo "$line" | jq -r '.excerpt // empty' 2>/dev/null)
+    [ -n "$EXCERPT" ] && echo "excerpt=$EXCERPT"
+  done
+else
+  echo "entries=0"
+fi

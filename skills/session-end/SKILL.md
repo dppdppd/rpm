@@ -92,6 +92,14 @@ this message — do NOT re-run these checks as tool calls.
   as possible drift if `days > 3` AND the session touched related
   work — the file may need an entry. `days=0` means freshly
   updated (no action). `count=0` means nothing to check.
+- `task_deps` — FUTURE.org dependency graph validation. `dangling=`
+  lines are broken references (task references a non-existent ID).
+  `ready=` lines are tasks newly unblocked by this session's work.
+  Surface both in Phase 3 findings.
+- `learnings_capture` — auto-captured learning excerpts from the
+  Stop hook. `entries > 0` means the hook found learning signals
+  during this session. Use these as pre-populated input for
+  Phase 1c — they supplement (not replace) conversation review.
 
 ### 1b. Fire remaining reads in parallel
 
@@ -127,6 +135,11 @@ conversation for:
 This is main-thread-only work (subagents can't see the parent
 conversation), so the win is running it CONCURRENTLY with the 1b
 tool calls, not sequentially after them.
+
+If the 1a scan shows `learnings_capture entries > 0`, use those
+excerpts as a head start — they were auto-captured by the Stop
+hook when learning signals were detected mid-session. Deduplicate
+against what you find in the conversation review.
 
 ### 1d. Assemble `drift_findings`
 
@@ -290,7 +303,7 @@ actions complete, move to Phase 5.
 Only after Phase 4 is done. **Single response** — the rm tool call
 and the handoff text go in the same message:
 
-- Clear the session marker: `rm -f docs/pm/~pm-session-active`
+- Clear session files: `rm -rf docs/pm/~pm-session-active docs/pm/~pm-compact-state docs/pm/~pm-learnings.jsonl docs/pm/~pm-nudge-flags`
 - Output the handoff text below as the **very last lines**:
 
 ```
@@ -306,7 +319,7 @@ can resume without re-investigation]
 
 To start a new session:
 1. Run `/clear` to clear this context
-2. Run `/pm:session-start` in the fresh session
+2. Start a new conversation — PM context auto-loads
 ```
 
 Do not continue the conversation after this.

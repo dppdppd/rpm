@@ -7,8 +7,6 @@ Project management layer for LLM-assisted development.
 | Command | Description |
 |---------|-------------|
 | `/pm:pm` | Explain the plugin and list its commands |
-| `/pm:session-start` | Begin session: load context, pick task, state plan |
-| `/pm:session-update` | Mid-session checkpoint: append progress, refresh PRESENT.md |
 | `/pm:session-end` | End session: drift scan, survey findings, action menu, handoff |
 | `/pm:init` | First-run project setup |
 | `/pm:audit documents` | On-demand deep scan: docs + CLAUDE.md + memory + session drift |
@@ -49,32 +47,29 @@ install the plugin:
 
 ## What a session looks like
 
-Once installed, start your first session with `/pm:session-start`.
-It reads your project state, surfaces any leftover work, and states
-a plan before touching anything. A real session opener looks like:
+Once installed, sessions start automatically. The `SessionStart`
+hook injects your project's PM context — git state, open tasks,
+latest daily log, tracker drift — so Claude proposes a task and
+gets to work without ceremony. A real session opener looks like:
 
 ```
-> /pm:session-start
+> let's work on the plugin
 
 Context loaded. Clean tree, no stashes, no leftover work.
 
-Recent state: last session (2026-04-08) shipped 8 audit findings
-and bumped version to 1.0.13.
-
 Open FUTURE.org TODOs:
-1. Add a sample /pm:session-start dry-run to README
-2. On publish: add homepage/repository fields  (blocked — unpublished)
+1. Add homepage/repository fields  (blocked — unpublished)
+2. Compaction guard hooks
 
-This session: TODO #1 — add a dry-run walkthrough to README.
-It's the only actionable item in the backlog and closes a real
-UX gap for new users. Proceed?
+This session: TODO #2 — compaction guard. It's the highest
+priority unblocked item. Proceed?
 ```
 
 Nothing is committed, no files are written beyond a session marker
-at `docs/pm/~pm-session-active`. You confirm the plan, work
+at `docs/pm/~pm-session-active`. You confirm the task, work
 happens, then `/pm:session-end` surveys findings and presents a
-commit menu. Mid-session, `/pm:session-update` checkpoints
-progress to today's daily log without ending the session.
+commit menu. Mid-session checkpoints happen automatically before
+context compaction — no manual step needed.
 
 ## Project Structure Created by /pm:init
 
@@ -95,5 +90,11 @@ The three trackers map to the timeline:
 
 ## Hooks
 
-- **SessionStart**: Reminds to run `/pm:session-start`. Detects
-  unclean exits from previous sessions and shows what was in progress.
+- **SessionStart**: Auto-injects PM context (git state, open tasks,
+  daily log, tracker drift). Detects unclean exits from previous
+  sessions.
+- **PreCompact / PostCompact**: Checkpoints session state to daily
+  log before compaction; re-injects recovery state after.
+- **Stop**: Captures learning signals from assistant responses to
+  JSONL for session-end review.
+- **UserPromptSubmit**: Nudges for session-end after ~90 minutes.

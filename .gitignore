@@ -1,2 +1,5 @@
-# Session state — ephemeral, recreated by /pm:session-start
+# Session state — ephemeral, recreated each session
 docs/pm/~pm-session-active
+docs/pm/~pm-compact-state
+docs/pm/~pm-learnings.jsonl
+docs/pm/~pm-nudge-flags/
