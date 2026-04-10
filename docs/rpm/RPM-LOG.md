@@ -5,6 +5,13 @@ Not loaded automatically — referenced from `docs/rpm/RPM.md` when needed.
 
 ## Audit History
 
+- 2026-04-10 — audit project — 7 findings, plan saved to reviews/2026-04-10-plan.md
+  - Phase 2 (Inward): Claude Code hooks spec (once: true, $CLAUDE_PLUGIN_DATA); agent frontmatter schema (color field valid, plugin security restrictions).
+  - Phase 3 (Outward): ccpm, cc-spex, claude-mem, gstack, flow-next. No competitor combines hook-driven automation + doc drift scoring + session lifecycle + task tracking.
+  - Critical: 4 of 5 hooks broken — `docs/pm` → `docs/rpm` rename not propagated to bash scripts. All hook automation non-functional.
+  - High: project-mode.md WebFetch contradiction with CLAUDE.md; RPM.md stale after rename.
+  - Medium: CLAUDE.md stale namespace refs; scan.sh pm_docs_staleness wrong path.
+  - Low: `once: true` replaces manual nudge flags; broken_refs blind to bash scripts.
 - 2026-04-10 — audit quick — 1 finding, 1 fixed, 0 skipped
 - 2026-04-08 — audit light — 5 issues surfaced (2 high, 1 medium, 2 low), all fixed in-session
 - 2026-04-08 — audit light — 4 surfaced, 4 fixed, 0 skipped
