@@ -7,7 +7,7 @@ auto-loadable skills. Pure markdown + bash; no build, test, or lint toolchain.
 Solo author (`dppdppd`). Stage: skills-first command surface
 (migrated from legacy `commands/*.md` in April 2026; legacy
 directory removed at 2.0.0). Deterministic ops (drift scan, git
-state) bundled as bash scripts under `skills/<name>/scripts/` at
+state) bundled as bash scripts under `plugin/skills/<name>/scripts/` at
 zero LLM token cost.
 
 Current command surface: `/rpm:rpm` (entry), `/rpm:init`,
@@ -24,13 +24,12 @@ should be evaluated by re-running them in a real Claude Code session.
 
 | What | Where |
 |------|-------|
-| Plugin manifest | `.claude-plugin/plugin.json` (canonical) |
-| Marketplace manifest | `.claude-plugin/marketplace.json` |
-| Skills (command surface) | `skills/<name>/SKILL.md` + supporting files |
-| Bundled scripts | `skills/<name>/scripts/*.sh` (e.g. `skills/session-end/scripts/scan.sh`) |
-| Subagents | `agents/*.md` (currently `auditor.md`) |
-| Hooks | `hooks/hooks.json` + lifecycle scripts (auto-start, compact guard, learn capture, session nudge) |
-| Non-plugin install variant | `command-version/` (legacy dispatcher, frozen) |
+| Plugin manifest | `plugin/.claude-plugin/plugin.json` (canonical) |
+| Marketplace manifest | `plugin/.claude-plugin/marketplace.json` |
+| Skills (command surface) | `plugin/skills/<name>/SKILL.md` + supporting files |
+| Bundled scripts | `plugin/skills/<name>/scripts/*.sh` (e.g. `plugin/skills/session-end/scripts/scan.sh`) |
+| Subagents | `plugin/agents/*.md` (currently `auditor.md`) |
+| Hooks | `plugin/hooks/hooks.json` + lifecycle scripts (auto-start, compact guard, learn capture, session nudge) |
 | README | `README.md` |
 | PM context | `docs/rpm/RPM.md` (this file) |
 | PM history | `docs/rpm/RPM-LOG.md` |
@@ -42,17 +41,15 @@ should emphasize:
 
 1. **Skill coherence** — frontmatter (`name`, `description`,
    `argument-hint`, `allowed-tools`, `disable-model-invocation`,
-   `user-invocable`, etc.) consistent across `skills/*/SKILL.md`;
+   `user-invocable`, etc.) consistent across `plugin/skills/*/SKILL.md`;
    user-facing slash command names match what's referenced in
-   README, `skills/rpm/SKILL.md`, and other skills.
-2. **Documentation drift** — README, `skills/rpm/SKILL.md`, and
+   README, `plugin/skills/rpm/SKILL.md`, and other skills.
+2. **Documentation drift** — README, `plugin/skills/rpm/SKILL.md`, and
    individual skill bodies all describe the same surface. Check
    after every skill rename or removal.
-3. **Version sync** — bump `version` in `.claude-plugin/plugin.json`
+3. **Version sync** — bump `version` in `plugin/.claude-plugin/plugin.json`
    after meaningful changes. No root mirror.
-4. **`command-version/` is frozen** — legacy dispatcher install, not
-   maintained. Flag only regressions within `command-version/` itself.
-5. **Hook reliability** — `session-start-auto.sh` runs every
+4. **Hook reliability** — `session-start-auto.sh` runs every
    session start; failures here block context loading.
 6. **No ADR ceremony** — user has rejected ADR scaffolding; do not
    propose adding ADR templates or directories.

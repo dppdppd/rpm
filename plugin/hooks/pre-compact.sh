@@ -102,3 +102,7 @@ fi
 } >> "$DAILY_LOG" 2>/dev/null
 
 echo "PM: Pre-compaction checkpoint saved — recovery state + daily log updated."
+echo ""
+echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+echo "  rpm: checkpoint saved — compaction OK"
+echo "This confirms to the user that PM state was preserved before compaction."

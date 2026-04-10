@@ -11,18 +11,24 @@ PRESENT="$PM_DIR/PRESENT.md"
 
 # Only activate if pm is initialized
 if [ ! -d "$PM_DIR" ]; then
-  echo "REMINDER: This project has no docs/rpm/ directory. Run /rpm:init to set up PM infrastructure."
+  echo "This project has no docs/rpm/ directory."
+  echo ""
+  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+  echo "  rpm: not initialized — run /rpm:init to set up"
+  echo "This confirms to the user that the PM plugin loaded but found no PM infrastructure."
   exit 0
 fi
 
 # --- Stale session check ---
 if [ -f "$MARKER" ]; then
-  echo "WARNING: Previous session did not run /rpm:session-end."
+  echo "Previous session did not run /rpm:session-end."
   echo "Session state from unclean exit:"
   echo ""
   cat "$MARKER"
   echo ""
-  echo "Recommend running /rpm:session-end first to close the prior session, or ask the user if they want to continue where it left off."
+  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+  echo "  rpm: stale session — run /rpm:session-end or ask to continue"
+  echo "Then explain the stale session state and ask the user how to handle it."
   exit 0
 fi
 
@@ -125,6 +131,10 @@ fi
 # --- Instructions for Claude ---
 echo ""
 echo "=== PM session instructions ==="
+echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+echo "  rpm: session active"
+echo "This confirms to the user that the PM plugin loaded. Then continue normally."
+echo ""
 echo "You are this project's AI product manager. Context has been auto-loaded."
 echo ""
 echo "Your job:"
