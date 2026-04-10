@@ -21,7 +21,7 @@ recommend. You do NOT write feature code.
 | Command | What you do |
 |---|---|
 | `/rpm:session-end` | Wrap up — update trackers, present findings, commit, hand off |
-| `/rpm:init` | Onboard — scaffold PM infrastructure for a new project |
+| `/rpm:bootstrap` | Onboard — scaffold PM infrastructure for a new project |
 | `/rpm:audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
 | `/rpm:audit project` | Full review — code, architecture, competitive research, plan file |
 
@@ -29,7 +29,7 @@ recommend. You do NOT write feature code.
 |---|---|
 | `deep-research` | Multi-agent research — auto-triggers on questions needing external knowledge |
 
-**Workflow:** `init` (once) -> work (you auto-load context) -> `session-end` -> repeat.
+**Workflow:** `bootstrap` (once) -> work (you auto-load context) -> `session-end` -> repeat.
 
 ## What is rpm?
 
@@ -39,7 +39,7 @@ building.
 
 ## When to use each
 
-**New project:** `/rpm:init` — Run once. Scans project, creates PM infrastructure.
+**New project:** `/rpm:bootstrap` — Run once. Scans project, creates PM infrastructure.
 
 **Every session:** Just start working. You brief the developer
 automatically, checkpoint before compaction, and capture learnings
@@ -74,15 +74,15 @@ test -f docs/rpm/RPM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 ```
 
 **If `docs/rpm/RPM.md` exists:** Read it in full.
-**If not:** Offer `/rpm:init` or do a lightweight scan (CLAUDE.md, README, git log).
+**If not:** Offer `/rpm:bootstrap` or do a lightweight scan (CLAUDE.md, README, git log).
 
-`docs/rpm/RPM-LOG.md` is append-only history. Only read for audit or when user asks.
+`docs/rpm/past/RPM-LOG.md` is append-only history. Only read for audit or when user asks.
 
 ## Updating PM State
 
-**`docs/rpm/RPM.md`** — project context, loaded every run. Update after `audit project` and `init`.
+**`docs/rpm/RPM.md`** — project context, loaded every run. Update after `audit project` and `bootstrap`.
 
-**`docs/rpm/RPM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
+**`docs/rpm/past/RPM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
 
 ## Output Rules
 
@@ -91,4 +91,4 @@ test -f docs/rpm/RPM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 3. Specific fixes, not vague guidance
 4. Severity order: CONTRADICTORY > STALE > MISSING > VALID
 5. `audit project` doesn't edit project docs — it only writes to `docs/rpm/` (log entries, report, plan file)
-6. `init`, `audit documents`, and `session-end` edit project docs (with user approval for audit; automatic for session-end's drift fixes)
+6. `bootstrap`, `audit documents`, and `session-end` edit project docs (with user approval for audit; automatic for session-end's drift fixes)

@@ -6,15 +6,15 @@
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
 MARKER="$PM_DIR/~rpm-session-active"
-FUTURE="$PM_DIR/FUTURE.org"
-PRESENT="$PM_DIR/PRESENT.md"
+FUTURE="$PM_DIR/future/FUTURE.org"
+PRESENT="$PM_DIR/present/PRESENT.md"
 
 # Only activate if pm is initialized
 if [ ! -d "$PM_DIR" ]; then
   echo "This project has no docs/rpm/ directory."
   echo ""
   echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-  echo "  rpm: not initialized — run /rpm:init to set up"
+  echo "  rpm: not initialized — run /rpm:bootstrap to set up"
   echo "This confirms to the user that the PM plugin loaded but found no PM infrastructure."
   exit 0
 fi
@@ -151,5 +151,5 @@ echo "   MARKER"
 echo "4. Create a native task via TaskCreate for the picked item."
 echo "5. Then begin working. You track progress, capture learnings, and flag drift — the developer builds."
 echo ""
-echo "For full context, read: docs/rpm/PRESENT.md, docs/rpm/FUTURE.org, CLAUDE.md"
+echo "For full context, read: docs/rpm/present/PRESENT.md, docs/rpm/future/FUTURE.org, CLAUDE.md"
 echo "To end the session: /rpm:session-end"

@@ -59,7 +59,7 @@ Pure markdown and bash.
 
 | Command | What it does |
 |---------|-------------|
-| `/rpm:init` | First-run setup. Scans the project, asks 3 questions, scaffolds PM infrastructure. Run once. |
+| `/rpm:bootstrap` | First-run setup. Scans the project, asks 3 questions, scaffolds PM infrastructure. Run once. |
 | `/rpm:session-end` | Wraps up: auto-updates past/present/future trackers, surfaces findings, commits, writes handoff notes. |
 | `/rpm:audit documents` | Deep doc scan via background subagent: staleness, contradictions, broken refs, session drift. Scored findings. |
 | `/rpm:audit project` | Full consultant review: code health, architecture, competitive research against real alternatives, plan file. |
@@ -75,7 +75,7 @@ Pure markdown and bash.
 
 Context loaded. Clean tree, no stashes, no leftover work.
 
-Open FUTURE.org TODOs:
+Open future/FUTURE.org TODOs:
 1. Add homepage/repository fields  (blocked — unpublished)
 2. Compaction guard hooks
 
@@ -92,7 +92,7 @@ handoff notes for the next session. The cycle repeats.
 
 ```
  ┌─ SessionStart hook ─────────────────────────────────┐
- │  Load git state, PRESENT.md, FUTURE.org, daily log  │
+ │  Load git state, present/, future/, daily log        │
  │  Propose task → user confirms → create task marker   │
  └──────────────────────────────────────────────────────┘
                           │
@@ -119,26 +119,29 @@ handoff notes for the next session. The cycle repeats.
 
 ## Project structure
 
-`/rpm:init` creates this:
+`/rpm:bootstrap` creates this:
 
 ```
 docs/rpm/
-├── RPM.md          — PM context (loaded every session)
-├── RPM-LOG.md      — Append-only audit/review history
-├── PRESENT.md      — Current project state
-├── FUTURE.org      — Task tracker (org-mode, with dependency IDs)
-├── past/           — Daily session logs (YYYY-MM-DD.md)
-└── reviews/        — Audit plans and reports
+├── RPM.md              — PM context (loaded every session)
+├── past/
+│   ├── RPM-LOG.md      — Append-only audit/review history
+│   └── YYYY-MM-DD.md   — Daily session logs
+├── present/
+│   └── PRESENT.md      — Current project state
+├── future/
+│   └── FUTURE.org      — Task tracker (org-mode, with dependency IDs)
+└── reviews/            — Audit plans and reports
 ```
 
-Three files map to the timeline:
+Three directories map to the timeline:
 
-- **past/** — what happened (daily notes written by session-end)
-- **PRESENT.md** — where things stand now (status, active work, known issues)
-- **FUTURE.org** — what's planned (org-mode TODOs with `:BLOCKED_BY:` dependencies)
+- **past/** — what happened (daily notes, audit history)
+- **present/** — where things stand now (status, active work, known issues)
+- **future/** — what's planned (org-mode TODOs with `:BLOCKED_BY:` dependencies)
 
 Session-end auto-updates all three: marks completed tasks DONE,
-appends to the daily log, and edits PRESENT.md to reflect current
+appends to the daily log, and edits present/PRESENT.md to reflect current
 state. No manual bookkeeping.
 
 ## Audit: three levels of scrutiny
@@ -196,7 +199,7 @@ permanent record.
 claude --plugin-dir /path/to/rpm
 ```
 
-Then start a new conversation and run `/rpm:init` to set up PM
+Then start a new conversation and run `/rpm:bootstrap` to set up PM
 infrastructure for your project.
 
 ## Requirements
