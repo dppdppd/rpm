@@ -39,6 +39,16 @@ if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
   STAGED=$(echo "$PORCELAIN" | grep -cE '^M |^A |^D ' || true)
   STASHES=$(git -C "$PROJECT_DIR" stash list 2>/dev/null | wc -l | tr -d ' ')
   echo "modified=$MODIFIED untracked=$UNTRACKED staged=$STAGED stashes=$STASHES"
+  # Modified file names (up to 15)
+  if [ "$MODIFIED" -gt 0 ] 2>/dev/null; then
+    git -C "$PROJECT_DIR" diff --name-only 2>/dev/null | head -15 | while read -r f; do
+      echo "  M $f"
+    done
+  fi
+  # Recent commits
+  echo ""
+  echo "=== recent_commits ==="
+  git -C "$PROJECT_DIR" log --oneline -10 2>/dev/null || echo "(none)"
 else
   echo "not a git repo"
 fi
@@ -123,6 +133,19 @@ if [ -n "$LATEST" ]; then
   head -20 "$LATEST"
 else
   echo "=== daily_log: none ==="
+fi
+
+# --- learnings from last session ---
+LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"
+if [ -f "$LEARNINGS" ]; then
+  LCOUNT=$(wc -l < "$LEARNINGS" | tr -d ' ')
+  if [ "$LCOUNT" -gt 0 ]; then
+    echo ""
+    echo "=== learnings ($LCOUNT captured) ==="
+    tail -5 "$LEARNINGS" | jq -r '.excerpt // empty' 2>/dev/null | while read -r ex; do
+      [ -n "$ex" ] && echo "  - $ex"
+    done
+  fi
 fi
 
 # --- Instructions for Claude ---
