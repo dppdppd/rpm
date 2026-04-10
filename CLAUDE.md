@@ -39,7 +39,7 @@ slash commands, doc auditing, and deep research.
 - Keep README, `skills/rpm/SKILL.md`, and individual skill bodies in
   sync when renaming or removing a slash command — they all describe
   the same surface.
-- Update `docs/rpm/past/RPM-LOG.md` after audits or noteworthy sessions.
+- Update `docs/rpm/past/log.md` after audits or noteworthy sessions.
 - Session context auto-loads via the SessionStart hook. Just start
   working — no `/session-start` needed.
 

@@ -77,9 +77,9 @@ echo "=== broken_refs ==="
 # Scan live current-state docs for backticked path references and
 # verify they resolve on disk.
 #
-# Scope: CLAUDE.md, README.md, docs/rpm/RPM.md (three "what IS" docs).
+# Scope: CLAUDE.md, README.md, docs/rpm/context.md (three "what IS" docs).
 #
-# Excluded: docs/rpm/past/RPM-LOG.md, docs/rpm/past/*.md, docs/rpm/present/PRESENT.md
+# Excluded: docs/rpm/past/log.md, docs/rpm/past/*.md, docs/rpm/present/status.md
 # — all append-only/historical. References to renamed or deleted
 # files are expected there and are not drift.
 #
@@ -92,7 +92,7 @@ echo "=== broken_refs ==="
 #   5. no shell metacharacters or `~`
 #   6. not a known shell command prefix
 BROKEN_COUNT=0
-for src in CLAUDE.md README.md docs/rpm/RPM.md; do
+for src in CLAUDE.md README.md docs/rpm/context.md; do
   [ -f "$src" ] || continue
   TOKENS=$(grep -oE '`[^`]+`' "$src" 2>/dev/null | sed 's/^`//;s/`$//' || true)
   while IFS= read -r token; do
@@ -158,16 +158,16 @@ fi
 # ----------------------------------------------------------------
 echo
 echo "=== specs_inventory ==="
-# If a spec directory exists, verify PRESENT.md mentions each
-# spec file. Catches the "new specs added but PRESENT.md not
+# If a spec directory exists, verify status.md mentions each
+# spec file. Catches the "new specs added but status.md not
 # updated" drift pattern (HIGH finding in volta 2026-04-09 audit:
 # 17 top-level specs + 38 in docs/spec/traits/ unlisted).
 #
 # Searches common spec locations: specs/, spec/, docs/specs/,
 # docs/spec/ — recursive within each. Match is filename-scoped
-# (looks for `$base.md` or `spec(s)/$base` in PRESENT.md, not a
+# (looks for `$base.md` or `spec(s)/$base` in status.md, not a
 # loose substring) to avoid false positives on common basenames.
-if [ ! -f docs/rpm/present/PRESENT.md ]; then
+if [ ! -f docs/rpm/present/status.md ]; then
   echo "status=no_present_md"
 else
   SPEC_LIST=$(find specs spec docs/specs docs/spec -type f -name '*.md' 2>/dev/null | sort)
@@ -181,9 +181,9 @@ else
       [ -z "$f" ] && continue
       TOTAL=$((TOTAL + 1))
       base=$(basename "$f" .md)
-      if grep -qF "$base.md" docs/rpm/present/PRESENT.md 2>/dev/null \
-         || grep -qF "specs/$base" docs/rpm/present/PRESENT.md 2>/dev/null \
-         || grep -qF "spec/$base" docs/rpm/present/PRESENT.md 2>/dev/null; then
+      if grep -qF "$base.md" docs/rpm/present/status.md 2>/dev/null \
+         || grep -qF "specs/$base" docs/rpm/present/status.md 2>/dev/null \
+         || grep -qF "spec/$base" docs/rpm/present/status.md 2>/dev/null; then
         continue
       fi
       UNLISTED=$((UNLISTED + 1))
@@ -214,7 +214,7 @@ echo "=== pm_docs_staleness ==="
 # 2026-04-05 despite 8+ fixes since" pattern from the volta
 # 2026-04-09 audit.
 #
-# Excludes rpm-meta files (past/RPM-LOG.md, RPM.md, present/PRESENT.md, future/FUTURE.org)
+# Excludes rpm-meta files (past/log.md, context.md, present/status.md, future/tasks.org)
 # which are updated by rpm itself and have their own checks.
 if git rev-parse --git-dir > /dev/null 2>&1; then
   NOW_EPOCH=$(date +%s)
@@ -224,7 +224,7 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
     [ ! -f "$f" ] && continue
     base=$(basename "$f")
     case "$base" in
-      RPM-LOG.md|RPM.md|PRESENT.md|FUTURE.org) continue ;;
+      log.md|context.md|status.md|tasks.org) continue ;;
     esac
     MTIME=$(git log -1 --format='%cI' -- "$f" 2>/dev/null)
     [ -z "$MTIME" ] && continue
@@ -245,10 +245,10 @@ fi
 # ----------------------------------------------------------------
 echo
 echo "=== task_deps ==="
-# Validate FUTURE.org dependency graph: extract :ID: and :BLOCKED_BY:
+# Validate tasks.org dependency graph: extract :ID: and :BLOCKED_BY:
 # from property drawers, check for dangling refs and cycles, and
 # report tasks that are ready (TODO with all blockers DONE).
-FUTURE="docs/rpm/future/FUTURE.org"
+FUTURE="docs/rpm/future/tasks.org"
 if [ -f "$FUTURE" ]; then
   # Build maps: id→status, id→blocked_by list
   # Parse sequentially: track current heading's status and ID

@@ -70,19 +70,19 @@ developer or an audit needs external knowledge.
 ## Step 0: Load Context (runs before EVERY subcommand)
 
 ```bash
-test -f docs/rpm/RPM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
+test -f docs/rpm/context.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 ```
 
-**If `docs/rpm/RPM.md` exists:** Read it in full.
+**If `docs/rpm/context.md` exists:** Read it in full.
 **If not:** Offer `/bootstrap` or do a lightweight scan (CLAUDE.md, README, git log).
 
-`docs/rpm/past/RPM-LOG.md` is append-only history. Only read for audit or when user asks.
+`docs/rpm/past/log.md` is append-only history. Only read for audit or when user asks.
 
 ## Updating rpm State
 
-**`docs/rpm/RPM.md`** — project context, loaded every session. Update after `audit project` and `bootstrap`.
+**`docs/rpm/context.md`** — project context, loaded every session. Update after `audit project` and `bootstrap`.
 
-**`docs/rpm/past/RPM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
+**`docs/rpm/past/log.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
 
 ## Output Rules
 

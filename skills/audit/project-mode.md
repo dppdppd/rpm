@@ -28,10 +28,10 @@ later defeats the purpose of a single consolidated review.
 Read project state in parallel:
 
 - `git log --oneline -30` and `git diff --stat`
-- CLAUDE.md, `present/PRESENT.md`, recent `past/` daily logs, debugging/parity logs
+- CLAUDE.md, `present/status.md`, recent `past/` daily logs, debugging/parity logs
 - Memory files (feedback type especially)
 - `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
-- `docs/rpm/RPM.md` (project-specific rpm context)
+- `docs/rpm/context.md` (project-specific rpm context)
 - Prior consultant reviews if they exist
 
 Then **probe deeper**:
@@ -124,7 +124,7 @@ Discipline). Trivial hygiene drops out.
 7. **Competitive Gaps** — features/patterns from Phase 3 the project
    should adopt or explicitly reject (with rationale).
 
-If `docs/rpm/RPM.md` defines project-specific focus areas, evaluate those too.
+If `docs/rpm/context.md` defines project-specific focus areas, evaluate those too.
 
 ## Phase 5: Ask questions and refine
 
@@ -155,7 +155,7 @@ Don't defer questions to the plan file.
 
 ### 2. Log the run
 
-Append one line to `docs/rpm/past/RPM-LOG.md` Audit History:
+Append one line to `docs/rpm/past/log.md` Audit History:
 
 ```
 - YYYY-MM-DD — audit project — N findings, plan saved to reviews/YYYY-MM-DD-plan.md
