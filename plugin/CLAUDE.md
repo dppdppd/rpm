@@ -5,20 +5,16 @@ what shipped, what's next, and what's drifting — via hooks,
 `/rpm:*` commands, doc auditing, and deep research.
 
 ## Layout
-- `skills/` — command surface (`rpm`, `init`, `audit`,
-  `session-end`, `deep-research`);
-  each is a directory with `SKILL.md` plus optional supporting files
-- `agents/` — subagents (currently `auditor.md`, namespaced
-  `rpm:auditor`)
-- `hooks/` — `hooks.json` + lifecycle scripts: `session-start-auto.sh`
-  (context injection), `pre-compact.sh` / `post-compact.sh` (state
-  preservation), `stop-learn-capture.sh` (learning extraction),
-  `prompt-session-nudge.sh` (checkpoint/wrap-up reminders)
-- `.claude-plugin/` — canonical plugin manifest (`plugin.json`) and
-  `marketplace.json`
-- `command-version/` — **legacy dispatcher install, frozen.** Drop
-  into `~/.claude/` as monolithic `pm.md` dispatcher. Not maintained.
-- `docs/rpm/` — PM context, log, reviews, past/present/future trackers
+- `plugin/` — the installable Claude Code plugin (this is the root
+  for `--plugin-dir` and marketplace installs)
+  - `skills/` — command surface (`rpm`, `init`, `audit`,
+    `session-end`, `deep-research`)
+  - `agents/` — subagents (`auditor.md`, namespaced `rpm:auditor`)
+  - `hooks/` — `hooks.json` + lifecycle scripts
+  - `.claude-plugin/` — plugin manifest + marketplace.json
+  - `command-version/` — legacy dispatcher, frozen
+- `docs/rpm/` — PM context, log, reviews, past/present/future
+  trackers (not shipped with plugin installs)
 
 ## Editing the plugin
 - Primary surface is `skills/<name>/SKILL.md`. Frontmatter:
