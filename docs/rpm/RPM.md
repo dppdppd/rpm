@@ -32,8 +32,8 @@ should be evaluated by re-running them in a real Claude Code session.
 | Hooks | `hooks/hooks.json` + lifecycle scripts (auto-start, compact guard, learn capture, session nudge) |
 | Non-plugin install variant | `command-version/` (legacy dispatcher, frozen) |
 | README | `README.md` |
-| PM context | `docs/pm/PM.md` (this file) |
-| PM history | `docs/pm/PM-LOG.md` |
+| PM context | `docs/rpm/RPM.md` (this file) |
+| PM history | `docs/rpm/RPM-LOG.md` |
 
 ## Focus Areas for Review
 

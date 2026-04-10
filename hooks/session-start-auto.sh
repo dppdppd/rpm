@@ -5,13 +5,13 @@
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/pm"
-MARKER="$PM_DIR/~pm-session-active"
+MARKER="$PM_DIR/~rpm-session-active"
 FUTURE="$PM_DIR/FUTURE.org"
 PRESENT="$PM_DIR/PRESENT.md"
 
 # Only activate if pm is initialized
 if [ ! -d "$PM_DIR" ]; then
-  echo "REMINDER: This project has no docs/pm/ directory. Run /rpm:init to set up PM infrastructure."
+  echo "REMINDER: This project has no docs/rpm/ directory. Run /rpm:init to set up PM infrastructure."
   exit 0
 fi
 
@@ -131,7 +131,7 @@ echo "Your job:"
 echo "1. Note any leftover state (uncommitted work, drift) and ask the developer how to handle it."
 echo "2. Propose a task from FUTURE.org (prefer TODO items, especially 'ready' ones with resolved blockers)."
 echo "3. Once the developer confirms (or if clean state + obvious task), write the session marker:"
-echo "   cat > docs/pm/~pm-session-active << MARKER"
+echo "   cat > docs/rpm/~rpm-session-active << MARKER"
 echo "   ---"
 echo "   session_id: \${CLAUDE_CODE_SESSION_ID:-unknown}"
 echo "   started: \$(date -Iseconds)"
@@ -141,5 +141,5 @@ echo "   MARKER"
 echo "4. Create a native task via TaskCreate for the picked item."
 echo "5. Then begin working. You track progress, capture learnings, and flag drift — the developer builds."
 echo ""
-echo "For full context, read: docs/pm/PRESENT.md, docs/pm/FUTURE.org, CLAUDE.md"
+echo "For full context, read: docs/rpm/PRESENT.md, docs/rpm/FUTURE.org, CLAUDE.md"
 echo "To end the session: /rpm:session-end"

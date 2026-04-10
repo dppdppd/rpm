@@ -100,7 +100,7 @@ is meant to be cheap and invisible when nothing's wrong.
 
 ### Phase 4: Log results (only if findings were present)
 
-Append a one-line run marker to `docs/pm/PM-LOG.md` Audit History:
+Append a one-line run marker to `docs/rpm/PM-LOG.md` Audit History:
 `- YYYY-MM-DD — audit quick — N findings, M fixed, K skipped`
 
 No findings detail beneath — keep quick mode's log footprint
@@ -178,11 +178,11 @@ deny with message: "{explanation}"
 
 After the Execute step (or a cancelled run):
 
-- Append a one-line run marker to `docs/pm/PM-LOG.md` Audit History:
+- Append a one-line run marker to `docs/rpm/PM-LOG.md` Audit History:
   `- YYYY-MM-DD — audit documents — N findings, M fixed, K skipped`
   (cancelled runs: `N findings, cancelled`)
 - Append findings detail below the marker
-- Add one-liner to `docs/pm/PM.md` Prior Findings table
+- Add one-liner to `docs/rpm/PM.md` Prior Findings table
 - Update Sessions Reviewed table if session drift was checked
 
 ---
@@ -201,8 +201,8 @@ Read it in full and follow it end-to-end. It contains:
 - Phase 3: Outward Research (competitive analysis — REQUIRED)
 - Phase 4: Analyze across 7 dimensions
 - Phase 5: Ask questions and refine
-- Deliverables (executive summary + `docs/pm/PM-LOG.md` entry +
-  `docs/pm/reviews/YYYY-MM-DD-plan.md` + `docs/pm/reviews/YYYY-MM-DD.md`)
+- Deliverables (executive summary + `docs/rpm/PM-LOG.md` entry +
+  `docs/rpm/reviews/YYYY-MM-DD-plan.md` + `docs/rpm/reviews/YYYY-MM-DD.md`)
 
 Do not skip phases. Outward research is **required**, not optional —
 without it you over-index on "does the project match its own spec?"

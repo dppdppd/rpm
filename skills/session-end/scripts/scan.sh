@@ -77,9 +77,9 @@ echo "=== broken_refs ==="
 # Scan live current-state docs for backticked path references and
 # verify they resolve on disk.
 #
-# Scope: CLAUDE.md, README.md, docs/pm/PM.md (three "what IS" docs).
+# Scope: CLAUDE.md, README.md, docs/rpm/RPM.md (three "what IS" docs).
 #
-# Excluded: docs/pm/PM-LOG.md, docs/pm/past/*.md, docs/pm/PRESENT.md
+# Excluded: docs/rpm/RPM-LOG.md, docs/rpm/past/*.md, docs/rpm/PRESENT.md
 # — all append-only/historical. References to renamed or deleted
 # files are expected there and are not drift.
 #
@@ -92,7 +92,7 @@ echo "=== broken_refs ==="
 #   5. no shell metacharacters or `~`
 #   6. not a known shell command prefix
 BROKEN_COUNT=0
-for src in CLAUDE.md README.md docs/pm/PM.md; do
+for src in CLAUDE.md README.md docs/rpm/RPM.md; do
   [ -f "$src" ] || continue
   TOKENS=$(grep -oE '`[^`]+`' "$src" 2>/dev/null | sed 's/^`//;s/`$//' || true)
   while IFS= read -r token; do
@@ -117,8 +117,8 @@ echo
 echo "=== daily_log ==="
 TODAY=$(date +%Y-%m-%d)
 echo "today=$TODAY"
-if [ -d docs/pm/past ]; then
-  LATEST=$(ls -1 docs/pm/past/*.md 2>/dev/null | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}\.md$' | sort -r | head -1)
+if [ -d docs/rpm/past ]; then
+  LATEST=$(ls -1 docs/rpm/past/*.md 2>/dev/null | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}\.md$' | sort -r | head -1)
   if [ -n "$LATEST" ]; then
     LOG_DATE=$(basename "$LATEST" .md)
     echo "latest=$LOG_DATE"
@@ -133,7 +133,7 @@ if [ -d docs/pm/past ]; then
       echo "commits_since=$COMMITS"
     fi
     # Does today's log exist?
-    if [ -f "docs/pm/past/$TODAY.md" ]; then
+    if [ -f "docs/rpm/past/$TODAY.md" ]; then
       echo "today_exists=true"
     else
       echo "today_exists=false"
@@ -149,7 +149,7 @@ fi
 # ----------------------------------------------------------------
 echo
 echo "=== session_marker ==="
-if [ -f docs/pm/~pm-session-active ]; then
+if [ -f docs/rpm/~rpm-session-active ]; then
   echo "exists=true"
 else
   echo "exists=false"
@@ -167,7 +167,7 @@ echo "=== specs_inventory ==="
 # docs/spec/ — recursive within each. Match is filename-scoped
 # (looks for `$base.md` or `spec(s)/$base` in PRESENT.md, not a
 # loose substring) to avoid false positives on common basenames.
-if [ ! -f docs/pm/PRESENT.md ]; then
+if [ ! -f docs/rpm/PRESENT.md ]; then
   echo "status=no_present_md"
 else
   SPEC_LIST=$(find specs spec docs/specs docs/spec -type f -name '*.md' 2>/dev/null | sort)
@@ -181,9 +181,9 @@ else
       [ -z "$f" ] && continue
       TOTAL=$((TOTAL + 1))
       base=$(basename "$f" .md)
-      if grep -qF "$base.md" docs/pm/PRESENT.md 2>/dev/null \
-         || grep -qF "specs/$base" docs/pm/PRESENT.md 2>/dev/null \
-         || grep -qF "spec/$base" docs/pm/PRESENT.md 2>/dev/null; then
+      if grep -qF "$base.md" docs/rpm/PRESENT.md 2>/dev/null \
+         || grep -qF "specs/$base" docs/rpm/PRESENT.md 2>/dev/null \
+         || grep -qF "spec/$base" docs/rpm/PRESENT.md 2>/dev/null; then
         continue
       fi
       UNLISTED=$((UNLISTED + 1))
@@ -208,13 +208,13 @@ fi
 echo
 echo "=== pm_docs_staleness ==="
 # Staleness check for loose log/tracker/inventory files under
-# docs/ and docs/pm/ (top level only — past/ and reviews/ are
+# docs/ and docs/rpm/ (top level only — past/ and reviews/ are
 # append-only). Emits days-since-last-commit for each match;
 # skill interprets. Catches the "parity-fix-log.md stale since
 # 2026-04-05 despite 8+ fixes since" pattern from the volta
 # 2026-04-09 audit.
 #
-# Excludes pm-meta files (PM-LOG.md, PM.md, PRESENT.md, FUTURE.org)
+# Excludes pm-meta files (RPM-LOG.md, RPM.md, PRESENT.md, FUTURE.org)
 # which are updated by pm itself and have their own checks.
 if git rev-parse --git-dir > /dev/null 2>&1; then
   NOW_EPOCH=$(date +%s)
@@ -224,7 +224,7 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
     [ ! -f "$f" ] && continue
     base=$(basename "$f")
     case "$base" in
-      PM-LOG.md|PM.md|PRESENT.md|FUTURE.org) continue ;;
+      RPM-LOG.md|RPM.md|PRESENT.md|FUTURE.org) continue ;;
     esac
     MTIME=$(git log -1 --format='%cI' -- "$f" 2>/dev/null)
     [ -z "$MTIME" ] && continue
@@ -248,7 +248,7 @@ echo "=== task_deps ==="
 # Validate FUTURE.org dependency graph: extract :ID: and :BLOCKED_BY:
 # from property drawers, check for dangling refs and cycles, and
 # report tasks that are ready (TODO with all blockers DONE).
-FUTURE="docs/pm/FUTURE.org"
+FUTURE="docs/rpm/FUTURE.org"
 if [ -f "$FUTURE" ]; then
   # Build maps: id→status, id→blocked_by list
   # Parse sequentially: track current heading's status and ID
@@ -318,7 +318,7 @@ fi
 echo
 echo "=== learnings_capture ==="
 # Check for auto-captured learnings from the Stop hook
-LEARNINGS_FILE="docs/pm/~pm-learnings.jsonl"
+LEARNINGS_FILE="docs/rpm/~rpm-learnings.jsonl"
 if [ -f "$LEARNINGS_FILE" ]; then
   ENTRY_COUNT=$(wc -l < "$LEARNINGS_FILE" | tr -d ' ')
   echo "file=$LEARNINGS_FILE"

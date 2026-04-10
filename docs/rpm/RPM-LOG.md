@@ -1,7 +1,7 @@
-# PM Log — pm plugin
+# RPM Log — rpm plugin
 
-Append-only history of PM audits, reviews, and session reviews.
-Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
+Append-only history of audits, reviews, and session reviews.
+Not loaded automatically — referenced from `docs/rpm/RPM.md` when needed.
 
 ## Audit History
 

@@ -10,8 +10,8 @@ allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 End the current work session in five phases:
 **Analyze → Auto-apply core PM updates → Present menu → Execute → Handoff**.
 
-Core PM bookkeeping (`docs/pm/past/YYYY-MM-DD.md`, `docs/pm/PRESENT.md`,
-`docs/pm/FUTURE.org`) is updated automatically during Phase 2 — **no
+Core PM bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`, `docs/rpm/PRESENT.md`,
+`docs/rpm/FUTURE.org`) is updated automatically during Phase 2 — **no
 prompts, no diff approval**. Only ask the user about actions outside
 that scope: committing uncommitted items, recording findings
 (promoting learnings to permanent docs), and anything else specific
@@ -74,13 +74,13 @@ this message — do NOT re-run these checks as tool calls.
   `agents/auditor.md`) are expected and should be **suppressed**.
   Only flag real stubs in source.
 - `broken_refs` — backticked path references in `CLAUDE.md`,
-  `README.md`, `docs/pm/PM.md` that don't resolve on disk.
+  `README.md`, `docs/rpm/PM.md` that don't resolve on disk.
   `count > 0` is always actionable. (`PRESENT.md`, `PM-LOG.md`,
   and `past/*.md` are deliberately excluded as historical.)
 - `daily_log` — today's date, most recent log date, days since,
   commits since. If `today_exists=false` and `commits_since > 0`,
   Phase 2 needs to create today's log.
-- `session_marker` — whether `docs/pm/~pm-session-active` exists.
+- `session_marker` — whether `docs/rpm/~rpm-session-active` exists.
   Phase 5 will remove it only if it exists.
 - `specs_inventory` — if a spec dir exists, `total` / `listed` /
   `unlisted` counts against `PRESENT.md`. `unlisted > 0` is a
@@ -88,7 +88,7 @@ this message — do NOT re-run these checks as tool calls.
   10 `unlisted_sample=` lines identify which. `status=no_spec_dir`
   means the project has no spec directory (no action).
 - `pm_docs_staleness` — `file=<path> days=<N>` pairs for loose
-  log/tracker/inventory files under `docs/` and `docs/pm/`. Flag
+  log/tracker/inventory files under `docs/` and `docs/rpm/`. Flag
   as possible drift if `days > 3` AND the session touched related
   work — the file may need an entry. `days=0` means freshly
   updated (no action). `count=0` means nothing to check.
@@ -106,10 +106,10 @@ this message — do NOT re-run these checks as tool calls.
 In a SINGLE message, issue all of these concurrently — do NOT
 sequence them:
 
-- Read `docs/pm/FUTURE.org` — tasks to mark DONE, IN-PROGRESS
+- Read `docs/rpm/FUTURE.org` — tasks to mark DONE, IN-PROGRESS
   updates, new TODOs surfaced this session
-- Read `docs/pm/PRESENT.md` — which fields still reflect reality
-- Read `docs/pm/past/YYYY-MM-DD.md` (today's date) — **only if
+- Read `docs/rpm/PRESENT.md` — which fields still reflect reality
+- Read `docs/rpm/past/YYYY-MM-DD.md` (today's date) — **only if
   `today_exists=true` in the 1a scan**. Phase 2 appends to this
   file; reading it now means the Phase 2 writes can all fire in
   parallel with no hidden pre-read.
@@ -157,12 +157,12 @@ update, skip it and note "no changes" in the Phase 3 report.
 
 **In a SINGLE message, issue all three writes concurrently:**
 
-1. **Write** `docs/pm/past/YYYY-MM-DD.md` — append if exists,
+1. **Write** `docs/rpm/past/YYYY-MM-DD.md` — append if exists,
    create if not. Sections: Accomplished, Key Discoveries, What
    Didn't Work, Next.
-2. **Edit** `docs/pm/PRESENT.md` — update only the fields that
+2. **Edit** `docs/rpm/PRESENT.md` — update only the fields that
    actually changed this session.
-3. **Edit** `docs/pm/FUTURE.org` — mark completed tasks DONE with
+3. **Edit** `docs/rpm/FUTURE.org` — mark completed tasks DONE with
    today's date, update IN-PROGRESS items, append discovered TODOs.
    Reconcile with native tasks per the rules below.
 
@@ -184,7 +184,7 @@ tool call, the findings as text output alongside it. This saves a
 round trip.
 
 ```bash
-git add docs/pm/past/$(date +%Y-%m-%d).md docs/pm/PRESENT.md docs/pm/FUTURE.org 2>/dev/null
+git add docs/rpm/past/$(date +%Y-%m-%d).md docs/rpm/PRESENT.md docs/rpm/FUTURE.org 2>/dev/null
 git diff --cached --quiet || git commit -m "pm: session end — update past/present/future"
 ```
 
@@ -219,9 +219,9 @@ for the user to pick.**
 - [Bullet list of learnings, corrections, patterns]
 
 ### Core PM state updated
-- `docs/pm/past/YYYY-MM-DD.md` — [what was logged, or "no changes"]
-- `docs/pm/PRESENT.md` — [what changed, or "no changes"]
-- `docs/pm/FUTURE.org` — [what was marked/added, or "no changes"]
+- `docs/rpm/past/YYYY-MM-DD.md` — [what was logged, or "no changes"]
+- `docs/rpm/PRESENT.md` — [what changed, or "no changes"]
+- `docs/rpm/FUTURE.org` — [what was marked/added, or "no changes"]
 
 ### Doc-drift scan
 - [one-line per finding, or "no drift detected"]
@@ -303,7 +303,7 @@ actions complete, move to Phase 5.
 Only after Phase 4 is done. **Single response** — the rm tool call
 and the handoff text go in the same message:
 
-- Clear session files: `rm -rf docs/pm/~pm-session-active docs/pm/~pm-compact-state docs/pm/~pm-learnings.jsonl docs/pm/~pm-nudge-flags`
+- Clear session files: `rm -rf docs/rpm/~rpm-session-active docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-nudge-flags`
 - Output the handoff text below as the **very last lines**:
 
 ```

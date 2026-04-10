@@ -1,5 +1,5 @@
 # Session state — ephemeral, recreated each session
-docs/pm/~pm-session-active
-docs/pm/~pm-compact-state
-docs/pm/~pm-learnings.jsonl
-docs/pm/~pm-nudge-flags/
+docs/rpm/~rpm-session-active
+docs/rpm/~rpm-compact-state
+docs/rpm/~rpm-learnings.jsonl
+docs/rpm/~rpm-nudge-flags/

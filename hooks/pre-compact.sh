@@ -2,16 +2,16 @@
 # PreCompact hook: checkpoint PM session state before context compaction.
 #
 # Two jobs:
-# 1. Save recovery snapshot to ~pm-compact-state (for PostCompact)
+# 1. Save recovery snapshot to ~rpm-compact-state (for PostCompact)
 # 2. Append a mechanical checkpoint to today's daily log — modified
 #    files, active task, auto-captured learnings. This is the data a
 #    bash script can extract; LLM synthesis happens post-compact.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/pm"
-STATE_FILE="$PM_DIR/~pm-compact-state"
-MARKER="$PM_DIR/~pm-session-active"
-LEARNINGS="$PM_DIR/~pm-learnings.jsonl"
+STATE_FILE="$PM_DIR/~rpm-compact-state"
+MARKER="$PM_DIR/~rpm-session-active"
+LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"
 TODAY=$(date +%Y-%m-%d)
 DAILY_LOG="$PM_DIR/past/$TODAY.md"
 NOW=$(date +%H:%M)

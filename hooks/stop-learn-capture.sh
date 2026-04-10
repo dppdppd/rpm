@@ -1,12 +1,12 @@
 #!/bin/bash
 # Stop hook: capture potential learnings from the assistant's response.
-# Appends to docs/pm/~pm-learnings.jsonl when learning signals are
+# Appends to docs/rpm/~rpm-learnings.jsonl when learning signals are
 # detected. Session-end reviews and promotes; file is ephemeral.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/pm"
-LEARNINGS="$PM_DIR/~pm-learnings.jsonl"
-MARKER="$PM_DIR/~pm-session-active"
+LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"
+MARKER="$PM_DIR/~rpm-session-active"
 
 # Only capture during active pm sessions
 [ -d "$PM_DIR" ] || exit 0

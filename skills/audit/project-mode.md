@@ -25,7 +25,7 @@ Read project state in parallel:
 - CLAUDE.md, `PRESENT.md`, recent `past/` daily logs, debugging/parity logs
 - Memory files (feedback type especially)
 - `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
-- `docs/pm/PM.md` (project-specific PM context)
+- `docs/rpm/PM.md` (project-specific PM context)
 - Prior consultant reviews if they exist
 
 Then **probe deeper**:
@@ -118,7 +118,7 @@ Discipline). Trivial hygiene drops out.
 7. **Competitive Gaps** — features/patterns from Phase 3 the project
    should adopt or explicitly reject (with rationale).
 
-If `docs/pm/PM.md` defines project-specific focus areas, evaluate those too.
+If `docs/rpm/PM.md` defines project-specific focus areas, evaluate those too.
 
 ## Phase 5: Ask questions and refine
 
@@ -143,13 +143,13 @@ Don't defer questions to the plan file.
 - **[Title] (Severity)** — [2-3 sentences: what, why, research context]
 
 ### Plan
-**Plan saved to** `docs/pm/reviews/YYYY-MM-DD-plan.md`
+**Plan saved to** `docs/rpm/reviews/YYYY-MM-DD-plan.md`
 [1-line per task: title + effort]
 ```
 
 ### 2. Log the run
 
-Append one line to `docs/pm/PM-LOG.md` Audit History:
+Append one line to `docs/rpm/PM-LOG.md` Audit History:
 
 ```
 - YYYY-MM-DD — audit project — N findings, plan saved to reviews/YYYY-MM-DD-plan.md
@@ -157,7 +157,7 @@ Append one line to `docs/pm/PM-LOG.md` Audit History:
 
 ### 3. Plan file (saved to disk)
 
-`docs/pm/reviews/YYYY-MM-DD-plan.md`:
+`docs/rpm/reviews/YYYY-MM-DD-plan.md`:
 
 ```markdown
 # PM Plan — YYYY-MM-DD
@@ -179,4 +179,4 @@ Append one line to `docs/pm/PM-LOG.md` Audit History:
 ```
 
 Ordered by severity then effort. Also save full report to
-`docs/pm/reviews/YYYY-MM-DD.md`.
+`docs/rpm/reviews/YYYY-MM-DD.md`.

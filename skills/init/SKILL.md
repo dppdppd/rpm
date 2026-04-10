@@ -1,6 +1,6 @@
 ---
 name: init
-description: First-run pm plugin setup for a project. Detects project state, scaffolds docs/pm/ infrastructure (PM.md, PM-LOG.md, PRESENT.md, FUTURE.org, past/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
+description: First-run pm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (RPM.md, RPM-LOG.md, PRESENT.md, FUTURE.org, past/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
 disable-model-invocation: true
 argument-hint: ""
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Bash(git:*) Glob Grep
@@ -9,7 +9,7 @@ allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Bash(git:*) Glob Grep
 # /rpm:init — Full Instructions
 
 First-run setup. Creates PM context for a project. Run once per project.
-If `docs/pm/PM.md` already exists, read it and **augment** — do not
+If `docs/rpm/RPM.md` already exists, read it and **augment** — do not
 overwrite. Merge in missing sections only.
 
 ## Phase 1: Detect Project State
@@ -41,7 +41,7 @@ Do NOT ask more than 3 questions.
 
 Create or update these files:
 
-### 3a. `docs/pm/PM.md` — project-local PM context
+### 3a. `docs/rpm/RPM.md` — project-local PM context
 
 ```markdown
 # {Project Name} — PM Context
@@ -67,13 +67,13 @@ For a startup: velocity vs quality tradeoffs.}
 |------|-------------|
 ```
 
-### 3b. `docs/pm/PM-LOG.md` — append-only PM history
+### 3b. `docs/rpm/RPM-LOG.md` — append-only PM history
 
 ```markdown
 # PM Log — {project name}
 
 Append-only history of PM audits, reviews, and session reviews.
-Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
+Not loaded automatically — referenced from `docs/rpm/RPM.md` when needed.
 
 ## Audit History
 
@@ -82,10 +82,10 @@ Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
 ## PM Notes
 ```
 
-### 3c. `docs/pm/reviews/` — plan file directory
+### 3c. `docs/rpm/reviews/` — plan file directory
 
 ```bash
-mkdir -p docs/pm/reviews
+mkdir -p docs/rpm/reviews
 ```
 
 ## Phase 4: Scaffold Missing Project Infrastructure
@@ -154,7 +154,7 @@ Create `docs/spec/_template.md`:
 
 ### Present tracker (if none exists)
 
-Create `docs/pm/PRESENT.md` for current project state:
+Create `docs/rpm/PRESENT.md` for current project state:
 
 ```markdown
 # {Project Name} — Present State
@@ -170,12 +170,12 @@ Create `docs/pm/PRESENT.md` for current project state:
 
 ### Past directory (if none exists)
 
-Create `docs/pm/past/` for daily session logs (`YYYY-MM-DD.md` files
+Create `docs/rpm/past/` for daily session logs (`YYYY-MM-DD.md` files
 written by `/rpm:session-end`).
 
 ### Future tracker (if none exists)
 
-Create `docs/pm/FUTURE.org`:
+Create `docs/rpm/FUTURE.org`:
 
 ```org
 #+TITLE: {Project Name} Future
@@ -204,9 +204,9 @@ numbered checklist:
 
 | # | Action | File |
 |---|--------|------|
-| 1 | Create | docs/pm/PM.md |
-| 2 | Create | docs/pm/PM-LOG.md |
-| 3 | Create | docs/pm/reviews/ |
+| 1 | Create | docs/rpm/RPM.md |
+| 2 | Create | docs/rpm/RPM-LOG.md |
+| 3 | Create | docs/rpm/reviews/ |
 | 4 | Create | CLAUDE.md |
 | ... | ... | ... |
 

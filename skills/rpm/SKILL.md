@@ -71,19 +71,19 @@ developer or an audit needs external knowledge.
 ## Step 0: Load Context (runs before EVERY subcommand)
 
 ```bash
-test -f docs/pm/PM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
+test -f docs/rpm/RPM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 ```
 
-**If `docs/pm/PM.md` exists:** Read it in full.
+**If `docs/rpm/RPM.md` exists:** Read it in full.
 **If not:** Offer `/rpm:init` or do a lightweight scan (CLAUDE.md, README, git log).
 
-`docs/pm/PM-LOG.md` is append-only history. Only read for audit or when user asks.
+`docs/rpm/RPM-LOG.md` is append-only history. Only read for audit or when user asks.
 
 ## Updating PM State
 
-**`docs/pm/PM.md`** — project context, loaded every run. Update after `audit project` and `init`.
+**`docs/rpm/RPM.md`** — project context, loaded every run. Update after `audit project` and `init`.
 
-**`docs/pm/PM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
+**`docs/rpm/RPM-LOG.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
 
 ## Output Rules
 
@@ -91,5 +91,5 @@ test -f docs/pm/PM.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 2. File paths and line numbers — every finding locatable
 3. Specific fixes, not vague guidance
 4. Severity order: CONTRADICTORY > STALE > MISSING > VALID
-5. `audit project` doesn't edit project docs — it only writes to `docs/pm/` (log entries, report, plan file)
+5. `audit project` doesn't edit project docs — it only writes to `docs/rpm/` (log entries, report, plan file)
 6. `init`, `audit documents`, and `session-end` edit project docs (with user approval for audit; automatic for session-end's drift fixes)

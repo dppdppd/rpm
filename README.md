@@ -88,9 +88,9 @@ for the next session.
 ## Project Structure Created by /rpm:init
 
 ```
-docs/pm/
-├── PM.md              — PM context (loaded every session)
-├── PM-LOG.md          — Append-only audit/review history
+docs/rpm/
+├── RPM.md              — PM context (loaded every session)
+├── RPM-LOG.md          — Append-only audit/review history
 ├── PRESENT.md         — Current project state
 ├── FUTURE.org         — Org-mode task tracker (planned work)
 ├── past/              — Daily session logs (YYYY-MM-DD.md)

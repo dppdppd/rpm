@@ -18,7 +18,7 @@ what shipped, what's next, and what's drifting — via hooks,
   `marketplace.json`
 - `command-version/` — **legacy dispatcher install, frozen.** Drop
   into `~/.claude/` as monolithic `pm.md` dispatcher. Not maintained.
-- `docs/pm/` — PM context, log, reviews, past/present/future trackers
+- `docs/rpm/` — PM context, log, reviews, past/present/future trackers
 
 ## Editing the plugin
 - Primary surface is `skills/<name>/SKILL.md`. Frontmatter:
@@ -44,7 +44,7 @@ what shipped, what's next, and what's drifting — via hooks,
 - Keep README, `skills/rpm/SKILL.md`, and individual skill bodies in
   sync when renaming or removing a slash command — they all describe
   the same surface.
-- Update `docs/pm/PM-LOG.md` after audits or noteworthy sessions.
+- Update `docs/rpm/RPM-LOG.md` after audits or noteworthy sessions.
 - Session context auto-loads via the SessionStart hook. Just start
   working — no `/rpm:session-start` needed.
 
@@ -60,7 +60,7 @@ what shipped, what's next, and what's drifting — via hooks,
   Records — do not propose ADR templates or directories.
 
 ## Post-compaction recovery
-If context was compacted mid-session, read `docs/pm/~pm-compact-state`
+If context was compacted mid-session, read `docs/rpm/~rpm-compact-state`
 to recover the active task, git state, and tracker snapshot. The
 PreCompact hook saves this automatically.
 
