@@ -95,12 +95,12 @@ If no findings, print:
 ## /audit quick — no drift detected
 ```
 
-and stop. Do NOT append to `past/RPM-LOG.md` for clean runs — quick mode
+and stop. Do NOT append to `past/log.md` for clean runs — quick mode
 is meant to be cheap and invisible when nothing's wrong.
 
 ### Phase 4: Log results (only if findings were present)
 
-Append a one-line run marker to `docs/rpm/past/RPM-LOG.md` Audit History:
+Append a one-line run marker to `docs/rpm/past/log.md` Audit History:
 `- YYYY-MM-DD — audit quick — N findings, M fixed, K skipped`
 
 No findings detail beneath — keep quick mode's log footprint
@@ -135,7 +135,7 @@ When the agent completes, score each finding:
 - Evidence: multiple sources=30, single clear source=20, inferred=10
 - Fix clarity: exact steps known=30, direction clear=20, needs investigation=10
 
-**Only present findings scoring ≥ 60.** Below that, log to past/RPM-LOG.md
+**Only present findings scoring ≥ 60.** Below that, log to past/log.md
 but don't bother the user.
 
 Present findings (sorted by score, highest first) using the **Shared
@@ -178,11 +178,11 @@ deny with message: "{explanation}"
 
 After the Execute step (or a cancelled run):
 
-- Append a one-line run marker to `docs/rpm/past/RPM-LOG.md` Audit History:
+- Append a one-line run marker to `docs/rpm/past/log.md` Audit History:
   `- YYYY-MM-DD — audit documents — N findings, M fixed, K skipped`
   (cancelled runs: `N findings, cancelled`)
 - Append findings detail below the marker
-- Add one-liner to `docs/rpm/RPM.md` Prior Findings table
+- Add one-liner to `docs/rpm/context.md` Prior Findings table
 - Update Sessions Reviewed table if session drift was checked
 
 ---
@@ -201,7 +201,7 @@ Read it in full and follow it end-to-end. It contains:
 - Phase 3: Outward Research (competitive analysis — REQUIRED)
 - Phase 4: Analyze across 7 dimensions
 - Phase 5: Ask questions and refine
-- Deliverables (executive summary + `docs/rpm/past/RPM-LOG.md` entry +
+- Deliverables (executive summary + `docs/rpm/past/log.md` entry +
   `docs/rpm/reviews/YYYY-MM-DD-plan.md` + `docs/rpm/reviews/YYYY-MM-DD.md`)
 
 Do not skip phases. Outward research is **required**, not optional —

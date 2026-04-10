@@ -1,6 +1,6 @@
 ---
 name: bootstrap
-description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (RPM.md, past/, present/, future/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
+description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (context.md, past/, present/, future/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
 disable-model-invocation: true
 argument-hint: ""
 allowed-tools: Read Write Bash(bash:*) Bash(mkdir:*) Bash(git:*) Glob Grep
@@ -9,7 +9,7 @@ allowed-tools: Read Write Bash(bash:*) Bash(mkdir:*) Bash(git:*) Glob Grep
 # /bootstrap — Full Instructions
 
 First-run setup. Creates rpm context for a project. Run once per project.
-If `docs/rpm/RPM.md` already exists, read it and **augment** — do not
+If `docs/rpm/context.md` already exists, read it and **augment** — do not
 overwrite. Merge in missing sections only.
 
 ## Phase 1: Detect Project State
@@ -35,13 +35,15 @@ Do NOT ask more than 3 questions.
 
 Create or update these files:
 
-### 3a. `docs/rpm/RPM.md` — project-local rpm context
+### 3a. `docs/rpm/context.md` — project-local rpm context
+
+Injected into every session via the SessionStart hook. Keep it
+under 30 lines — this is hot context, not documentation.
 
 ```markdown
 # {Project Name} — rpm Context
 
-Project-specific guidance for rpm.
-Read at Step 0 of every session.
+Injected at session start. Keep under 30 lines.
 
 ## Project Summary
 {One paragraph: what, tech stack, stage, team size, key constraints}
@@ -61,13 +63,13 @@ For a startup: velocity vs quality tradeoffs.}
 |------|-------------|
 ```
 
-### 3b. `docs/rpm/past/RPM-LOG.md` — append-only history
+### 3b. `docs/rpm/past/log.md` — append-only history
 
 ```markdown
 # rpm Log — {project name}
 
 Append-only history of audits, reviews, and sessions.
-Referenced from `docs/rpm/RPM.md` when needed.
+Referenced from `docs/rpm/context.md` when needed.
 
 ## Audit History
 
@@ -148,7 +150,7 @@ Create `docs/spec/_template.md`:
 
 ### Present tracker (if none exists)
 
-Create `docs/rpm/present/PRESENT.md` for current project state:
+Create `docs/rpm/present/status.md` for current project state:
 
 ```markdown
 # {Project Name} — Present State
@@ -169,7 +171,7 @@ written by `/session-end`).
 
 ### Future tracker (if none exists)
 
-Create `docs/rpm/future/FUTURE.org`:
+Create `docs/rpm/future/tasks.org`:
 
 ```org
 #+TITLE: {Project Name} Future

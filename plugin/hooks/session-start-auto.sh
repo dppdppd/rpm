@@ -4,8 +4,9 @@
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
 MARKER="$PM_DIR/~rpm-session-active"
-FUTURE="$PM_DIR/future/FUTURE.org"
-PRESENT="$PM_DIR/present/PRESENT.md"
+CONTEXT="$PM_DIR/context.md"
+FUTURE="$PM_DIR/future/tasks.org"
+PRESENT="$PM_DIR/present/status.md"
 
 # --- Not initialized ---
 if [ ! -d "$PM_DIR" ]; then
@@ -58,7 +59,7 @@ if [ -f "$PRESENT" ] && git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>
   LAST=$(git -C "$PROJECT_DIR" log -1 --format=%H -- "$PRESENT" 2>/dev/null)
   if [ -n "$LAST" ]; then
     DRIFT=$(git -C "$PROJECT_DIR" log --oneline "${LAST}..HEAD" 2>/dev/null | wc -l | tr -d ' ')
-    [ "$DRIFT" -gt 0 ] && echo "drift: $DRIFT commits since PRESENT.md updated"
+    [ "$DRIFT" -gt 0 ] && echo "drift: $DRIFT commits since status.md updated"
   fi
 fi
 
@@ -105,6 +106,15 @@ if [ -f "$FUTURE" ]; then
     fi
   fi
   [ -n "$READY" ] && echo "" && echo "=== ready_tasks ===" && echo "$READY"
+fi
+
+# --- context ---
+echo ""
+echo "=== context ==="
+if [ -f "$CONTEXT" ]; then
+  cat "$CONTEXT"
+else
+  echo "(missing)"
 fi
 
 # --- present ---
@@ -156,7 +166,7 @@ echo "  rpm: session active"
 echo ""
 echo "Then:"
 echo "1. Note leftover state (uncommitted work, drift) — ask the developer how to handle it."
-echo "2. Propose a task from FUTURE.org (prefer unblocked TODOs, especially ready ones above)."
+echo "2. Propose a task from tasks.org (prefer unblocked TODOs, especially ready ones above)."
 echo "3. On confirmation, write the session marker:"
 echo "   cat > docs/rpm/~rpm-session-active << MARKER"
 echo "   ---"
@@ -170,5 +180,5 @@ echo "5. Begin working."
 echo ""
 echo "When you discover a root cause or change approach, lead with \"Key finding:\" so learnings are captured automatically."
 echo ""
-echo "Context: docs/rpm/present/PRESENT.md, docs/rpm/future/FUTURE.org, CLAUDE.md"
+echo "Context: docs/rpm/context.md, docs/rpm/present/status.md, docs/rpm/future/tasks.org, CLAUDE.md"
 echo "Wrap up: /session-end"
