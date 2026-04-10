@@ -7,11 +7,7 @@
     {
       "name": "rpm",
       "description": "Relentless Project Manager. Prevents drift and keeps you on task across LLM-assisted development sessions.",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/dppdppd/rpm.git",
-        "path": "plugin"
-      }
+      "source": "https://github.com/dppdppd/rpm"
     }
   ]
 }
