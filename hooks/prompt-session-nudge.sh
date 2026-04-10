@@ -25,3 +25,5 @@ ELAPSED_MIN=$(( ( $(date +%s) - START_EPOCH ) / 60 ))
 HOURS=$(( ELAPSED_MIN / 60 ))
 MINS=$(( ELAPSED_MIN % 60 ))
 echo "SessionAge: ${HOURS}h${MINS}m. Context may be degrading. Recommend /rpm:session-end when ready — auto-updates past/present/future, surfaces uncommitted work, and hands off cleanly."
+echo ""
+echo "IMPORTANT: After completing your current task, you MUST address the user's message above. Do not ignore it."

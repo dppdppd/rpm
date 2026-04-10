@@ -12,7 +12,6 @@ what shipped, what's next, and what's drifting — via hooks,
   `rpm:auditor`)
 - `hooks/` — `hooks.json` + lifecycle scripts
 - `.claude-plugin/` — plugin manifest + marketplace.json
-- `command-version/` — legacy dispatcher, frozen
 
 ## Editing the plugin
 - Primary surface is `skills/<name>/SKILL.md`. Frontmatter:
@@ -31,6 +30,8 @@ what shipped, what's next, and what's drifting — via hooks,
   the plugin and running the skill in a real Claude Code session.
 - Recent commit style: short conventional-ish prefixes (`chore:`,
   `audit:`, `pm:`). One commit per deliverable.
+- To publish to GitHub (pushes only `plugin/` contents):
+  `git subtree split --prefix=plugin -b plugin-only && git push origin plugin-only:master --force`
 
 ## Workflow
 - Plan → edit → verify → commit. No spec ceremony for skill-sized
