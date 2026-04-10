@@ -5,6 +5,7 @@ Not loaded automatically — referenced from `docs/pm/PM.md` when needed.
 
 ## Audit History
 
+- 2026-04-10 — audit quick — 1 finding, 1 fixed, 0 skipped
 - 2026-04-08 — audit light — 5 issues surfaced (2 high, 1 medium, 2 low), all fixed in-session
 - 2026-04-08 — audit light — 4 surfaced, 4 fixed, 0 skipped
 - 2026-04-08 — audit standard — 3 findings, 3 fixed, 0 skipped (+ auditor rename and deep-research correction handled in same session)
