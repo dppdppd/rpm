@@ -1,11 +1,13 @@
 # rpm — Present State
 
 ## Project Status
-- **Current phase**: Post-audit fix sweep. 9 rename-gap findings fixed across 15 files. README rewritten around documentation alignment. 2 low-severity findings deferred (T6: `once:true` nudge, T7: bash path scanner). Next: commit + dogfood hooks in fresh session.
+- **Current phase**: Plugin restructured into `plugin/` subdirectory for subtree publishing. T6 (`once:true` nudge) completed. 1 finding deferred (T7: bash path scanner). 10 broken path refs in RPM.md from subdirectory move need fixing. Uncommitted: `command-version/` removal + CLAUDE.md update.
 - **Last updated**: 2026-04-10
 - **Version**: 2.2.0
 
 ## Completed Work
+- 2026-04-10 — **once:true nudge hook + publish prep** (`dba0b58`): adopted `once: true` for UserPromptSubmit nudge hook, replacing manual flag-file system. Added homepage + repository to plugin.json. Created public GitHub repo dppdppd/rpm.
+- 2026-04-10 — **plugin/ subdirectory restructure** (`e015ee8`, `7efeb92`): moved plugin into `plugin/` subdirectory for subtree publishing. Reverted complex source URL to simple form.
 - 2026-04-10 — **audit project + 9 fixes**: third `/rpm:audit project`. Critical finding: `docs/pm/` → `docs/rpm/` rename broke 4 of 5 hooks. Fixed hooks, skill bodies (PM.md→RPM.md refs), marketplace.json, CLAUDE.md namespace, scan.sh path, project-mode.md WebFetch→curl, deep-research stale /pm ref, FUTURE.org marker name. Also: strengthened auditor gate in project-mode.md. Plan + report saved to `reviews/2026-04-10*`.
 - 2026-04-10 — **README rewrite**: reframed around documentation alignment (not session statefulness). Competitive positioning vs claude-mem, gstack, cc-spex, ccpm, flow-next.
 - 2026-04-10 — **rename to rpm** (`d443ba6`, `83020ea`): plugin renamed from pm to rpm (Relentless Product Manager). All command prefixes, skill directory, agent namespace, docs/pm/ → docs/rpm/ updated.

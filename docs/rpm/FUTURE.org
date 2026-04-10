@@ -79,5 +79,7 @@
    - Critical: 4 hooks using docs/pm (broken after rename). Also fixed: skill body PM.md→RPM.md refs, marketplace.json name, CLAUDE.md namespace, scan.sh path, project-mode.md WebFetch→curl, deep-research stale /pm, FUTURE.org marker name. Strengthened auditor gate in project-mode.md. 2 deferred: T6 (once:true), T7 (bash path scanner). Reviews/2026-04-10*.
 ** DONE Adopt `once: true` for UserPromptSubmit nudge hook [2026-04-10]
    - Added `once: true` to hooks.json UserPromptSubmit handler. Removed manual ~rpm-nudge-flags flag-file system from prompt-session-nudge.sh, session-end cleanup, and .gitignore.
+** TODO Fix 10 broken path refs in docs/rpm/RPM.md
+   - After plugin/ subdirectory move, RPM.md references (.claude-plugin/, skills/, hooks/, command-version/) don't resolve from repo root. Update paths to include plugin/ prefix.
 ** TODO Extend broken_refs scanner to bash scripts
    - scan.sh only checks markdown path refs. The hooks rename bug was invisible to drift detection. Scan hooks/*.sh and skills/*/scripts/*.sh for path-like strings, verify they resolve.
