@@ -1,67 +1,79 @@
 # rpm — Relentless Project Manager
 
-A Claude Code plugin that keeps your project's documentation aligned
-with reality across sessions. It tracks what shipped, what's next,
-and what's drifting — so you can focus on building.
+A Claude Code plugin that manages your project across sessions.
 
-LLM-assisted development generates documentation (CLAUDE.md, specs,
-trackers, session logs, memory files) that drifts from reality the
-moment the session that wrote it ends. rpm sits in every session like
-a product manager in a standup: it knows what happened yesterday,
-what's planned today, and what's falling through the cracks.
+## Why
 
-## What happens automatically
+Claude Code sessions are disposable. You start one, do some work,
+and when you're done the context is gone. The next session starts
+cold — it doesn't know what you did yesterday, what you decided, or
+what's next. You end up re-explaining context, redoing work, and
+watching docs drift from reality because nothing checks whether
+yesterday's documentation still matches today's code.
 
-Five hooks run the session lifecycle with no commands needed:
+rpm fixes this. It maintains a persistent project state across
+sessions — what happened (past), where things stand (present), and
+what's planned (future). Each session starts with full context and
+ends with a clean handoff to the next one.
 
-| Hook | What happens |
-|------|-------------|
-| **SessionStart** | Briefs you: git state, open tasks, daily log, tracker drift. Proposes a task from the backlog. |
-| **Stop** | Captures learning signals (root causes, discoveries, corrections) after each response. |
-| **PreCompact** | Checkpoints progress before context compaction. |
-| **PostCompact** | Re-injects session state so you don't lose your place. |
-| **UserPromptSubmit** | Nudges for wrap-up after ~90 minutes, when context starts degrading. |
+## The workflow
+
+**First time:** Run `/bootstrap`. It scans your project, asks a few
+questions, and scaffolds the tracking infrastructure under `docs/rpm/`.
+
+**Every session after that:** Just start working. rpm automatically
+loads your project context — git state, open tasks, daily log,
+recent drift — and proposes a task from the backlog. You confirm and
+work.
+
+**Mid-session:** rpm quietly captures learnings and checkpoints your
+progress. If you run `/compact`, rpm saves your state before
+compaction and restores it after — so you pick up exactly where you
+left off without re-explaining anything. After about 90 minutes it
+nudges you to wrap up before context quality degrades.
+
+**End of session:** Run `/session-end`. It auto-updates all three
+trackers, surfaces uncommitted work and learnings, and writes a
+handoff for the next session. Start a new conversation and the cycle
+repeats.
+
+The result: every session starts informed and ends clean. Nothing
+falls through the cracks between sessions.
 
 ## Commands
 
 ### `/bootstrap`
 
 First-run setup. Run once per project. Scans the codebase, asks 3
-questions, then scaffolds rpm infrastructure under `docs/rpm/`
-(trackers, daily logs, task backlog) and creates a CLAUDE.md if one
-doesn't exist.
+questions, scaffolds `docs/rpm/` (trackers, daily logs, task
+backlog), and creates a CLAUDE.md if one doesn't exist.
 
 ### `/session-end`
 
-Wrap up the current session. Auto-updates all three trackers
-(past/present/future), surfaces uncommitted work and learnings,
-presents an action menu, then writes handoff notes for the next
-session. Run this when you're done working or when context is getting
-long.
+Wrap up the current session. Auto-updates past/present/future
+trackers, surfaces uncommitted work and learnings, presents an action
+menu, then writes handoff notes. Run when you're done working or when
+context is getting long.
 
 ### `/audit quick`
 
 Fast mechanical scan. Zero LLM tokens. Checks git state, CLAUDE.md
-size, `NOT_IMPLEMENTED` stubs, broken refs, daily-log gaps, spec
-inventory drift. Use between session-ends when you want a quick
-"anything broken right now?" check. ~5 seconds.
+size, broken refs, daily-log gaps, spec inventory drift. Use when you
+want a quick "anything broken?" check. ~5 seconds.
 
 ### `/audit documents`
 
-Deep doc scan via background subagent. Scans every markdown file
-across 8 dimensions (validity, coherence, LLM-effectiveness, guidance
-alignment, gap analysis, future-tracker health, session drift).
-Findings scored 0-100; only high-confidence results presented. Use
-when you suspect docs have drifted but aren't sure where. ~3 minutes.
+Deep doc scan via background subagent. Checks every markdown file for
+staleness, contradictions, broken references, and session drift.
+Scored findings, only high-confidence results shown. Use when you
+suspect docs have drifted but aren't sure where. ~3 minutes.
 
 ### `/audit project`
 
 Full consultant review. Reads the codebase, validates against vendor
-docs, then runs competitive research against 3-5 real alternatives.
-Analyzes across 7 dimensions including architecture health, LLM
-workflow efficiency, and strategic direction. Outputs an executive
-summary and a plan file. Use when you want outside perspective on the
-project's overall health. ~30 minutes.
+docs, runs competitive research against real alternatives. Outputs an
+executive summary and a plan file. Use when you want outside
+perspective on the project's overall health. ~30 minutes.
 
 ## Installation
 
@@ -83,7 +95,19 @@ Then start a new conversation and run `/bootstrap`.
 ## Requirements
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
-- No other dependencies. rpm runs on markdown, bash, and Claude Code hooks.
+- No other dependencies. Pure markdown and bash.
+
+## Hooks
+
+Five hooks drive the automatic behavior:
+
+| Hook | What it does |
+|------|-------------|
+| **SessionStart** | Loads git state, open tasks, daily log, tracker drift. Proposes a task. |
+| **Stop** | Captures learning signals after each response. |
+| **PreCompact** | Checkpoints progress before context compaction. |
+| **PostCompact** | Re-injects session state after compaction. |
+| **UserPromptSubmit** | Nudges for wrap-up after ~90 minutes. |
 
 ## License
 
