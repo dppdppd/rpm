@@ -41,7 +41,7 @@ what shipped, what's next, and what's drifting — via hooks,
 ## Workflow
 - Plan → edit → verify → commit. No spec ceremony for skill-sized
   changes.
-- Keep README, `skills/pm/SKILL.md`, and individual skill bodies in
+- Keep README, `skills/rpm/SKILL.md`, and individual skill bodies in
   sync when renaming or removing a slash command — they all describe
   the same surface.
 - Update `docs/pm/PM-LOG.md` after audits or noteworthy sessions.

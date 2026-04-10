@@ -44,8 +44,8 @@ should emphasize:
    `argument-hint`, `allowed-tools`, `disable-model-invocation`,
    `user-invocable`, etc.) consistent across `skills/*/SKILL.md`;
    user-facing slash command names match what's referenced in
-   README, `skills/pm/SKILL.md`, and other skills.
-2. **Documentation drift** — README, `skills/pm/SKILL.md`, and
+   README, `skills/rpm/SKILL.md`, and other skills.
+2. **Documentation drift** — README, `skills/rpm/SKILL.md`, and
    individual skill bodies all describe the same surface. Check
    after every skill rename or removal.
 3. **Version sync** — bump `version` in `.claude-plugin/plugin.json`
