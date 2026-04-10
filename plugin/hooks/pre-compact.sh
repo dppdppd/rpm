@@ -47,9 +47,9 @@ fi
   cat "$MARKER"
   echo ""
 
-  if [ -f "$PM_DIR/FUTURE.org" ]; then
+  if [ -f "$PM_DIR/future/FUTURE.org" ]; then
     echo "=== open tasks ==="
-    grep -E '^\*\* (TODO|IN-PROGRESS|BLOCKED) ' "$PM_DIR/FUTURE.org" 2>/dev/null || echo "(none)"
+    grep -E '^\*\* (TODO|IN-PROGRESS|BLOCKED) ' "$PM_DIR/future/FUTURE.org" 2>/dev/null || echo "(none)"
     echo ""
   fi
 
@@ -60,9 +60,9 @@ fi
   [ -n "$STAGED_FILES" ] && echo "$STAGED_FILES" | while read -r f; do echo "staged=$f"; done
   echo ""
 
-  if [ -f "$PM_DIR/PRESENT.md" ]; then
+  if [ -f "$PM_DIR/present/PRESENT.md" ]; then
     echo "=== present snapshot ==="
-    head -10 "$PM_DIR/PRESENT.md"
+    head -10 "$PM_DIR/present/PRESENT.md"
     echo ""
   fi
 

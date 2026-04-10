@@ -39,7 +39,7 @@ what shipped, what's next, and what's drifting — via hooks,
 - Keep README, `skills/rpm/SKILL.md`, and individual skill bodies in
   sync when renaming or removing a slash command — they all describe
   the same surface.
-- Update `docs/rpm/RPM-LOG.md` after audits or noteworthy sessions.
+- Update `docs/rpm/past/RPM-LOG.md` after audits or noteworthy sessions.
 - Session context auto-loads via the SessionStart hook. Just start
   working — no `/rpm:session-start` needed.
 
@@ -48,7 +48,7 @@ what shipped, what's next, and what's drifting — via hooks,
 - Same error twice → change strategy, do not retry blindly
 - Ask before: renaming user-facing commands, changing command
   argument shape, restructuring directories, adding new top-level
-  scaffolding to what `/rpm:init` generates
+  scaffolding to what `/rpm:bootstrap` generates
 - Read command body + referenced subagents/skills end-to-end before
   proposing any rename or regrouping
 - **No ADRs.** This project does not use Architecture Decision

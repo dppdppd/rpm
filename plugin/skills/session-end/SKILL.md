@@ -10,8 +10,8 @@ allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 End the current work session in five phases:
 **Analyze → Auto-apply core PM updates → Present menu → Execute → Handoff**.
 
-Core PM bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`, `docs/rpm/PRESENT.md`,
-`docs/rpm/FUTURE.org`) is updated automatically during Phase 2 — **no
+Core PM bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`, `docs/rpm/present/PRESENT.md`,
+`docs/rpm/future/FUTURE.org`) is updated automatically during Phase 2 — **no
 prompts, no diff approval**. Only ask the user about actions outside
 that scope: committing uncommitted items, recording findings
 (promoting learnings to permanent docs), and anything else specific
@@ -75,7 +75,7 @@ this message — do NOT re-run these checks as tool calls.
   Only flag real stubs in source.
 - `broken_refs` — backticked path references in `CLAUDE.md`,
   `README.md`, `docs/rpm/RPM.md` that don't resolve on disk.
-  `count > 0` is always actionable. (`PRESENT.md`, `RPM-LOG.md`,
+  `count > 0` is always actionable. (`present/PRESENT.md`, `past/RPM-LOG.md`,
   and `past/*.md` are deliberately excluded as historical.)
 - `daily_log` — today's date, most recent log date, days since,
   commits since. If `today_exists=false` and `commits_since > 0`,
@@ -83,7 +83,7 @@ this message — do NOT re-run these checks as tool calls.
 - `session_marker` — whether `docs/rpm/~rpm-session-active` exists.
   Phase 5 will remove it only if it exists.
 - `specs_inventory` — if a spec dir exists, `total` / `listed` /
-  `unlisted` counts against `PRESENT.md`. `unlisted > 0` is a
+  `unlisted` counts against `present/PRESENT.md`. `unlisted > 0` is a
   drift signal — PRESENT.md isn't enumerating all specs. Up to
   10 `unlisted_sample=` lines identify which. `status=no_spec_dir`
   means the project has no spec directory (no action).
@@ -92,7 +92,7 @@ this message — do NOT re-run these checks as tool calls.
   as possible drift if `days > 3` AND the session touched related
   work — the file may need an entry. `days=0` means freshly
   updated (no action). `count=0` means nothing to check.
-- `task_deps` — FUTURE.org dependency graph validation. `dangling=`
+- `task_deps` — `future/FUTURE.org` dependency graph validation. `dangling=`
   lines are broken references (task references a non-existent ID).
   `ready=` lines are tasks newly unblocked by this session's work.
   Surface both in Phase 3 findings.
@@ -106,9 +106,9 @@ this message — do NOT re-run these checks as tool calls.
 In a SINGLE message, issue all of these concurrently — do NOT
 sequence them:
 
-- Read `docs/rpm/FUTURE.org` — tasks to mark DONE, IN-PROGRESS
+- Read `docs/rpm/future/FUTURE.org` — tasks to mark DONE, IN-PROGRESS
   updates, new TODOs surfaced this session
-- Read `docs/rpm/PRESENT.md` — which fields still reflect reality
+- Read `docs/rpm/present/PRESENT.md` — which fields still reflect reality
 - Read `docs/rpm/past/YYYY-MM-DD.md` (today's date) — **only if
   `today_exists=true` in the 1a scan**. Phase 2 appends to this
   file; reading it now means the Phase 2 writes can all fire in
@@ -160,19 +160,19 @@ update, skip it and note "no changes" in the Phase 3 report.
 1. **Write** `docs/rpm/past/YYYY-MM-DD.md` — append if exists,
    create if not. Sections: Accomplished, Key Discoveries, What
    Didn't Work, Next.
-2. **Edit** `docs/rpm/PRESENT.md` — update only the fields that
+2. **Edit** `docs/rpm/present/PRESENT.md` — update only the fields that
    actually changed this session.
-3. **Edit** `docs/rpm/FUTURE.org` — mark completed tasks DONE with
+3. **Edit** `docs/rpm/future/FUTURE.org` — mark completed tasks DONE with
    today's date, update IN-PROGRESS items, append discovered TODOs.
    Reconcile with native tasks per the rules below.
 
-### Native task reconciliation (within the FUTURE.org edit above)
+### Native task reconciliation (within the `future/FUTURE.org` edit above)
 
 - For each native task **completed this session**, mark the
-  corresponding `FUTURE.org` entry DONE with today's date. If no
+  corresponding `future/FUTURE.org` entry DONE with today's date. If no
   matching entry exists, append a DONE line.
 - For each native task still **in-progress or pending** created
-  this session without a `FUTURE.org` counterpart, append as
+  this session without a `future/FUTURE.org` counterpart, append as
   TODO (or IN-PROGRESS if active).
 - **Do not delete** native tasks — they persist for the next session.
 
@@ -184,7 +184,7 @@ tool call, the findings as text output alongside it. This saves a
 round trip.
 
 ```bash
-git add docs/rpm/past/$(date +%Y-%m-%d).md docs/rpm/PRESENT.md docs/rpm/FUTURE.org 2>/dev/null
+git add docs/rpm/past/$(date +%Y-%m-%d).md docs/rpm/present/PRESENT.md docs/rpm/future/FUTURE.org 2>/dev/null
 git diff --cached --quiet || git commit -m "pm: session end — update past/present/future"
 ```
 
@@ -220,8 +220,8 @@ for the user to pick.**
 
 ### Core PM state updated
 - `docs/rpm/past/YYYY-MM-DD.md` — [what was logged, or "no changes"]
-- `docs/rpm/PRESENT.md` — [what changed, or "no changes"]
-- `docs/rpm/FUTURE.org` — [what was marked/added, or "no changes"]
+- `docs/rpm/present/PRESENT.md` — [what changed, or "no changes"]
+- `docs/rpm/future/FUTURE.org` — [what was marked/added, or "no changes"]
 
 ### Doc-drift scan
 - [one-line per finding, or "no drift detected"]
@@ -310,7 +310,7 @@ and the handoff text go in the same message:
 ## Session done
 
 **What's next:** [specific task for the next session, or
-"unknown — pick from FUTURE.org"]
+"unknown — pick from future/FUTURE.org"]
 
 [If mid-task: note exactly where it left off so the next session
 can resume without re-investigation]

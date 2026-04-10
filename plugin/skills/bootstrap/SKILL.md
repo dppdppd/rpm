@@ -1,12 +1,12 @@
 ---
-name: init
-description: First-run pm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (RPM.md, RPM-LOG.md, PRESENT.md, FUTURE.org, past/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
+name: bootstrap
+description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (RPM.md, past/, present/, future/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
 disable-model-invocation: true
 argument-hint: ""
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Bash(git:*) Glob Grep
 ---
 
-# /rpm:init — Full Instructions
+# /rpm:bootstrap — Full Instructions
 
 First-run setup. Creates PM context for a project. Run once per project.
 If `docs/rpm/RPM.md` already exists, read it and **augment** — do not
@@ -67,7 +67,7 @@ For a startup: velocity vs quality tradeoffs.}
 |------|-------------|
 ```
 
-### 3b. `docs/rpm/RPM-LOG.md` — append-only PM history
+### 3b. `docs/rpm/past/RPM-LOG.md` — append-only PM history
 
 ```markdown
 # PM Log — {project name}
@@ -154,7 +154,7 @@ Create `docs/spec/_template.md`:
 
 ### Present tracker (if none exists)
 
-Create `docs/rpm/PRESENT.md` for current project state:
+Create `docs/rpm/present/PRESENT.md` for current project state:
 
 ```markdown
 # {Project Name} — Present State
@@ -175,7 +175,7 @@ written by `/rpm:session-end`).
 
 ### Future tracker (if none exists)
 
-Create `docs/rpm/FUTURE.org`:
+Create `docs/rpm/future/FUTURE.org`:
 
 ```org
 #+TITLE: {Project Name} Future
@@ -194,28 +194,11 @@ demonstrably struggles. Cap at 4. Communicate via typed artifacts.
 
 **Large (10+):** Module ownership, git worktrees for parallel agent isolation.
 
-## Phase 6: Present and Confirm
+## Phase 6: Create All Files
 
-Do NOT create or modify files yet. Present all planned changes as a
-numbered checklist:
-
-```
-## /rpm:init — proposed changes
-
-| # | Action | File |
-|---|--------|------|
-| 1 | Create | docs/rpm/RPM.md |
-| 2 | Create | docs/rpm/RPM-LOG.md |
-| 3 | Create | docs/rpm/reviews/ |
-| 4 | Create | CLAUDE.md |
-| ... | ... | ... |
-
-(Only files that don't already exist are listed)
-
-Which to create? (e.g., "1", "1,2,3", "all", "none")
-```
-
-Execute only what the user selects. After creating files, proceed to
+Create all files from Phase 3 and Phase 4 that do not already exist.
+Do NOT prompt the user to select which files to create — all are
+required for the plugin to function. After creating files, proceed to
 Phase 7.
 
 ## Phase 7: Permissions
@@ -244,7 +227,7 @@ existing entries.
 ## Phase 8: Present and Confirm
 
 ```
-## /rpm:init complete
+## /rpm:bootstrap complete
 
 Created: {list of created files}
 

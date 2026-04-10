@@ -10,7 +10,7 @@ you on task across LLM-assisted development sessions.
 /plugin install rpm@dppdppd-plugins
 ```
 
-Then start a new conversation and run `/rpm:init`.
+Then start a new conversation and run `/rpm:bootstrap`.
 
 See [plugin/README.md](plugin/README.md) for full documentation.
 

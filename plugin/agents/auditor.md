@@ -47,8 +47,8 @@ Scan the project and report findings.
    docs?
 
 7. **FUTURE TRACKER & SESSION DISCIPLINE:**
-   - `FUTURE.org` (or equivalent) exists and consistent with
-     `PRESENT.md`?
+   - `future/FUTURE.org` (or equivalent) exists and consistent with
+     `present/PRESENT.md`?
    - `IN-PROGRESS` items dated? Stale (>3 sessions)?
    - `CLAUDE.md` instruction count (warn >120, critical >150).
 

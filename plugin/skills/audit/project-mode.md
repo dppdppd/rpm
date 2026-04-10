@@ -28,7 +28,7 @@ later defeats the purpose of a single consolidated review.
 Read project state in parallel:
 
 - `git log --oneline -30` and `git diff --stat`
-- CLAUDE.md, `PRESENT.md`, recent `past/` daily logs, debugging/parity logs
+- CLAUDE.md, `present/PRESENT.md`, recent `past/` daily logs, debugging/parity logs
 - Memory files (feedback type especially)
 - `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
 - `docs/rpm/RPM.md` (project-specific PM context)
@@ -155,7 +155,7 @@ Don't defer questions to the plan file.
 
 ### 2. Log the run
 
-Append one line to `docs/rpm/RPM-LOG.md` Audit History:
+Append one line to `docs/rpm/past/RPM-LOG.md` Audit History:
 
 ```
 - YYYY-MM-DD — audit project — N findings, plan saved to reviews/YYYY-MM-DD-plan.md

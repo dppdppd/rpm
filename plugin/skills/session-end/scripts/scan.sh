@@ -79,7 +79,7 @@ echo "=== broken_refs ==="
 #
 # Scope: CLAUDE.md, README.md, docs/rpm/RPM.md (three "what IS" docs).
 #
-# Excluded: docs/rpm/RPM-LOG.md, docs/rpm/past/*.md, docs/rpm/PRESENT.md
+# Excluded: docs/rpm/past/RPM-LOG.md, docs/rpm/past/*.md, docs/rpm/present/PRESENT.md
 # — all append-only/historical. References to renamed or deleted
 # files are expected there and are not drift.
 #
@@ -167,7 +167,7 @@ echo "=== specs_inventory ==="
 # docs/spec/ — recursive within each. Match is filename-scoped
 # (looks for `$base.md` or `spec(s)/$base` in PRESENT.md, not a
 # loose substring) to avoid false positives on common basenames.
-if [ ! -f docs/rpm/PRESENT.md ]; then
+if [ ! -f docs/rpm/present/PRESENT.md ]; then
   echo "status=no_present_md"
 else
   SPEC_LIST=$(find specs spec docs/specs docs/spec -type f -name '*.md' 2>/dev/null | sort)
@@ -181,9 +181,9 @@ else
       [ -z "$f" ] && continue
       TOTAL=$((TOTAL + 1))
       base=$(basename "$f" .md)
-      if grep -qF "$base.md" docs/rpm/PRESENT.md 2>/dev/null \
-         || grep -qF "specs/$base" docs/rpm/PRESENT.md 2>/dev/null \
-         || grep -qF "spec/$base" docs/rpm/PRESENT.md 2>/dev/null; then
+      if grep -qF "$base.md" docs/rpm/present/PRESENT.md 2>/dev/null \
+         || grep -qF "specs/$base" docs/rpm/present/PRESENT.md 2>/dev/null \
+         || grep -qF "spec/$base" docs/rpm/present/PRESENT.md 2>/dev/null; then
         continue
       fi
       UNLISTED=$((UNLISTED + 1))
@@ -214,7 +214,7 @@ echo "=== pm_docs_staleness ==="
 # 2026-04-05 despite 8+ fixes since" pattern from the volta
 # 2026-04-09 audit.
 #
-# Excludes pm-meta files (RPM-LOG.md, RPM.md, PRESENT.md, FUTURE.org)
+# Excludes pm-meta files (past/RPM-LOG.md, RPM.md, present/PRESENT.md, future/FUTURE.org)
 # which are updated by pm itself and have their own checks.
 if git rev-parse --git-dir > /dev/null 2>&1; then
   NOW_EPOCH=$(date +%s)
@@ -248,7 +248,7 @@ echo "=== task_deps ==="
 # Validate FUTURE.org dependency graph: extract :ID: and :BLOCKED_BY:
 # from property drawers, check for dangling refs and cycles, and
 # report tasks that are ready (TODO with all blockers DONE).
-FUTURE="docs/rpm/FUTURE.org"
+FUTURE="docs/rpm/future/FUTURE.org"
 if [ -f "$FUTURE" ]; then
   # Build maps: id→status, id→blocked_by list
   # Parse sequentially: track current heading's status and ID
