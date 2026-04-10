@@ -58,6 +58,11 @@ Injected at session start. Keep under 30 lines.
 discovered. E.g., for a clean-room project: compliance checks.
 For a startup: velocity vs quality tradeoffs.}
 
+## Tasks
+New tasks in `future/tasks.org`: one short sentence + link to
+`future/<date>-<slug>.md` with details. Never inline task details
+in tasks.org itself.
+
 ## Prior Findings
 | Date | Key Finding |
 |------|-------------|
@@ -178,8 +183,11 @@ Create `docs/rpm/future/tasks.org`:
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * {Current Phase}
-** TODO {first task}
+** TODO {first task} [[file:YYYY-MM-DD-slug.md]]
 ```
+
+Each task entry is one short sentence + a link to a detail file
+(`future/<date>-<slug>.md`). Never inline task details in tasks.org.
 
 ## Phase 5: Adapt for Team Size
 

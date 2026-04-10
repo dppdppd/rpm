@@ -167,7 +167,9 @@ update, skip it and note "no changes" in the Phase 3 report.
    actually changed this session.
 3. **Edit** `docs/rpm/future/tasks.org` — mark completed tasks DONE with
    today's date, update IN-PROGRESS items, append discovered TODOs.
-   Reconcile with native tasks per the rules below.
+   New TODOs: one short sentence + link to `future/<date>-<slug>.md`.
+   Write the detail file for each new task. Reconcile with native
+   tasks per the rules below.
 
 ### Native task reconciliation (within the `future/tasks.org` edit above)
 
