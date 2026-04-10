@@ -1,7 +1,7 @@
-# rpm — Your Relentless Product Manager
+# rpm — Relentless Project Manager
 
-A Claude Code plugin that tracks what shipped, what's next, and
-what's drifting — so you can focus on building.
+A Claude Code plugin that prevents documentation drift and keeps
+you on task across LLM-assisted development sessions.
 
 ## The problem
 
@@ -186,13 +186,13 @@ permanent record.
 ### Quick trial (session-scoped)
 
 ```bash
-claude --plugin-dir /path/to/claude-plugin-pm
+claude --plugin-dir https://github.com/dppdppd/rpm
 ```
 
 ### Persistent local install
 
 ```
-/plugin marketplace add /path/to/claude-plugin-pm
+/plugin marketplace add https://github.com/dppdppd/rpm
 /plugin install rpm@dppdppd-plugins
 ```
 

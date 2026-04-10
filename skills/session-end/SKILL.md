@@ -303,7 +303,7 @@ actions complete, move to Phase 5.
 Only after Phase 4 is done. **Single response** — the rm tool call
 and the handoff text go in the same message:
 
-- Clear session files: `rm -rf docs/rpm/~rpm-session-active docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-nudge-flags`
+- Clear session files: `rm -rf docs/rpm/~rpm-session-active docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl`
 - Output the handoff text below as the **very last lines**:
 
 ```

@@ -1,4 +1,4 @@
-# Project: rpm — Your Relentless Product Manager
+# Project: rpm — Relentless Project Manager
 
 Relentless product manager for LLM-assisted development. Tracks
 what shipped, what's next, and what's drifting — via hooks,

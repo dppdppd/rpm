@@ -6,8 +6,8 @@
   "plugins": [
     {
       "name": "rpm",
-      "description": "Your Relentless Product Manager. Tracks what shipped, what's next, and what's drifting — so you can focus on building.",
-      "source": "./."
+      "description": "Relentless Project Manager. Prevents drift and keeps you on task across LLM-assisted development sessions.",
+      "source": "https://github.com/dppdppd/rpm"
     }
   ]
 }
