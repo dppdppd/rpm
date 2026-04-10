@@ -11,9 +11,10 @@ PRESENT="$PM_DIR/present/PRESENT.md"
 if [ ! -d "$PM_DIR" ]; then
   echo "This project has no docs/rpm/ directory."
   echo ""
-  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+  echo "If the user's first message invokes /bootstrap, proceed with"
+  echo "bootstrap directly — do NOT print the line below."
+  echo "Otherwise, begin your first response with exactly this line:"
   echo "  rpm: not initialized — run /bootstrap to set up"
-  echo "This confirms rpm loaded but found no project infrastructure."
   exit 0
 fi
 
