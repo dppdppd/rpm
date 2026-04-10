@@ -15,9 +15,15 @@ best-in-class.
 (`subagent_type: "rpm:auditor"`) so its structured scan runs in
 parallel with the reads below. Without this, a Project audit can
 silently miss broken file refs and tracker drift that a Documents
-audit would catch. Wait for the scan to return before Phase 4; its
-VALIDITY / COHERENCE / tracker findings become Phase 4 evidence
-inputs.
+audit would catch.
+
+**Hard gate:** Do NOT start Phase 4, present findings, or write
+deliverables until the `rpm:auditor` scan has completed and its
+findings have been merged into your evidence. Phases 2–3 may run
+while the auditor is in flight, but the analysis and all output
+must reflect the union of manual investigation AND the auditor
+report. Presenting a partial list and appending auditor findings
+later defeats the purpose of a single consolidated review.
 
 Read project state in parallel:
 
@@ -25,7 +31,7 @@ Read project state in parallel:
 - CLAUDE.md, `PRESENT.md`, recent `past/` daily logs, debugging/parity logs
 - Memory files (feedback type especially)
 - `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
-- `docs/rpm/PM.md` (project-specific PM context)
+- `docs/rpm/RPM.md` (project-specific PM context)
 - Prior consultant reviews if they exist
 
 Then **probe deeper**:
@@ -54,7 +60,7 @@ docs (vendor docs, RFCs, spec repos). **Min 2 dimensions.**
 
 Either:
 
-- Use WebSearch / WebFetch directly for narrow lookups, or
+- Use WebSearch / `curl --max-time 30 -sL` directly for narrow lookups, or
 - Invoke the `deep-research` skill in parallel for complex,
   multi-angle topics. (`deep-research` is a skill in this plugin,
   not a slash command.)
@@ -74,7 +80,7 @@ whether the project matches its own spec. Skipping this phase is the
 single biggest failure mode of Project mode.
 
 **Discover 3–5 direct competitors or comparable tools.** For at least
-**2**, actually `WebFetch` their docs or README — do not rely on
+**2**, actually fetch their docs or README (via `curl --max-time 30 -sL`) — do not rely on
 search-result titles or summaries.
 
 For each competitor, note:
@@ -118,7 +124,7 @@ Discipline). Trivial hygiene drops out.
 7. **Competitive Gaps** — features/patterns from Phase 3 the project
    should adopt or explicitly reject (with rationale).
 
-If `docs/rpm/PM.md` defines project-specific focus areas, evaluate those too.
+If `docs/rpm/RPM.md` defines project-specific focus areas, evaluate those too.
 
 ## Phase 5: Ask questions and refine
 
@@ -149,7 +155,7 @@ Don't defer questions to the plan file.
 
 ### 2. Log the run
 
-Append one line to `docs/rpm/PM-LOG.md` Audit History:
+Append one line to `docs/rpm/RPM-LOG.md` Audit History:
 
 ```
 - YYYY-MM-DD — audit project — N findings, plan saved to reviews/YYYY-MM-DD-plan.md

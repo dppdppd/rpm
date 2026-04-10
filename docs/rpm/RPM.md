@@ -1,6 +1,6 @@
 ## Project Summary
 
-`pm` is a Claude Code plugin — your AI product manager. It tracks
+`rpm` is a Claude Code plugin — your AI product manager. It tracks
 what shipped, what's next, and what's drifting: session lifecycle,
 doc auditing, task tracking, and deep research — all via hooks and
 auto-loadable skills. Pure markdown + bash; no build, test, or lint toolchain.
@@ -10,7 +10,7 @@ directory removed at 2.0.0). Deterministic ops (drift scan, git
 state) bundled as bash scripts under `skills/<name>/scripts/` at
 zero LLM token cost.
 
-Current command surface: `/rpm:pm` (entry), `/rpm:init`,
+Current command surface: `/rpm:rpm` (entry), `/rpm:init`,
 `/rpm:session-end`, `/rpm:audit documents`, `/rpm:audit project`.
 Plus a `deep-research` skill (no slash command — auto-triggers on
 research questions). Session context auto-loads via SessionStart

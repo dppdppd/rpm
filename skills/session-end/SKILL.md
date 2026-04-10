@@ -74,8 +74,8 @@ this message — do NOT re-run these checks as tool calls.
   `agents/auditor.md`) are expected and should be **suppressed**.
   Only flag real stubs in source.
 - `broken_refs` — backticked path references in `CLAUDE.md`,
-  `README.md`, `docs/rpm/PM.md` that don't resolve on disk.
-  `count > 0` is always actionable. (`PRESENT.md`, `PM-LOG.md`,
+  `README.md`, `docs/rpm/RPM.md` that don't resolve on disk.
+  `count > 0` is always actionable. (`PRESENT.md`, `RPM-LOG.md`,
   and `past/*.md` are deliberately excluded as historical.)
 - `daily_log` — today's date, most recent log date, days since,
   commits since. If `today_exists=false` and `commits_since > 0`,

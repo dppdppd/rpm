@@ -4,7 +4,7 @@
 # detected. Session-end reviews and promotes; file is ephemeral.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
-PM_DIR="$PROJECT_DIR/docs/pm"
+PM_DIR="$PROJECT_DIR/docs/rpm"
 LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"
 MARKER="$PM_DIR/~rpm-session-active"
 

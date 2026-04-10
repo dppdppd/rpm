@@ -8,7 +8,7 @@
 #    bash script can extract; LLM synthesis happens post-compact.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
-PM_DIR="$PROJECT_DIR/docs/pm"
+PM_DIR="$PROJECT_DIR/docs/rpm"
 STATE_FILE="$PM_DIR/~rpm-compact-state"
 MARKER="$PM_DIR/~rpm-session-active"
 LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"

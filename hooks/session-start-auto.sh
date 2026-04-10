@@ -4,7 +4,7 @@
 # + instructions for Claude to pick up the PM workflow automatically.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
-PM_DIR="$PROJECT_DIR/docs/pm"
+PM_DIR="$PROJECT_DIR/docs/rpm"
 MARKER="$PM_DIR/~rpm-session-active"
 FUTURE="$PM_DIR/FUTURE.org"
 PRESENT="$PM_DIR/PRESENT.md"

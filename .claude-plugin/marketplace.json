@@ -5,8 +5,8 @@
   },
   "plugins": [
     {
-      "name": "pm",
-      "description": "Project management layer for LLM-assisted development.",
+      "name": "rpm",
+      "description": "Your Relentless Product Manager. Tracks what shipped, what's next, and what's drifting — so you can focus on building.",
       "source": "./."
     }
   ]

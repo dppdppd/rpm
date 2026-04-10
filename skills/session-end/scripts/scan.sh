@@ -236,7 +236,7 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
     rel="${f#./}"
     echo "file=$rel days=$DAYS"
     STALE_COUNT=$((STALE_COUNT + 1))
-  done < <(find docs docs/pm -maxdepth 1 -type f \( -iname '*log*.md' -o -iname '*tracker*.md' -o -iname '*inventory*.md' \) 2>/dev/null)
+  done < <(find docs docs/rpm -maxdepth 1 -type f \( -iname '*log*.md' -o -iname '*tracker*.md' -o -iname '*inventory*.md' \) 2>/dev/null)
   echo "count=$STALE_COUNT"
 else
   echo "count=0"

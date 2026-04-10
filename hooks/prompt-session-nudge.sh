@@ -4,7 +4,7 @@
 # wrap-up recommendation. Fires once at ~90min.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
-PM_DIR="$PROJECT_DIR/docs/pm"
+PM_DIR="$PROJECT_DIR/docs/rpm"
 MARKER="$PM_DIR/~rpm-session-active"
 
 # Only act during active sessions

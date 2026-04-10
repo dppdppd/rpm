@@ -5,11 +5,11 @@ what shipped, what's next, and what's drifting — via hooks,
 `/rpm:*` commands, doc auditing, and deep research.
 
 ## Layout
-- `skills/` — command surface (`pm`, `init`, `audit`,
+- `skills/` — command surface (`rpm`, `init`, `audit`,
   `session-end`, `deep-research`);
   each is a directory with `SKILL.md` plus optional supporting files
 - `agents/` — subagents (currently `auditor.md`, namespaced
-  `pm:auditor`)
+  `rpm:auditor`)
 - `hooks/` — `hooks.json` + lifecycle scripts: `session-start-auto.sh`
   (context injection), `pre-compact.sh` / `post-compact.sh` (state
   preservation), `stop-learn-capture.sh` (learning extraction),
