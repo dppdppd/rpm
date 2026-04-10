@@ -15,7 +15,7 @@
 ** DONE Add a sample /pm:session-start dry-run note to README so new users see what to expect [2026-04-08]
    - Shipped in c2475ce as a new "What a session looks like" README section.
 ** TODO On publish: add homepage + repository fields to .claude-plugin/plugin.json, finalize marketplace install instructions in README
-** TODO Investigate ~pm-session-active disappearance at /exit→resume boundary
+** TODO Investigate ~rpm-session-active disappearance at /exit→resume boundary
    - One-time quirk observed this session. Marker persisted fine during normal session activity, but vanished between /exit and resume. Root cause unknown — possibly a cleanup process treating ~-prefixed files as backups, or installed hook still using old docs/pm/tmp/ path. Revisit if recurs.
 ** DONE /pm:audit project skips the mechanical VALIDITY/COHERENCE scan [2026-04-08]
    - Fixed by launching pm:auditor in background at start of Project Phase 1 (plugin version) and inlining the Documents scan spec into Project Phase 1 (dispatcher version). Mechanical findings are explicitly called out as Phase 4 evidence inputs. Plugin → 1.0.17.
@@ -76,3 +76,9 @@
    - All command prefixes, skill directory, agent namespace renamed. docs/pm/ kept. Commit `d443ba6`.
 ** TODO Dogfood rpm hooks in a fresh session
    - Verify: auto-start hook loads context, Stop hook captures learnings, PreCompact checkpoints, session-end consumes learnings + task deps.
+** DONE Third /rpm:audit project — 11 findings, 9 fixed [2026-04-10]
+   - Critical: 4 hooks using docs/pm (broken after rename). Also fixed: skill body PM.md→RPM.md refs, marketplace.json name, CLAUDE.md namespace, scan.sh path, project-mode.md WebFetch→curl, deep-research stale /pm, FUTURE.org marker name. Strengthened auditor gate in project-mode.md. 2 deferred: T6 (once:true), T7 (bash path scanner). Reviews/2026-04-10*.
+** TODO Adopt `once: true` for UserPromptSubmit nudge hook
+   - Claude Code v2.1.0 added `once: true` handler option. Replaces manual ~rpm-nudge-flags/wrapup flag system. Small change: hooks.json + prompt-session-nudge.sh + session-end cleanup.
+** TODO Extend broken_refs scanner to bash scripts
+   - scan.sh only checks markdown path refs. The hooks rename bug was invisible to drift detection. Scan hooks/*.sh and skills/*/scripts/*.sh for path-like strings, verify they resolve.

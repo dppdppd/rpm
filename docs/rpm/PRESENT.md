@@ -1,12 +1,14 @@
 # rpm — Present State
 
 ## Project Status
-- **Current phase**: Renamed to **rpm** (Relentless Product Manager). Hook-driven session lifecycle at 2.2.0 — session-start and session-update replaced by hooks; 5 lifecycle hooks total. Next: dogfood hooks in a fresh session.
+- **Current phase**: Post-audit fix sweep. 9 rename-gap findings fixed across 15 files. README rewritten around documentation alignment. 2 low-severity findings deferred (T6: `once:true` nudge, T7: bash path scanner). Next: commit + dogfood hooks in fresh session.
 - **Last updated**: 2026-04-10
 - **Version**: 2.2.0
 
 ## Completed Work
-- 2026-04-10 — **rename to rpm** (`d443ba6`): plugin renamed from pm to rpm (Relentless Product Manager). All command prefixes, skill directory, agent namespace updated. `docs/rpm/` kept as-is.
+- 2026-04-10 — **audit project + 9 fixes**: third `/rpm:audit project`. Critical finding: `docs/pm/` → `docs/rpm/` rename broke 4 of 5 hooks. Fixed hooks, skill bodies (PM.md→RPM.md refs), marketplace.json, CLAUDE.md namespace, scan.sh path, project-mode.md WebFetch→curl, deep-research stale /pm ref, FUTURE.org marker name. Also: strengthened auditor gate in project-mode.md. Plan + report saved to `reviews/2026-04-10*`.
+- 2026-04-10 — **README rewrite**: reframed around documentation alignment (not session statefulness). Competitive positioning vs claude-mem, gstack, cc-spex, ccpm, flow-next.
+- 2026-04-10 — **rename to rpm** (`d443ba6`, `83020ea`): plugin renamed from pm to rpm (Relentless Product Manager). All command prefixes, skill directory, agent namespace, docs/pm/ → docs/rpm/ updated.
 - 2026-04-10 — **hook-driven session lifecycle** (2.2.0, `c53f699`): 5 new hooks (SessionStart auto-inject, PreCompact checkpoint, PostCompact recovery, Stop learning capture, UserPromptSubmit nudge). Deleted session-start, session-update, and context-scouts skills. Added structured task deps (:ID:/:BLOCKED_BY:) with scan.sh validation. Competitive audit against 8 plugins informed feature priorities.
 - 2026-04-10 — **session-end latency optimizations** (`f605ead`): pre-read today's past log in Phase 1b to eliminate hidden dependency; merge Phase 2 commit + Phase 3 presentation into one response; merge Phase 5 rm + handoff into one response. ~4 tool-call rounds instead of ~6.
 - 2026-04-10 — **session-start scan.sh auto-inject** (2.1.3, `c17dbcf`): new `skills/session-start/scripts/scan.sh` bundles latest past-file lookup, git status/stash, and PRESENT.md drift check. Auto-injects before skill body loads, cutting session-start from ~5 sequential tool-call rounds to ~2. Rewrote SKILL.md to consume scan output and fire all reads in one parallel message.
