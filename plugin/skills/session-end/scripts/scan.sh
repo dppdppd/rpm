@@ -316,6 +316,31 @@ fi
 
 # ----------------------------------------------------------------
 echo
+echo "=== migration ==="
+# Detect old rpm file names that need migration to current structure.
+# Two eras: flat (docs/rpm/FUTURE.org) and dir-with-old-names
+# (docs/rpm/future/FUTURE.org). Emit move=old→new for each.
+MIGRATE_COUNT=0
+migrate() {
+  if [ -f "$1" ]; then
+    echo "move=$1→$2"
+    MIGRATE_COUNT=$((MIGRATE_COUNT + 1))
+  fi
+}
+# Flat era (pre-directory reorganization)
+migrate "docs/rpm/FUTURE.org"  "docs/rpm/future/tasks.org"
+migrate "docs/rpm/PRESENT.md"  "docs/rpm/present/status.md"
+migrate "docs/rpm/RPM-LOG.md"  "docs/rpm/past/log.md"
+# Directory era with old names
+migrate "docs/rpm/future/FUTURE.org" "docs/rpm/future/tasks.org"
+migrate "docs/rpm/present/PRESENT.md" "docs/rpm/present/status.md"
+migrate "docs/rpm/past/RPM-LOG.md"    "docs/rpm/past/log.md"
+# RPM.md → context.md (always at docs/rpm/ root)
+migrate "docs/rpm/RPM.md" "docs/rpm/context.md"
+echo "count=$MIGRATE_COUNT"
+
+# ----------------------------------------------------------------
+echo
 echo "=== learnings_capture ==="
 # Check for auto-captured learnings from the Stop hook
 LEARNINGS_FILE="docs/rpm/~rpm-learnings.jsonl"

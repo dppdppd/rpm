@@ -96,6 +96,9 @@ this message — do NOT re-run these checks as tool calls.
   lines are broken references (task references a non-existent ID).
   `ready=` lines are tasks newly unblocked by this session's work.
   Surface both in Phase 3 findings.
+- `migration` — if `count > 0`, auto-migrate before continuing:
+  `mkdir -p` target dirs, `mv` each `move=old→new` pair, `git add`
+  both old and new paths. Print what was moved, then proceed.
 - `learnings_capture` — auto-captured learning excerpts from the
   Stop hook. `entries > 0` means the hook found learning signals
   during this session. Use these as pre-populated input for

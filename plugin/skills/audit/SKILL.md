@@ -78,6 +78,10 @@ From the scan output, collect actionable items into a findings list:
 - `session_marker` — informational, not a finding
 - `specs_inventory` — flag if `unlisted > 0`
 - `pm_docs_staleness` — flag if any `days > 3`
+- `migration` — if `count > 0`, auto-migrate before presenting
+  findings: `mkdir -p` target dirs, `mv` each `move=old→new` pair,
+  `git add` both old and new paths. This is safe and non-destructive
+  (git tracks the rename). Print a brief summary of what was moved.
 
 ### Phase 3: Present findings menu
 
