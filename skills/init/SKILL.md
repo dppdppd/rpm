@@ -215,7 +215,33 @@ numbered checklist:
 Which to create? (e.g., "1", "1,2,3", "all", "none")
 ```
 
-Execute only what the user selects. After completing:
+Execute only what the user selects. After creating files, proceed to
+Phase 7.
+
+## Phase 7: Permissions
+
+rpm hooks and skills frequently read/write files under `docs/rpm/`.
+Without explicit permissions, every file operation prompts the user.
+
+Check whether `Read(./docs/rpm/**)` and `Edit(./docs/rpm/**)` already
+appear in `.claude/settings.local.json` (or `.claude/settings.json`).
+If they do, skip this phase silently.
+
+If not, ask:
+
+```
+Grant rpm read/write access to docs/rpm/?
+This lets hooks and skills manage session files, daily logs, and
+trackers without per-file permission prompts.
+(y/n)
+```
+
+If yes: read `.claude/settings.local.json` (create if missing), merge
+`Read(./docs/rpm/**)` and `Edit(./docs/rpm/**)` into
+`permissions.allow`, and write the file back. Do not overwrite
+existing entries.
+
+## Phase 8: Present and Confirm
 
 ```
 ## /rpm:init complete
