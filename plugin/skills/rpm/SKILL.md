@@ -1,7 +1,7 @@
 ---
 name: rpm
 description: Explain the rpm plugin and list its commands. Use when the user asks what rpm is, how /rpm works, which rpm commands are available, or needs an overview of the session-lifecycle / audit / deep-research surface.
-argument-hint: "[version]"
+argument-hint: "[version | ?]"
 ---
 
 # /rpm — Relentless Project Manager
@@ -13,6 +13,22 @@ If `$ARGUMENTS` is `version` (or `--version` or `-v`):
 !bash "jq -r '.version' \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json\""
 
 Print `rpm v{version}` and stop. Do not continue to the overview below.
+
+If `$ARGUMENTS` is `?` (or `help` or `--help` or `-h`):
+
+Print this exact list and stop:
+
+```
+/session-end     — wrap up, update trackers, commit, hand off
+/bootstrap       — scaffold rpm infrastructure for a new project
+/audit documents — scan docs, CLAUDE.md, memory, session drift
+/audit project   — full review with competitive research and plan
+/tasks           — manage backlog (add, list, review, done)
+/rpm             — what is rpm, how it works, governing principles
+/rpm ?           — this list
+```
+
+Do not continue to the overview below.
 
 If `$ARGUMENTS` is empty or anything else, continue:
 
