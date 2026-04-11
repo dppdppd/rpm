@@ -7,6 +7,16 @@ MARKER="$PM_DIR/~rpm-session-active"
 CONTEXT="$PM_DIR/context.md"
 FUTURE="$PM_DIR/future/tasks.org"
 PRESENT="$PM_DIR/present/status.md"
+LAST_SESSION="$PM_DIR/~rpm-last-session"
+
+# Read source from stdin (startup, clear, resume, compact)
+PAYLOAD=$(cat)
+SOURCE=$(echo "$PAYLOAD" | jq -r '.source // empty' 2>/dev/null)
+[ -z "$SOURCE" ] && SOURCE=$(echo "$PAYLOAD" | sed -n 's/.*"source" *: *"\([^"]*\)".*/\1/p')
+[ -z "$SOURCE" ] && SOURCE="startup"
+
+# Let PostCompact handle compaction
+[ "$SOURCE" = "compact" ] && exit 0
 
 # --- Not initialized ---
 if [ ! -d "$PM_DIR" ]; then
@@ -19,7 +29,34 @@ if [ ! -d "$PM_DIR" ]; then
   exit 0
 fi
 
-# --- Stale session ---
+# --- Continuing session (clear/resume with active marker) ---
+if [ -f "$MARKER" ] && { [ "$SOURCE" = "clear" ] || [ "$SOURCE" = "resume" ]; }; then
+  TASK=$(grep -oP 'task: \K.*' "$MARKER" 2>/dev/null | head -1)
+  echo "rpm: continuing — ${TASK:-unknown task}"
+  echo ""
+  # Brief git state
+  if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
+    PORCELAIN=$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null || true)
+    MODIFIED=$(echo "$PORCELAIN" | grep -cE '^.M|^M ' || true)
+    UNTRACKED=$(echo "$PORCELAIN" | grep -cE '^\?\?' || true)
+    STAGED=$(echo "$PORCELAIN" | grep -cE '^M |^A |^D ' || true)
+    echo "git: modified=$MODIFIED untracked=$UNTRACKED staged=$STAGED"
+    echo ""
+    echo "=== recent_commits ==="
+    git -C "$PROJECT_DIR" log --oneline -5 2>/dev/null || echo "(none)"
+  fi
+  echo ""
+  echo "=== instructions ==="
+  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+  echo "  rpm: continuing — ${TASK:-unknown task}"
+  echo ""
+  echo "The user cleared context but is still working on the same task."
+  echo "Check git state and recent commits to orient, then pick up where you left off."
+  echo "If the user wants a different task, they'll say so."
+  exit 0
+fi
+
+# --- Stale session (new session with leftover marker) ---
 if [ -f "$MARKER" ]; then
   echo "rpm: stale session detected"
   echo ""
@@ -94,6 +131,29 @@ if [ -f "$FUTURE" ]; then
   BLOCKED_N=$(grep -cE '^\*\* BLOCKED ' "$FUTURE" 2>/dev/null || true)
   echo "scoreboard: $DONE_N done · $IP_N in-progress · $TODO_N todo · $BLOCKED_N blocked"
   echo ""
+  # Show last session context if available
+  if [ -f "$LAST_SESSION" ]; then
+    LAST_TASK=$(grep -oP 'task: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
+    LAST_ENDED=$(grep -oP 'ended: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
+    if [ -n "$LAST_TASK" ]; then
+      AGO=""
+      if [ -n "$LAST_ENDED" ]; then
+        END_EPOCH=$(date -d "$LAST_ENDED" +%s 2>/dev/null || echo 0)
+        if [ "$END_EPOCH" -gt 0 ]; then
+          ELAPSED=$(( $(date +%s) - END_EPOCH ))
+          if [ "$ELAPSED" -lt 3600 ]; then
+            AGO=" ($(( ELAPSED / 60 ))m ago)"
+          elif [ "$ELAPSED" -lt 86400 ]; then
+            AGO=" ($(( ELAPSED / 3600 ))h ago)"
+          else
+            AGO=" ($(( ELAPSED / 86400 ))d ago)"
+          fi
+        fi
+      fi
+      echo "Last session: ${LAST_TASK}${AGO}"
+      echo ""
+    fi
+  fi
   echo "What would you like to work on? Open tasks from your backlog:"
 
   # Pass 1: collect task IDs and statuses for dependency resolution
