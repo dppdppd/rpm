@@ -107,7 +107,7 @@ Polish
 S: something else
 R: review tasks
 
-Pick a number, add ? for details, or choose S/R.
+Pick #, #? for details, S, or R.
 ```
 
 ### `/audit quick`
