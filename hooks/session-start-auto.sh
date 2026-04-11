@@ -228,11 +228,11 @@ if [ -f "$FUTURE" ]; then
   fi
 
   echo ""
+  echo "S: something else"
+  echo "R: review tasks"
   if [ -n "$LAST_TASK" ]; then
     echo "C: continue working on ${LAST_TASK}"
   fi
-  echo "S: something else"
-  echo "R: review tasks"
   echo ""
   if [ -n "$LAST_TASK" ]; then
     echo "Pick #, #? for details, C, S, or R."
