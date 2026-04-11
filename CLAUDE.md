@@ -56,8 +56,3 @@ slash commands, doc auditing, and deep research.
 ## Post-compaction recovery
 Read `docs/rpm/~rpm-compact-state` to recover the active task, git
 state, and tracker snapshot. The PreCompact hook saves this automatically.
-
-## WebFetch
-Do not use WebFetch — it has no tool-level timeout and a hung
-request stalls the entire session (anthropics/claude-code#34565).
-Use `curl --max-time 30 -sL <url>` via Bash instead.

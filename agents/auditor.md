@@ -54,7 +54,7 @@ Scan the project and report findings.
 
 8. **SESSION DRIFT:** Mine recent sessions for undocumented changes.
    Session data:
-   `~/.claude/projects/$(pwd | sed 's|/|-|g; s|^-||')/*.jsonl`.
+   `~/.claude/projects/$(pwd | sed 's|/|-|g')/*.jsonl`.
    For unreviewed sessions (most recent first, max 5):
    - Extract user messages and file-modifying tool calls.
    - Classify drift as `JUSTIFIED` or `UNJUSTIFIED`.
