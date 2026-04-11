@@ -90,7 +90,7 @@ rpm: session active
 
 rpm: 5 done · 1 in-progress · 6 todo · 1 blocked
 
-Next tasks:
+What would you like to work on?
 API Layer
    1. Rate limiter middleware (in-progress)
       detail: future/2026-04-08-rate-limiter.md
