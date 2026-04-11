@@ -311,7 +311,7 @@ and the handoff text go in the same message:
 - Save last session info before cleanup:
   ```bash
   TASK=$(grep -oP 'task: \K.*' docs/rpm/~rpm-session-active 2>/dev/null | head -1)
-  printf 'task: %s\nended: %s\n' "${TASK:-unknown}" "$(date -Iseconds)" > docs/rpm/~rpm-last-session
+  printf 'task: %s\nended: %s\nnext: %s\n' "${TASK:-unknown}" "$(date -Iseconds)" "{what's next text}" > docs/rpm/~rpm-last-session
   ```
 - Clear session files: `rm -rf docs/rpm/~rpm-session-active docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl`
 - Output the handoff text below as the **very last lines**:
