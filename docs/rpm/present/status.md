@@ -16,6 +16,9 @@
 - Learning capture pipeline (Stop hook + "Key finding:" contract)
 - PostCompact compact_summary for better continuity after compaction
 - Random tips at session start (stderr, not model context)
+- /rpm ? quick-reference command
+- Context-aware session-end suggestion (replaces time-based nudge)
+- Post-clear continuity: next field in ~rpm-last-session, branched startup flow
 - File rename migration (FUTURE.org/PRESENT.md/RPM.md/RPM-LOG.md to tasks.org/status.md/context.md/log.md)
 - Bootstrap with single detect.sh script, permissions-first flow
 - Context.md auto-injection at session start
