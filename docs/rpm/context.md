@@ -31,3 +31,7 @@ in tasks.org itself.
 ## Prior Findings
 | Date | Key Finding |
 |------|-------------|
+| 2026-04-08 | command-version drift; CLAUDE.md effectiveness baseline |
+| 2026-04-09 | scan gap fix validation; project-mode protocol refinement |
+| 2026-04-10 | docs/pm→docs/rpm rename gap in hooks; skills migration |
+| 2026-04-11 | stale `init`/`/pm:` refs in CLAUDE.md + memory; empty audit log backfilled |
