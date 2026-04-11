@@ -237,6 +237,7 @@ Created: {list of created files}
 
 Next steps:
 - Start a new conversation — rpm context auto-loads via SessionStart hook
+- `/tasks add <description>` — add tasks to your backlog
 - `/audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
 ```

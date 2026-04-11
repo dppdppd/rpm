@@ -55,7 +55,8 @@ building.
 
 **Every session:** Just start working. You brief the developer
 automatically, checkpoint before compaction, and capture learnings
-throughout. `/session-end` when it's time to wrap up.
+throughout. `/tasks` to manage the backlog mid-session.
+`/session-end` when it's time to wrap up.
 
 **Project health:** Routine drift checks run at session-end. For
 deeper analysis: `/audit documents` (doc scan) or

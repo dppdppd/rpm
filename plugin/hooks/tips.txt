@@ -1,7 +1,7 @@
 "/audit quick" runs in ~5 seconds with zero LLM tokens — good for a fast sanity check between session-ends.
 "/audit project" includes competitive research — use it when you want outside perspective on your project's health.
 /session-end auto-updates past/present/future trackers — no manual bookkeeping needed.
-Tasks: ask me to add, organize, evaluate, or list your tasks.
+/tasks to add, list, review, or complete tasks from your backlog — anytime, mid-session.
 /compact when you need — we'll pick up where we left off right after.
 Context getting long? /clear and we'll pick up where we left off.
 Need to research something? Ask me — deep research runs parallel search agents and validates findings.

@@ -27,7 +27,8 @@ recent drift — and proposes a task from the backlog. You confirm and
 work.
 
 **Mid-session:** rpm quietly captures learnings and checkpoints your
-progress. If you run `/compact`, rpm saves your state before
+progress. Use `/tasks` to add, list, review, or complete tasks from
+your backlog. If you run `/compact`, rpm saves your state before
 compaction and restores it after — so you pick up exactly where you
 left off without re-explaining anything. After about 90 minutes it
 nudges you to wrap up before context quality degrades.
