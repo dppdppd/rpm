@@ -6,7 +6,7 @@ slash commands, doc auditing, and deep research.
 
 ## Layout
 - `skills/` — command surface (`rpm`, `bootstrap`, `audit`,
-  `session-end`, `deep-research`);
+  `session-end`, `tasks`, `deep-research`);
   each is a directory with `SKILL.md` plus optional supporting files
 - `agents/` — subagents (currently `auditor.md`, namespaced
   `rpm:auditor`)
