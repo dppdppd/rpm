@@ -22,7 +22,9 @@ Solo developer. Published via git subtree split to GitHub.
 - Hook reliability (bash scripts, no LLM tokens)
 - CLAUDE.md staying under 150 lines
 ## Tasks
-New tasks: one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
+When the user mentions work to do later, capture it as a task.
+When you suggest work, offer to add it as a task.
+Format: one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
 
 ## Prior Findings
 See `docs/rpm/past/log.md` Audit History for full list.
