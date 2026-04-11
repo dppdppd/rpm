@@ -125,9 +125,10 @@ if [ -f "$FUTURE" ]; then
   echo "scoreboard: $DONE_N done · $IP_N in-progress · $TODO_N todo · $BLOCKED_N blocked"
   echo ""
   # Check for last session task
-  LAST_TASK=""
+  LAST_TASK="" LAST_NEXT=""
   if [ -f "$LAST_SESSION" ]; then
     LAST_TASK=$(grep -oP 'task: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
+    LAST_NEXT=$(grep -oP 'next: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
   fi
   echo "What would you like to work on? Open tasks from your backlog:"
 
@@ -272,6 +273,25 @@ echo "=== instructions ==="
 echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
 echo "  rpm: session active"
 echo ""
+if [ "$SOURCE" = "clear" ] && [ -n "$LAST_NEXT" ]; then
+echo "Then:"
+echo "1. Tell the user what was next from the last session:"
+echo "   \"$LAST_NEXT\""
+echo "2. Ask if they want to continue with that or pick something else."
+echo "   - If yes → proceed to step 3"
+echo "   - If no → present the task menu (scoreboard through prompt line, verbatim)"
+echo "     and handle their selection"
+echo "3. On task selection, write the session marker:"
+echo "   cat > docs/rpm/~rpm-session-active << MARKER"
+echo "   ---"
+echo "   session_id: \${CLAUDE_CODE_SESSION_ID:-unknown}"
+echo "   started: \$(date -Iseconds)"
+echo "   task: {chosen task}"
+echo "   ---"
+echo "   MARKER"
+echo "4. Create a native task via TaskCreate."
+echo "5. Begin working."
+else
 echo "Then:"
 echo "1. Note leftover state (uncommitted work, drift) — ask the developer how to handle it."
 echo "2. Present the task menu in a code block (triple backticks) to preserve formatting."
@@ -296,6 +316,7 @@ echo "   ---"
 echo "   MARKER"
 echo "5. Create a native task via TaskCreate."
 echo "6. Begin working."
+fi
 echo ""
 echo "Task management: /tasks (add, list, review, done) for mid-session backlog operations."
 echo ""
