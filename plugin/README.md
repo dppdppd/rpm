@@ -30,8 +30,7 @@ work.
 progress. Use `/tasks` to add, list, review, or complete tasks from
 your backlog. If you run `/compact`, rpm saves your state before
 compaction and restores it after — so you pick up exactly where you
-left off without re-explaining anything. After about 90 minutes it
-nudges you to wrap up before context quality degrades.
+left off without re-explaining anything.
 
 **End of session:** Run `/session-end`. It auto-updates all three
 trackers, surfaces uncommitted work and learnings, and writes a
@@ -218,7 +217,6 @@ Five hooks drive the automatic behavior:
 | **Stop** | Captures learning signals after each response. |
 | **PreCompact** | Checkpoints progress before context compaction. |
 | **PostCompact** | Re-injects session state after compaction. |
-| **UserPromptSubmit** | Nudges for wrap-up after ~90 minutes. |
 
 ## License
 

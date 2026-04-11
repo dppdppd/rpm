@@ -24,6 +24,8 @@ Solo developer. Published via git subtree split to GitHub.
 ## Tasks
 When the user mentions work to do later, capture it as a task.
 When you suggest work, offer to add it as a task.
+When the user shifts to a new task and current context has little carry-over value,
+suggest /session-end first so trackers stay current.
 Format: one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
 
 ## Prior Findings
