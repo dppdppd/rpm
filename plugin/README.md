@@ -55,6 +55,13 @@ trackers, surfaces uncommitted work and learnings, presents an action
 menu, then writes handoff notes. Run when you're done working or when
 context is getting long.
 
+### `/tasks`
+
+Manage the task backlog. Add new tasks, list all tasks with statuses,
+review and reorganize the backlog, or mark tasks done. Also
+auto-triggers when you mention tasks naturally ("add a task", "what's
+on my backlog").
+
 ### `/audit quick`
 
 Fast mechanical scan. Zero LLM tokens. Checks git state, CLAUDE.md

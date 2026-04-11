@@ -52,7 +52,21 @@ Scan the project and report findings.
    - `IN-PROGRESS` items dated? Stale (>3 sessions)?
    - `CLAUDE.md` instruction count (warn >120, critical >150).
 
-8. **SESSION DRIFT:** Mine recent sessions for undocumented changes.
+8. **TASK REVIEW:** Read `future/tasks.org` and all linked detail
+   files. Evaluate:
+   - **Organization:** tasks under logical parent headings? Any
+     miscategorized?
+   - **Dependencies:** `:BLOCKED_BY:` relationships make sense?
+     Missing dependencies that should exist? Circular refs?
+   - **Clarity:** descriptions actionable? Detail files present
+     for complex tasks?
+   - **Staleness:** TODO items with no activity across multiple
+     sessions? IN-PROGRESS items that haven't progressed?
+   - **Duplicates:** overlapping or redundant tasks?
+   - **Scope:** tasks sized for a single session (~35 min)? Any
+     that should be broken down further?
+
+9. **SESSION DRIFT:** Mine recent sessions for undocumented changes.
    Session data:
    `~/.claude/projects/$(pwd | sed 's|/|-|g')/*.jsonl`.
    For unreviewed sessions (most recent first, max 5):
