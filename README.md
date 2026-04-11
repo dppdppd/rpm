@@ -1,20 +1,32 @@
 # rpm — Relentless Project Manager
 
-A Claude Code plugin that manages your project across sessions.
+A Claude Code plugin that solves the two hardest problems in
+LLM-assisted development: **session resumption** and **drift**.
 
 ## Why
 
-Claude Code sessions are disposable. You start one, do some work,
-and when you're done the context is gone. The next session starts
-cold — it doesn't know what you did yesterday, what you decided, or
-what's next. You end up re-explaining context, redoing work, and
-watching docs drift from reality because nothing checks whether
-yesterday's documentation still matches today's code.
+LLM sessions are stateless. Every new conversation starts cold —
+no memory of what you shipped yesterday, what you decided, or what's
+next. You waste time re-explaining context, and the AI wastes tokens
+rediscovering your codebase.
 
-rpm fixes this. It maintains a persistent project state across
-sessions — what happened (past), where things stand (present), and
-what's planned (future). Each session starts with full context and
-ends with a clean handoff to the next one.
+Meanwhile, your docs quietly rot. README instructions fall behind
+the code. CLAUDE.md references files that were renamed three commits
+ago. Nobody notices until something breaks, because nothing is
+watching.
+
+**rpm fixes both problems.**
+
+**Session resumption:** rpm tracks what happened (past), where things
+stand (present), and what's planned (future). Every session starts
+with full context — git state, open tasks, recent drift, handoff
+notes from the last session — and ends with a clean handoff to the
+next one. No re-explaining.
+
+**Drift detection:** rpm audits your docs against reality. Quick
+scans catch broken refs and stale instructions in seconds. Deep
+scans find contradictions between documentation and code. Full
+project reviews validate against external sources.
 
 ## The workflow
 
