@@ -75,6 +75,104 @@ docs, runs competitive research against real alternatives. Outputs an
 executive summary and a plan file. Use when you want outside
 perspective on the project's overall health. ~30 minutes.
 
+## Examples
+
+### Session start
+
+```
+rpm: session active
+
+2 untracked files, 3 commits of drift since status.md updated.
+
+rpm: 5 done · 1 in-progress · 6 todo · 1 blocked
+
+API Layer
+   1. Rate limiter middleware (in-progress)
+      detail: future/2026-04-08-rate-limiter.md
+   2. Request validation
+
+Data Layer
+   3. Migration rollback support
+   4. Connection pool tuning
+      detail: future/2026-04-05-pool-tuning.md
+
+Polish
+   5. Error message consistency
+   6. OpenAPI spec generation
+
+S: something else
+R: review tasks
+
+Pick a number, add ? for details, or choose S/R.
+```
+
+### `/audit quick`
+
+Fast mechanical scan, zero LLM tokens:
+
+```
+## /audit quick — 2 findings
+
+A. 2 broken refs in docs/rpm/context.md                        [70]
+   context.md:12 → api/routes.md (deleted in abc1234)
+   context.md:18 → docs/setup.md (moved to docs/guides/setup.md)
+
+B. Daily log gap — 3 commits since last entry                  [65]
+
+Fix A, B, all, or skip?
+```
+
+### `/audit documents`
+
+Deep doc scan via background subagent:
+
+```
+## /audit documents — 3 findings
+
+A. CLAUDE.md § Build command outdated — says `npm run build`,     [85]
+   codebase switched to `pnpm build` 12 commits ago
+
+B. docs/api-design.md contradicts implementation —                [72]
+   doc says auth uses JWT, code uses session tokens since Phase 4
+
+C. 2 memory files reference renamed src/utils/ directory          [65]
+
+(1 low-confidence finding logged but not shown)
+
+Fix all, pick by letter, or skip?
+```
+
+### `/audit project`
+
+Full consultant review with external research:
+
+```
+## rpm Review — 2026-04-10
+
+### Health
+API layer well-structured. Auth middleware and public endpoint
+exposure are the main risks.
+
+### Research Conducted
+- Inward — session token storage — confirmed non-compliant
+  with SOC2 control CC6.1; tokens stored in plaintext cookies
+- Outward — Hono, Fastify, Express — all three default to
+  httpOnly signed cookies; current impl skips signing
+
+### Findings
+- Auth token storage (Critical) — session tokens stored unsigned
+  in plaintext cookies. Industry standard is httpOnly + signed.
+  Outward research confirms all three comparable frameworks
+  default to signed cookies.
+- Unprotected public endpoints (High) — 3 public routes have no
+  rate limiting. Inward research confirms no middleware registered.
+
+### Plan
+Plan saved to docs/rpm/reviews/2026-04-10-plan.md
+- Fix auth token storage — Critical, ~2 sessions
+- Add rate limiting to public endpoints — High, ~1 session
+```
+
 ## Installation
 
 ### From marketplace
