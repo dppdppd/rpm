@@ -18,16 +18,9 @@ SOURCE=$(echo "$PAYLOAD" | jq -r '.source // empty' 2>/dev/null)
 # Let PostCompact handle compaction
 [ "$SOURCE" = "compact" ] && exit 0
 
-# --- Not initialized ---
-if [ ! -d "$PM_DIR" ]; then
-  echo "This project has no docs/rpm/ directory."
-  echo ""
-  echo "If the user's first message invokes /bootstrap, proceed with"
-  echo "bootstrap directly — do NOT print the line below."
-  echo "Otherwise, begin your first response with exactly this line:"
-  echo "  rpm: not initialized — run /bootstrap to set up"
-  exit 0
-fi
+# --- Not initialized — exit silently ---
+# If the user hasn't bootstrapped, don't assume they want rpm here.
+[ ! -d "$PM_DIR" ] && exit 0
 
 # --- Continuing session (clear/resume with active marker) ---
 if [ -f "$MARKER" ] && { [ "$SOURCE" = "clear" ] || [ "$SOURCE" = "resume" ]; }; then
