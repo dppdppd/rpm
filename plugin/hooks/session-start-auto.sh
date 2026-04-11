@@ -259,6 +259,13 @@ if [ -f "$LEARNINGS" ]; then
   fi
 fi
 
+# --- Random tip (user-visible only, not model context) ---
+TIPS_FILE="${CLAUDE_PLUGIN_ROOT}/hooks/tips.txt"
+if [ -f "$TIPS_FILE" ]; then
+  TIP=$(shuf -n 1 "$TIPS_FILE" 2>/dev/null)
+  [ -n "$TIP" ] && echo "rpm tip: $TIP" >&2
+fi
+
 # --- Instructions for Claude ---
 echo ""
 echo "=== instructions ==="
