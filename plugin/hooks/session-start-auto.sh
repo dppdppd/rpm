@@ -131,28 +131,10 @@ if [ -f "$FUTURE" ]; then
   BLOCKED_N=$(grep -cE '^\*\* BLOCKED ' "$FUTURE" 2>/dev/null || true)
   echo "scoreboard: $DONE_N done · $IP_N in-progress · $TODO_N todo · $BLOCKED_N blocked"
   echo ""
-  # Show last session context if available
+  # Check for last session task
+  LAST_TASK=""
   if [ -f "$LAST_SESSION" ]; then
     LAST_TASK=$(grep -oP 'task: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
-    LAST_ENDED=$(grep -oP 'ended: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
-    if [ -n "$LAST_TASK" ]; then
-      AGO=""
-      if [ -n "$LAST_ENDED" ]; then
-        END_EPOCH=$(date -d "$LAST_ENDED" +%s 2>/dev/null || echo 0)
-        if [ "$END_EPOCH" -gt 0 ]; then
-          ELAPSED=$(( $(date +%s) - END_EPOCH ))
-          if [ "$ELAPSED" -lt 3600 ]; then
-            AGO=" ($(( ELAPSED / 60 ))m ago)"
-          elif [ "$ELAPSED" -lt 86400 ]; then
-            AGO=" ($(( ELAPSED / 3600 ))h ago)"
-          else
-            AGO=" ($(( ELAPSED / 86400 ))d ago)"
-          fi
-        fi
-      fi
-      echo "Last session: ${LAST_TASK}${AGO}"
-      echo ""
-    fi
   fi
   echo "What would you like to work on? Open tasks from your backlog:"
 
@@ -246,10 +228,17 @@ if [ -f "$FUTURE" ]; then
   fi
 
   echo ""
+  if [ -n "$LAST_TASK" ]; then
+    echo "C: continue working on ${LAST_TASK}"
+  fi
   echo "S: something else"
   echo "R: review tasks"
   echo ""
-  echo "Pick #, #? for details, S, or R."
+  if [ -n "$LAST_TASK" ]; then
+    echo "Pick #, #? for details, C, S, or R."
+  else
+    echo "Pick #, #? for details, S, or R."
+  fi
 else
   echo "(no tasks.org found)"
 fi
@@ -291,6 +280,7 @@ echo "3. Handle the user's response:"
 echo "   - #  → select that task, proceed to step 4"
 echo "   - #? → read the detail file (path shown under the task), summarize it,"
 echo "          then re-present the menu"
+echo "   - C  → continue working on last session's task, proceed to step 4"
 echo "   - S: <description> → use their custom task, proceed to step 4"
 echo "   - R  → show ALL tasks from tasks.org (including DONE/BLOCKED) with statuses,"
 echo "          then re-present the actionable menu"
