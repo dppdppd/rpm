@@ -34,10 +34,12 @@ recommend. You do NOT write feature code.
 | `/bootstrap` | Onboard — scaffold rpm infrastructure for a new project |
 | `/audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
 | `/audit project` | Full review — code, architecture, competitive research, plan file |
+| `/tasks` | Manage backlog — add, list, review, or complete tasks |
 
 | Skill | What you do |
 |---|---|
 | `deep-research` | Multi-agent research — auto-triggers on questions needing external knowledge |
+| `tasks` | Also auto-triggers on "add a task", "what's on my backlog", etc. |
 
 **Workflow:** `bootstrap` (once) -> work (you auto-load context) -> `session-end` -> repeat.
 

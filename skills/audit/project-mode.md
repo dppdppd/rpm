@@ -123,6 +123,12 @@ Discipline). Trivial hygiene drops out.
 6. **Session Discipline** — tracker maintained? sessions scoped?
 7. **Competitive Gaps** — features/patterns from Phase 3 the project
    should adopt or explicitly reject (with rationale).
+8. **Gaps & Opportunities** — what patterns or implicit tools have
+   emerged that would benefit from formal inclusion? Look for:
+   operations scattered across multiple components that belong
+   together, recurring conventions that lack a dedicated interface,
+   functionality that exists in practice but hasn't been named or
+   surfaced as a feature. Each is a candidate for promotion.
 
 If `docs/rpm/context.md` defines project-specific focus areas, evaluate those too.
 
