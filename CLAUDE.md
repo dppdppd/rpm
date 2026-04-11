@@ -5,7 +5,7 @@ what shipped, what's next, and what's drifting — via hooks,
 slash commands, doc auditing, and deep research.
 
 ## Layout
-- `skills/` — command surface (`rpm`, `init`, `audit`,
+- `skills/` — command surface (`rpm`, `bootstrap`, `audit`,
   `session-end`, `deep-research`);
   each is a directory with `SKILL.md` plus optional supporting files
 - `agents/` — subagents (currently `auditor.md`, namespaced
@@ -40,8 +40,7 @@ slash commands, doc auditing, and deep research.
   sync when renaming or removing a slash command — they all describe
   the same surface.
 - Update `docs/rpm/past/log.md` after audits or noteworthy sessions.
-- Session context auto-loads via the SessionStart hook. Just start
-  working — no `/session-start` needed.
+- Session context auto-loads via the SessionStart hook.
 
 ## Guardrails
 - 3 attempts max to fix an issue, then STOP and report
