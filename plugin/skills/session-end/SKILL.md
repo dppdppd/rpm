@@ -252,13 +252,13 @@ Possible actions (include only when applicable):
 - **Fix drift** — apply the doc-drift findings
   *(only if `drift_findings` is non-empty)*
 
-- **Other** — anything else specific to this session
-  *(always include as the last numbered item)*
-
 Which actions? (e.g., `1,2` · `all` · `none`)
 ```
 
-Wait for the user's choice. Do not proceed without it.
+If no actions remain after filtering, skip the menu entirely and
+proceed directly to Phase 5.
+
+Otherwise, wait for the user's choice. Do not proceed without it.
 
 ---
 
@@ -297,9 +297,6 @@ followup questions needed before acting.
   user instead of guessing.
 - After fixes land, note them in the today's past log under a
   "Doc-drift fixes" subsection.
-
-### Action 4: Other
-- Handle whatever the user asks
 
 After each action, briefly confirm completion. After ALL chosen
 actions complete, move to Phase 5.

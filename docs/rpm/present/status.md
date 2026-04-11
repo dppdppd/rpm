@@ -20,4 +20,4 @@
 ## Active Specs
 
 ## Known Issues
-- context.md broken_refs scanner flags template patterns (`{name}`) and relative paths as false positives
+- context.md broken_refs scanner flags relative paths (e.g. `future/tasks.org`) as false positives — paths are relative to docs/rpm/ but scanner resolves from project root

@@ -8,6 +8,7 @@ Referenced from `docs/rpm/context.md` when needed.
 - 2026-04-09 — audit project — 8 findings, all executed
 - 2026-04-10 — audit project — review + plan saved to reviews/2026-04-10{,-plan}.md
 - 2026-04-11 — audit documents — 7 findings (6 shown), 6 fixed, 0 skipped
+- 2026-04-11 — audit project — 6 findings, plan saved to reviews/2026-04-11-plan.md
   - F1: plugin/CLAUDE.md listed `init` instead of `bootstrap` (90)
   - F2: tasks.org linked missing detail file (80)
   - F3: log.md + context.md Prior Findings empty despite 3 reviews (80)
@@ -17,5 +18,11 @@ Referenced from `docs/rpm/context.md` when needed.
   - F7: scan.sh broken_refs doesn't cover plugin/CLAUDE.md (50, suppressed)
 
 ## Sessions Reviewed
+- 2026-04-11 — 5 sessions reviewed by audit documents
+  - `1854b515` (Apr 11) — /audit documents, 6 fixes — JUSTIFIED
+  - `d66616ec` (Apr 11) — C: continue UX fix, silent exit — JUSTIFIED
+  - `b07b10f4` (Apr 10) — session continuity, task menu — JUSTIFIED
+  - `aa872298` (Apr 10) — bootstrap hardening, renames, v2.3.0 — JUSTIFIED
+  - `082a9583` (Apr 11) — current audit session — N/A
 
 ## Notes

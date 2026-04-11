@@ -101,7 +101,7 @@ for src in CLAUDE.md README.md docs/rpm/context.md; do
     case "$token" in /*) continue ;; esac
     case "$token" in *:*) continue ;; esac
     case "$token" in [a-z.]*) ;; *) continue ;; esac
-    echo "$token" | grep -qE '\$|\*|\||>|~' && continue
+    echo "$token" | grep -qE '\$|\*|\||>|~|\{|\}' && continue
     echo "$token" | grep -qE '^(rm|git|cat|grep|ls|mkdir|cd|cp|mv|echo|curl|wget|npm|yarn|turbo|pnpm|claude|gh|bash|sh|python|node) ' && continue
     clean="${token#./}"
     if [ ! -e "$clean" ] && [ ! -e "$token" ]; then

@@ -21,17 +21,8 @@ Solo developer. Published via git subtree split to GitHub.
 - Skill instructions producing correct LLM behavior
 - Hook reliability (bash scripts, no LLM tokens)
 - CLAUDE.md staying under 150 lines
-- Tracker file consistency across renames
-
 ## Tasks
-New tasks in `future/tasks.org`: one short sentence + link to
-`future/<date>-<slug>.md` with details. Never inline task details
-in tasks.org itself.
+New tasks: one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
 
 ## Prior Findings
-| Date | Key Finding |
-|------|-------------|
-| 2026-04-08 | command-version drift; CLAUDE.md effectiveness baseline |
-| 2026-04-09 | scan gap fix validation; project-mode protocol refinement |
-| 2026-04-10 | docs/pm→docs/rpm rename gap in hooks; skills migration |
-| 2026-04-11 | stale `init`/`/pm:` refs in CLAUDE.md + memory; empty audit log backfilled |
+See `docs/rpm/past/log.md` Audit History for full list.
