@@ -94,6 +94,7 @@ if [ -f "$FUTURE" ]; then
   BLOCKED_N=$(grep -cE '^\*\* BLOCKED ' "$FUTURE" 2>/dev/null || true)
   echo "scoreboard: $DONE_N done · $IP_N in-progress · $TODO_N todo · $BLOCKED_N blocked"
   echo ""
+  echo "Next tasks:"
 
   # Pass 1: collect task IDs and statuses for dependency resolution
   san() { echo "$1" | tr '-' '_'; }
