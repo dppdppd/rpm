@@ -79,6 +79,10 @@ perspective on the project's overall health. ~30 minutes.
 
 ### Session start
 
+Each session opens with a scoreboard and a task menu pulled from your
+backlog. Pick a number to start working, add `?` to read the detail
+file first, or choose `S` to name your own task:
+
 ```
 rpm: session active
 
