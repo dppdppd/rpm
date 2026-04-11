@@ -8,6 +8,8 @@
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
 - Session lifecycle (start, compact, end)
+- Session-start task menu (hierarchical, interactive, scoreboard)
+- Session continuity across /clear and resume (source field detection)
 - Audit system (quick, documents, project)
 - Deep research skill
 - Learning capture pipeline (Stop hook + "Key finding:" contract)
