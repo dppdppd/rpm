@@ -63,50 +63,7 @@ if [ -f "$PRESENT" ] && git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>
   fi
 fi
 
-# --- ready_tasks ---
-if [ -f "$FUTURE" ]; then
-  san() { echo "$1" | tr '-' '_'; }
-  CUR_STATUS="" CUR_ID="" CUR_BLOCKED="" CUR_HEADING=""
-  ALL_IDS="" READY=""
-
-  while IFS= read -r line; do
-    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) '; then
-      if [ -n "$CUR_ID" ] && [ -n "$CUR_BLOCKED" ]; then
-        if [ "$CUR_STATUS" = "TODO" ] || [ "$CUR_STATUS" = "BLOCKED" ]; then
-          ALL_BLOCKERS_DONE=true
-          for dep in $CUR_BLOCKED; do
-            eval "dep_status=\${STATUS_$(san "$dep"):-UNKNOWN}"
-            [ "$dep_status" != "DONE" ] && ALL_BLOCKERS_DONE=false
-          done
-          $ALL_BLOCKERS_DONE && READY="$READY  - $CUR_HEADING"$'\n'
-        fi
-      fi
-      CUR_STATUS=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) .*/\1/')
-      CUR_HEADING=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) //')
-      CUR_ID="" CUR_BLOCKED=""
-    fi
-    if echo "$line" | grep -qE '^\s+:ID:\s'; then
-      CUR_ID=$(echo "$line" | sed -E 's/^\s+:ID:\s+//' | tr -d ' ')
-      ALL_IDS="$ALL_IDS $CUR_ID"
-      eval "STATUS_$(san "$CUR_ID")=$CUR_STATUS"
-    fi
-    if echo "$line" | grep -qE '^\s+:BLOCKED_BY:\s'; then
-      CUR_BLOCKED=$(echo "$line" | sed -E 's/^\s+:BLOCKED_BY:\s+//')
-    fi
-  done < "$FUTURE"
-  # Flush last
-  if [ -n "$CUR_ID" ] && [ -n "$CUR_BLOCKED" ]; then
-    if [ "$CUR_STATUS" = "TODO" ] || [ "$CUR_STATUS" = "BLOCKED" ]; then
-      ALL_BLOCKERS_DONE=true
-      for dep in $CUR_BLOCKED; do
-        eval "dep_status=\${STATUS_$(san "$dep"):-UNKNOWN}"
-        [ "$dep_status" != "DONE" ] && ALL_BLOCKERS_DONE=false
-      done
-      $ALL_BLOCKERS_DONE && READY="$READY  - $CUR_HEADING"$'\n'
-    fi
-  fi
-  [ -n "$READY" ] && echo "" && echo "=== ready_tasks ===" && echo "$READY"
-fi
+# (ready_tasks logic moved into task_menu below)
 
 # --- context ---
 echo ""
@@ -126,13 +83,112 @@ else
   echo "(missing)"
 fi
 
-# --- future ---
+# --- task_menu ---
 echo ""
-echo "=== future ==="
+echo "=== task_menu ==="
 if [ -f "$FUTURE" ]; then
-  grep -E '^\*\* (TODO|IN-PROGRESS|BLOCKED) ' "$FUTURE" 2>/dev/null || echo "(none)"
+  # Scoreboard
+  DONE_N=$(grep -cE '^\*\* DONE ' "$FUTURE" 2>/dev/null || true)
+  IP_N=$(grep -cE '^\*\* IN-PROGRESS ' "$FUTURE" 2>/dev/null || true)
+  TODO_N=$(grep -cE '^\*\* TODO ' "$FUTURE" 2>/dev/null || true)
+  BLOCKED_N=$(grep -cE '^\*\* BLOCKED ' "$FUTURE" 2>/dev/null || true)
+  echo "scoreboard: $DONE_N done · $IP_N in-progress · $TODO_N todo · $BLOCKED_N blocked"
+  echo ""
+
+  # Pass 1: collect task IDs and statuses for dependency resolution
+  san() { echo "$1" | tr '-' '_'; }
+  _S=""
+  while IFS= read -r line; do
+    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) '; then
+      _S=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) .*/\1/')
+    fi
+    if echo "$line" | grep -qE '^\s+:ID:\s'; then
+      _I=$(echo "$line" | sed -E 's/^\s+:ID:\s+//' | tr -d ' ')
+      eval "STATUS_$(san "$_I")=$_S"
+    fi
+  done < "$FUTURE"
+
+  # Pass 2: collect menu items in document order with parent context
+  MENU_ITEMS=""
+  CUR_PARENT="" CUR_TASK_PARENT="" CUR_S="" CUR_H="" CUR_B="" CUR_D=""
+
+  flush_item() {
+    [ -z "$CUR_H" ] && return
+    [ "$CUR_S" = "DONE" ] && return
+
+    local show=false
+    case "$CUR_S" in
+      IN-PROGRESS) show=true ;;
+      TODO|BLOCKED)
+        if [ -z "$CUR_B" ]; then
+          [ "$CUR_S" = "TODO" ] && show=true
+        else
+          show=true
+          for dep in $CUR_B; do
+            eval "ds=\${STATUS_$(san "$dep"):-UNKNOWN}"
+            [ "$ds" != "DONE" ] && { show=false; break; }
+          done
+        fi
+        ;;
+    esac
+    $show || return
+
+    # Use detail from heading or body, strip [[file:...]] and org tags from label
+    local detail="$CUR_D"
+    [ -z "$detail" ] && detail=$(echo "$CUR_H" | grep -oP '\[\[file:\K[^\]]+' | head -1)
+    local label=$(echo "$CUR_H" | sed -E 's/\[\[file:[^]]*\]\]//g; s/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
+    local parent=$(echo "$CUR_TASK_PARENT" | sed -E 's/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
+
+    MENU_ITEMS="${MENU_ITEMS}${parent}|${label}|${detail}|${CUR_S}"$'\n'
+  }
+
+  while IFS= read -r line; do
+    # Track * parent headings
+    if echo "$line" | grep -qE '^\* '; then
+      CUR_PARENT=$(echo "$line" | sed -E 's/^\* (DONE |TODO |IN-PROGRESS |BLOCKED )?//')
+    fi
+    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) '; then
+      flush_item
+      CUR_S=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) .*/\1/')
+      CUR_H=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) //')
+      CUR_TASK_PARENT="$CUR_PARENT"
+      CUR_B="" CUR_D=""
+    fi
+    # Capture detail file from body lines: [[file:...]] or - Detail: [[file:...]]
+    if [ -z "$CUR_D" ]; then
+      _d=$(echo "$line" | grep -oP '\[\[file:\K[^\]]+' 2>/dev/null | head -1)
+      [ -n "$_d" ] && CUR_D="$_d"
+    fi
+    echo "$line" | grep -qE '^\s+:BLOCKED_BY:\s' && \
+      CUR_B=$(echo "$line" | sed -E 's/^\s+:BLOCKED_BY:\s+//')
+  done < "$FUTURE"
+  flush_item
+
+  # Output numbered menu grouped by parent
+  NUM=0 LAST_PARENT=""
+  while IFS='|' read -r parent label detail status; do
+    [ -z "$label" ] && continue
+    if [ "$parent" != "$LAST_PARENT" ]; then
+      [ -n "$LAST_PARENT" ] && echo ""
+      [ -n "$parent" ] && echo "$parent"
+      LAST_PARENT="$parent"
+    fi
+    NUM=$((NUM + 1))
+    tag=""
+    [ "$status" = "IN-PROGRESS" ] && tag=" (in-progress)"
+    echo "   ${NUM}. ${label}${tag}"
+    [ -n "$detail" ] && echo "      detail: future/${detail}"
+  done <<< "$MENU_ITEMS"
+
+  if [ "$NUM" -eq 0 ]; then
+    echo "(no actionable tasks)"
+  fi
+
+  echo ""
+  echo "S: something else"
+  echo "R: review tasks"
 else
-  echo "(missing)"
+  echo "(no tasks.org found)"
 fi
 
 # --- daily_log ---
@@ -166,8 +222,17 @@ echo "  rpm: session active"
 echo ""
 echo "Then:"
 echo "1. Note leftover state (uncommitted work, drift) — ask the developer how to handle it."
-echo "2. Propose a task from tasks.org (prefer unblocked TODOs, especially ready ones above)."
-echo "3. On confirmation, write the session marker:"
+echo "2. Present the task menu from above. Show the scoreboard, then numbered tasks"
+echo "   with blank lines between entries, then the options line."
+echo "   Tell the user: pick a number, add ? for details, or choose the other options."
+echo "3. Handle the user's response:"
+echo "   - #  → select that task, proceed to step 4"
+echo "   - #? → read the detail file (path shown under the task), summarize it,"
+echo "          then re-present the menu"
+echo "   - S: <description> → use their custom task, proceed to step 4"
+echo "   - R  → show ALL tasks from tasks.org (including DONE/BLOCKED) with statuses,"
+echo "          then re-present the actionable menu"
+echo "4. On task selection, write the session marker:"
 echo "   cat > docs/rpm/~rpm-session-active << MARKER"
 echo "   ---"
 echo "   session_id: \${CLAUDE_CODE_SESSION_ID:-unknown}"
@@ -175,8 +240,8 @@ echo "   started: \$(date -Iseconds)"
 echo "   task: {chosen task}"
 echo "   ---"
 echo "   MARKER"
-echo "4. Create a native task via TaskCreate."
-echo "5. Begin working."
+echo "5. Create a native task via TaskCreate."
+echo "6. Begin working."
 echo ""
 echo "When you discover a root cause or change approach, lead with \"Key finding:\" so learnings are captured automatically."
 echo ""
