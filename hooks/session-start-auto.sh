@@ -280,7 +280,9 @@ echo "3. Handle the user's response:"
 echo "   - #  → select that task, proceed to step 4"
 echo "   - #? → read the detail file (path shown under the task), summarize it,"
 echo "          then re-present the menu"
+if [ -n "$LAST_TASK" ]; then
 echo "   - C  → continue working on last session's task, proceed to step 4"
+fi
 echo "   - S: <description> → use their custom task, proceed to step 4"
 echo "   - R  → show ALL tasks from tasks.org (including DONE/BLOCKED) with statuses,"
 echo "          then re-present the actionable menu"
