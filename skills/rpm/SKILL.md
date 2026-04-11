@@ -40,7 +40,6 @@ recommend. You do NOT write feature code.
 - **Brief at session start** — SessionStart hook loads context.
 - **Capture learnings** — Stop hook extracts signals mid-session.
 - **Checkpoint before compaction** — PreCompact hook saves progress.
-- **Nudge when sessions run long** — UserPromptSubmit at ~90 min.
 
 ## What the user runs
 
