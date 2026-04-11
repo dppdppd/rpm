@@ -10,9 +10,12 @@
 - Session lifecycle (start, compact, end)
 - Session-start task menu (hierarchical, interactive, scoreboard)
 - Session continuity across /clear and resume (source field detection)
-- Audit system (quick, documents, project)
+- Audit system (quick, documents, project) with 8 analysis dimensions
 - Deep research skill
+- /tasks skill for mid-session backlog management
 - Learning capture pipeline (Stop hook + "Key finding:" contract)
+- PostCompact compact_summary for better continuity after compaction
+- Random tips at session start (stderr, not model context)
 - File rename migration (FUTURE.org/PRESENT.md/RPM.md/RPM-LOG.md to tasks.org/status.md/context.md/log.md)
 - Bootstrap with single detect.sh script, permissions-first flow
 - Context.md auto-injection at session start
