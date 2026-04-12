@@ -11,7 +11,9 @@ slash commands, doc auditing, and deep research.
 - `agents/` — subagents (currently `auditor.md`, namespaced
   `rpm:auditor`)
 - `hooks/` — `hooks.json` + lifecycle scripts (SessionStart, SessionEnd,
-  Stop, PostToolUse context monitor, PreCompact, PostCompact)
+  Stop with learning-capture + handoff-validator, PostToolUse
+  context-monitor, PreCompact, PostCompact, TaskCreated + TaskCompleted
+  task-capture)
 - `.claude-plugin/` — plugin manifest + marketplace.json
 
 ## Editing the plugin

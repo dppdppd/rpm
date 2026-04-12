@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-04-11
-- **Version**: 2.4.0
+- **Version**: 2.5.0
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -24,6 +24,8 @@
 - Context.md auto-injection at session start
 - SessionEnd hook — warns + stubs daily log when session ends without /session-end
 - PostToolUse context monitor — 40/60/70% transcript-size thresholds for wrap-up pressure
+- Stop handoff validator — checks /session-end output completeness (Accomplished/Next sections, status.md date)
+- TaskCreated/TaskCompleted capture — native task lifecycle persisted to ~rpm-native-tasks.jsonl
 
 ## Active Specs
 
