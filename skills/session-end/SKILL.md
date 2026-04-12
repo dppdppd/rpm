@@ -180,6 +180,11 @@ update, skip it and note "no changes" in the Phase 3 report.
   this session without a `future/tasks.org` counterpart, append as
   TODO (or IN-PROGRESS if active).
 - **Do not delete** native tasks — they persist for the next session.
+- If `docs/rpm/~rpm-native-tasks.jsonl` has entries from prior
+  unwrapped sessions (different `session` IDs than the current
+  `TaskList` state), those represent abandoned work. Offer to promote
+  them to `future/tasks.org` as TODOs before the file is cleared in
+  Phase 5.
 
 ### Commit tracker updates + present findings (same response)
 
@@ -313,7 +318,7 @@ and the handoff text go in the same message:
   TASK=$(grep -oP 'task: \K.*' docs/rpm/~rpm-session-active 2>/dev/null | head -1)
   printf 'task: %s\nended: %s\nnext: %s\n' "${TASK:-unknown}" "$(date -Iseconds)" "{what's next text}" > docs/rpm/~rpm-last-session
   ```
-- Clear session files: `rm -rf docs/rpm/~rpm-session-active docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl`
+- Clear session files: `rm -rf docs/rpm/~rpm-session-active docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-native-tasks.jsonl`
 - Output the handoff text below as the **very last lines**:
 
 ```
