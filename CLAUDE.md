@@ -10,7 +10,8 @@ slash commands, doc auditing, and deep research.
   each is a directory with `SKILL.md` plus optional supporting files
 - `agents/` — subagents (currently `auditor.md`, namespaced
   `rpm:auditor`)
-- `hooks/` — `hooks.json` + lifecycle scripts
+- `hooks/` — `hooks.json` + lifecycle scripts (SessionStart, SessionEnd,
+  Stop, PostToolUse context monitor, PreCompact, PostCompact)
 - `.claude-plugin/` — plugin manifest + marketplace.json
 
 ## Editing the plugin
