@@ -104,6 +104,11 @@ for src in CLAUDE.md README.md docs/rpm/context.md; do
     echo "$token" | grep -qE '\$|\*|\||>|~|\{|\}' && continue
     echo "$token" | grep -qE '^(rm|git|cat|grep|ls|mkdir|cd|cp|mv|echo|curl|wget|npm|yarn|turbo|pnpm|claude|gh|bash|sh|python|node) ' && continue
     clean="${token#./}"
+    # For context.md, also accept paths relative to docs/rpm/
+    # (context.md's perspective is its own directory, not project root).
+    if [ "$src" = "docs/rpm/context.md" ] && { [ -e "docs/rpm/$clean" ] || [ -e "docs/rpm/$token" ]; }; then
+      continue
+    fi
     if [ ! -e "$clean" ] && [ ! -e "$token" ]; then
       echo "broken=$src:$token"
       BROKEN_COUNT=$((BROKEN_COUNT + 1))
@@ -179,8 +184,10 @@ else
     UNLISTED_SAMPLES=""
     while IFS= read -r f; do
       [ -z "$f" ] && continue
-      TOTAL=$((TOTAL + 1))
       base=$(basename "$f" .md)
+      # Skip scaffolding templates (files starting with _)
+      case "$base" in _*) continue ;; esac
+      TOTAL=$((TOTAL + 1))
       if grep -qF "$base.md" docs/rpm/present/status.md 2>/dev/null \
          || grep -qF "specs/$base" docs/rpm/present/status.md 2>/dev/null \
          || grep -qF "spec/$base" docs/rpm/present/status.md 2>/dev/null; then

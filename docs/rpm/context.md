@@ -3,9 +3,8 @@
 Injected at session start. Keep under 30 lines.
 
 ## Project Summary
-Claude Code plugin (pure markdown + bash) that tracks what shipped,
-what's next, and what's drifting across LLM-assisted dev sessions.
-Solo developer. Published via git subtree split to GitHub.
+Claude Code plugin (pure markdown + bash) tracking what shipped, next,
+and drift across LLM sessions. Solo dev; published via git subtree split.
 
 ## Key Files
 | What | Where |
@@ -21,12 +20,11 @@ Solo developer. Published via git subtree split to GitHub.
 - Skill instructions producing correct LLM behavior
 - Hook reliability (bash scripts, no LLM tokens)
 - CLAUDE.md staying under 150 lines
+
 ## Tasks
-When the user mentions work to do later, capture it as a task.
-When you suggest work, offer to add it as a task.
-When the user shifts to a new task and current context has little carry-over value,
-suggest /session-end first so trackers stay current.
-Format: one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
+- User mentions future work → capture as a task.
+- You suggest new work → ask "Add to tasks.org?" (don't just suggest and move on).
+- User shifts to a new task with little carry-over → suggest /session-end first; one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
 
 ## Prior Findings
-See `docs/rpm/past/log.md` Audit History for full list.
+See `docs/rpm/past/log.md` Audit History.

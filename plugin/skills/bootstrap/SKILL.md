@@ -59,13 +59,12 @@ discovered. E.g., for a clean-room project: compliance checks.
 For a startup: velocity vs quality tradeoffs.}
 
 ## Tasks
-New tasks in `future/tasks.org`: one short sentence + link to
-`future/<date>-<slug>.md` with details. Never inline task details
-in tasks.org itself.
+- User mentions future work → capture as a task.
+- You suggest new work → ask "Add to tasks.org?" (don't just suggest and move on).
+- User shifts to a new task with little carry-over → suggest /session-end first; one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
 
 ## Prior Findings
-| Date | Key Finding |
-|------|-------------|
+See `docs/rpm/past/log.md` Audit History.
 ```
 
 ### 3b. `docs/rpm/past/log.md` — append-only history

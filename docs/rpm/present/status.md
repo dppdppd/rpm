@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-04-11
-- **Version**: 2.3.0
+- **Version**: 2.4.0
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -22,8 +22,9 @@
 - File rename migration (FUTURE.org/PRESENT.md/RPM.md/RPM-LOG.md to tasks.org/status.md/context.md/log.md)
 - Bootstrap with single detect.sh script, permissions-first flow
 - Context.md auto-injection at session start
+- SessionEnd hook — warns + stubs daily log when session ends without /session-end
+- PostToolUse context monitor — 40/60/70% transcript-size thresholds for wrap-up pressure
 
 ## Active Specs
 
 ## Known Issues
-- context.md broken_refs scanner flags relative paths (e.g. `future/tasks.org`) as false positives — paths are relative to docs/rpm/ but scanner resolves from project root

@@ -16,6 +16,17 @@ Referenced from `docs/rpm/context.md` when needed.
   - F5: 5 memory files carried stale `/pm:` prefixes (60)
   - F6: plugin/CLAUDE.md implied `/session-start` existed (60)
   - F7: scan.sh broken_refs doesn't cover plugin/CLAUDE.md (50, suppressed)
+- 2026-04-11 — audit project (re-run, max effort) — 10 findings, plan saved to reviews/2026-04-11b-plan.md
+  - T1: project CLAUDE.md ghost `prompt-nudge` hook + missing `tasks` skill (90, High)
+  - T2: Session 4 uncommitted — context.md + bootstrap/SKILL.md (85, High)
+  - T3: past/2026-04-11.md missing Session 4 backfill (70, Med)
+  - T4: plugin/README.md "Five hooks" (actually 4) (75, Med)
+  - T5: plugin.json still 2.3.0 despite 5+ feature commits (70, Med)
+  - T6: adopt context-pressure monitoring (outward: claude-code-session-kit) (65, Med)
+  - T7: scan.sh false positives — _template + context-relative paths (65, Med)
+  - T8: adopt SessionEnd hook for wrap-up enforcement (60, Med)
+  - T9: context.md formatting drift — 31 lines, missing blank line, Prior Findings format (60, Low)
+  - T10: ~rpm-last-session `next:` field stale (55, Low)
 
 ## Sessions Reviewed
 - 2026-04-11 — 5 sessions reviewed by audit documents

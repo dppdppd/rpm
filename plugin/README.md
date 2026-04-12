@@ -221,12 +221,14 @@ Then start a new conversation and run `/bootstrap`.
 
 ## Hooks
 
-Five hooks drive the automatic behavior:
+Six hooks drive the automatic behavior:
 
 | Hook | What it does |
 |------|-------------|
 | **SessionStart** | Loads git state, open tasks, daily log, tracker drift. Proposes a task. |
+| **SessionEnd** | Detects sessions that ended without `/session-end`; writes stub log + stderr warning. |
 | **Stop** | Captures learning signals after each response. |
+| **PostToolUse** | Monitors transcript size; warns at ~40% / ~60% / hard-stops at ~70% context usage. |
 | **PreCompact** | Checkpoints progress before context compaction. |
 | **PostCompact** | Re-injects session state after compaction. |
 
