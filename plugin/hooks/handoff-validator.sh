@@ -37,6 +37,21 @@ else
     || ERRORS="${ERRORS}  - past/$TODAY.md missing Next section\n"
 fi
 
+# ~rpm-last-session: must exist with task + ended + next fields.
+LAST_SESSION="$PM_DIR/~rpm-last-session"
+if [ ! -f "$LAST_SESSION" ]; then
+  ERRORS="${ERRORS}  - ~rpm-last-session not written (next-session resume will have nothing to offer)\n"
+else
+  grep -qE '^task: .+'  "$LAST_SESSION" || ERRORS="${ERRORS}  - ~rpm-last-session missing 'task:' line\n"
+  grep -qE '^ended: .+' "$LAST_SESSION" || ERRORS="${ERRORS}  - ~rpm-last-session missing 'ended:' line\n"
+  grep -qE '^next: .+'  "$LAST_SESSION" || ERRORS="${ERRORS}  - ~rpm-last-session missing 'next:' line\n"
+fi
+
+# Active-session marker should be gone after session-end.
+for f in ~rpm-session-active ~rpm-compact-state ~rpm-learnings.jsonl ~rpm-native-tasks.jsonl; do
+  [ -e "$PM_DIR/$f" ] && ERRORS="${ERRORS}  - $f still present (should be cleared in Phase 5)\n"
+done
+
 # status.md: Last updated field should be today.
 if [ -f "$STATUS" ]; then
   UPDATED=$(grep -oE 'Last updated[^0-9]*[0-9]{4}-[0-9]{2}-[0-9]{2}' "$STATUS" 2>/dev/null \
