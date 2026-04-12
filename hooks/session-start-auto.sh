@@ -22,12 +22,14 @@ SOURCE=$(echo "$PAYLOAD" | jq -r '.source // empty' 2>/dev/null)
 # If the user hasn't bootstrapped, don't assume they want rpm here.
 [ ! -d "$PM_DIR" ] && exit 0
 
-# --- Continuing session (clear/resume with active marker) ---
-if [ -f "$MARKER" ] && { [ "$SOURCE" = "clear" ] || [ "$SOURCE" = "resume" ]; }; then
+# --- Active marker present — resume the in-flight task ---
+# Covers clear, resume, and fresh startup where the user exited without /session-end.
+if [ -f "$MARKER" ]; then
   TASK=$(grep -oP 'task: \K.*' "$MARKER" 2>/dev/null | head -1)
-  echo "rpm: continuing — ${TASK:-unknown task}"
+  STARTED=$(grep -oP 'started: \K.*' "$MARKER" 2>/dev/null | head -1)
+  echo "rpm: resuming — ${TASK:-unknown task}"
+  [ -n "$STARTED" ] && echo "(session started $STARTED)"
   echo ""
-  # Brief git state
   if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
     PORCELAIN=$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null || true)
     MODIFIED=$(echo "$PORCELAIN" | grep -cE '^.M|^M ' || true)
@@ -41,23 +43,14 @@ if [ -f "$MARKER" ] && { [ "$SOURCE" = "clear" ] || [ "$SOURCE" = "resume" ]; };
   echo ""
   echo "=== instructions ==="
   echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-  echo "  rpm: continuing — ${TASK:-unknown task}"
+  echo "  rpm: resuming — ${TASK:-unknown task}"
   echo ""
-  echo "The user cleared context but is still working on the same task."
-  echo "Check git state and recent commits to orient, then pick up where you left off."
-  echo "If the user wants a different task, they'll say so."
-  exit 0
-fi
-
-# --- Stale session (new session with leftover marker) ---
-if [ -f "$MARKER" ]; then
-  echo "rpm: stale session detected"
-  echo ""
-  cat "$MARKER"
-  echo ""
-  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-  echo "  rpm: stale session — run /session-end or ask to continue"
-  echo "Then briefly explain the stale state and ask the user how to handle it."
+  echo "An rpm session marker is present — the user has unfinished work on this task."
+  echo "Check git state and recent commits to orient, then offer options:"
+  echo "  A. Continue the in-flight task"
+  echo "  B. Wrap it up with /session-end"
+  echo "  C. Switch to something else (then present the task menu)"
+  echo "Wait for the user's choice before acting."
   exit 0
 fi
 
@@ -273,7 +266,7 @@ echo "=== instructions ==="
 echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
 echo "  rpm: session active"
 echo ""
-if [ "$SOURCE" = "clear" ] && [ -n "$LAST_NEXT" ]; then
+if [ -n "$LAST_NEXT" ]; then
 echo "Then:"
 echo "1. Tell the user what was next from the last session:"
 echo "   \"$LAST_NEXT\""
