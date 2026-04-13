@@ -155,6 +155,7 @@ if [ -f "$FUTURE" ]; then
           [ "$CUR_S" = "TODO" ] && show=true
         else
           show=true
+          local ds=""
           for dep in $CUR_B; do
             eval "ds=\${STATUS_$(san "$dep"):-UNKNOWN}"
             [ "$ds" != "DONE" ] && { show=false; break; }
@@ -167,8 +168,9 @@ if [ -f "$FUTURE" ]; then
     # Use detail from heading or body, strip [[file:...]] and org tags from label
     local detail="$CUR_D"
     [ -z "$detail" ] && detail=$(echo "$CUR_H" | grep -oP '\[\[file:\K[^\]]+' | head -1)
-    local label=$(echo "$CUR_H" | sed -E 's/\[\[file:[^]]*\]\]//g; s/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
-    local parent=$(echo "$CUR_TASK_PARENT" | sed -E 's/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
+    local label parent
+    label=$(echo "$CUR_H" | sed -E 's/\[\[file:[^]]*\]\]//g; s/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
+    parent=$(echo "$CUR_TASK_PARENT" | sed -E 's/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
 
     MENU_ITEMS="${MENU_ITEMS}${parent}|${label}|${detail}|${CUR_S}"$'\n'
   }
@@ -233,7 +235,7 @@ fi
 
 # --- daily_log ---
 echo ""
-LATEST=$(ls -1 "$PM_DIR/past/"*.md 2>/dev/null | sort -r | head -1)
+LATEST=$(find "$PM_DIR/past/" -maxdepth 1 -type f -name '*.md' 2>/dev/null | sort -r | head -1)
 if [ -n "$LATEST" ]; then
   echo "=== daily_log: $(basename "$LATEST") ==="
   head -20 "$LATEST"
