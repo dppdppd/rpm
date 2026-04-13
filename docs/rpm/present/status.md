@@ -32,6 +32,7 @@
 - Session-start stale detection via session_id mismatch (v2.5.2) — works across `--continue` / new-process flows, not just `SOURCE=startup`
 - Proactive session marker written on every fresh session — any work survives the next session's stale check even if the user skips the task menu
 - `/session-end` Phase 1e — auto-derive a task title when the marker says `(unassigned)`; no prompt, no "(unassigned)" leaking into daily log / last-session
+- Paired session markers (v2.5.3) — `~rpm-session-start` (SessionStart) + `~rpm-session-end` (/session-end) pair on session_id for deterministic orphan detection; softer "wasn't ended with /session-end" stale UX, no task menu on stale path
 
 ## Active Specs
 

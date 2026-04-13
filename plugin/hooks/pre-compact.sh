@@ -4,7 +4,7 @@
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
 STATE_FILE="$PM_DIR/~rpm-compact-state"
-MARKER="$PM_DIR/~rpm-session-active"
+MARKER="$PM_DIR/~rpm-session-start"
 LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"
 TODAY=$(date +%Y-%m-%d)
 DAILY_LOG="$PM_DIR/past/$TODAY.md"

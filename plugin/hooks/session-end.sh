@@ -7,7 +7,7 @@
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
-MARKER="$PM_DIR/~rpm-session-active"
+MARKER="$PM_DIR/~rpm-session-start"
 TODAY=$(date +%Y-%m-%d)
 DAILY_LOG="$PM_DIR/past/$TODAY.md"
 NOW=$(date +%H:%M)

@@ -74,17 +74,17 @@ EOF
 
 @test "flags leftover transient markers" {
   seed_good_handoff
-  : > "$PM_DIR/~rpm-session-active"
+  : > "$PM_DIR/~rpm-session-start"
   : > "$PM_DIR/~rpm-learnings.jsonl"
   make_session_end_commit
   run run_validator
-  [[ "$output" == *"~rpm-session-active still present"* ]]
+  [[ "$output" == *"~rpm-session-start still present"* ]]
   [[ "$output" == *"~rpm-learnings.jsonl still present"* ]]
 }
 
 @test "dedupes — second run on same commit is silent" {
   seed_good_handoff
-  : > "$PM_DIR/~rpm-session-active"
+  : > "$PM_DIR/~rpm-session-start"
   make_session_end_commit
   run run_validator
   [ -n "$output" ]

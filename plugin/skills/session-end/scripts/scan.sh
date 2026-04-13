@@ -154,7 +154,7 @@ fi
 # ----------------------------------------------------------------
 echo
 echo "=== session_marker ==="
-if [ -f docs/rpm/~rpm-session-active ]; then
+if [ -f docs/rpm/~rpm-session-start ]; then
   echo "exists=true"
 else
   echo "exists=false"

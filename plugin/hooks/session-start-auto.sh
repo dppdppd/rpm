@@ -3,7 +3,8 @@
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
-MARKER="$PM_DIR/~rpm-session-active"
+MARKER="$PM_DIR/~rpm-session-start"
+HANDOFF="$PM_DIR/~rpm-session-end"
 CONTEXT="$PM_DIR/context.md"
 FUTURE="$PM_DIR/future/tasks.org"
 PRESENT="$PM_DIR/present/status.md"
@@ -25,37 +26,64 @@ HOOK_SESSION_ID=$(echo "$PAYLOAD" | jq -r '.session_id // empty' 2>/dev/null)
 # If the user hasn't bootstrapped, don't assume they want rpm here.
 [ ! -d "$PM_DIR" ] && exit 0
 
-# --- Active marker present — resume or offer to wrap up stale session ---
+# --- Active marker present — resume, wrap up stale session, or drop orphan ---
 # Covers clear, resume, and fresh startup where the user exited without /session-end.
 if [ -f "$MARKER" ]; then
   TASK=$(grep -oP 'task: \K.*' "$MARKER" 2>/dev/null | head -1)
   STARTED=$(grep -oP 'started: \K.*' "$MARKER" 2>/dev/null | head -1)
   SESSION_ID=$(grep -oP 'session_id: \K.*' "$MARKER" 2>/dev/null | head -1)
 
-  # Detect "stale" — we're a different session than the one that wrote
-  # the marker, AND ~rpm-last-session either doesn't exist or predates
-  # the active marker's `started:` (meaning the previous session never
-  # ran /session-end). session_id mismatch handles --continue, --resume
+  # Different CC process? session_id mismatch handles --continue, --resume
   # across CC processes, and fresh startup alike; /clear and /resume
-  # within the same CC process preserve session_id, so they stay on
-  # the resume path.
-  STALE=0
+  # within the same CC process preserve session_id, so they stay on the
+  # resume path.
+  DIFFERENT_SESSION=0
   if [ -n "$HOOK_SESSION_ID" ] && [ "$HOOK_SESSION_ID" != "unknown" ] \
      && [ -n "$SESSION_ID" ] && [ "$HOOK_SESSION_ID" != "$SESSION_ID" ]; then
-    if [ ! -f "$LAST_SESSION" ]; then
-      STALE=1
-    else
-      LAST_ENDED=$(grep -oP 'ended: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
-      if [ -z "$LAST_ENDED" ]; then
-        STALE=1
-      elif [ -n "$STARTED" ] && [[ "$LAST_ENDED" < "$STARTED" ]]; then
-        STALE=1
-      fi
-    fi
+    DIFFERENT_SESSION=1
   fi
 
+  # Pair detection: every session should have a matching pair of markers —
+  # a "start" marker (~rpm-session-start, written by this hook on startup)
+  # and an "end" marker (~rpm-session-end, written by /session-end). If they
+  # pair on session_id, the session wrapped up cleanly and any marker left
+  # behind (e.g. a /clear after /session-end proactively rewrote one) is
+  # an orphan — silently reset and fall through. If no pair, the previous
+  # session didn't wrap up — warn.
+  STALE=0
+  if [ "$DIFFERENT_SESSION" = "1" ]; then
+    HANDOFF_SID=""
+    [ -f "$HANDOFF" ] && HANDOFF_SID=$(grep -oP 'session_id: \K.*' "$HANDOFF" 2>/dev/null | head -1)
+    if [ -n "$HANDOFF_SID" ] && [ "$HANDOFF_SID" != "unknown" ] \
+       && [ -n "$SESSION_ID" ] && [ "$HANDOFF_SID" = "$SESSION_ID" ]; then
+      # Paired: start and end markers from the same session_id.
+      rm -f "$MARKER" "$HANDOFF"
+    else
+      STALE=1
+    fi
+  fi
+fi
+
+# Drop an orphan end marker if no start marker paired with it (e.g. a
+# clean /session-end followed directly by /exit and a new CC process).
+# Keep the end marker if it matches the current CC session (we're
+# inside the /session-end→/clear transition in the same process, and
+# the proactive block below will rewrite a start marker to pair).
+if [ -f "$HANDOFF" ] && [ ! -f "$MARKER" ]; then
+  H_SID=$(grep -oP 'session_id: \K.*' "$HANDOFF" 2>/dev/null | head -1)
+  if [ -z "$H_SID" ] || [ "$H_SID" = "unknown" ] \
+     || [ -z "$HOOK_SESSION_ID" ] || [ "$HOOK_SESSION_ID" = "unknown" ] \
+     || [ "$H_SID" != "$HOOK_SESSION_ID" ]; then
+    rm -f "$HANDOFF"
+  fi
+fi
+
+# If the marker block above consumed the marker (resume / stale), emit
+# the appropriate header + instructions and exit. Otherwise fall through
+# to proactive creation + the normal startup flow.
+if [ -f "$MARKER" ]; then
   if [ "$STALE" = "1" ]; then
-    echo "rpm: previous session didn't wrap up"
+    echo "rpm: previous session wasn't ended with /session-end"
     echo "(last active task: ${TASK:-unknown}, started $STARTED)"
     echo "(session_id: ${SESSION_ID:-unknown})"
   else
@@ -77,30 +105,26 @@ if [ -f "$MARKER" ]; then
   echo "=== instructions ==="
   if [ "$STALE" = "1" ]; then
     echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-    echo "  rpm: previous session didn't wrap up"
+    echo "  rpm: your previous session wasn't ended with /session-end"
     echo ""
-    echo "Then emit the following recommendation + fallback verbatim:"
+    echo "Then emit this verbatim:"
     echo ""
-    echo "  I STRONGLY recommend going back and running /session-end."
-    echo "  /resume ${SESSION_ID:-<session id>}"
-    echo "  then"
-    echo "  /session-end"
+    echo "  You can /resume ${SESSION_ID:-<session id>} and run /session-end to"
+    echo "  close it out, or I can clear the marker and we'll move on."
     echo ""
-    echo "  or if you insist, i can clear the state marker and present you"
-    echo "  with the (outdated) task list."
-    echo ""
-    echo "Stop after emitting. Wait for the user. If they ask to clear:"
-    echo "  rm docs/rpm/~rpm-session-active"
+    echo "Stop after emitting. Do NOT present the task menu. Wait for the user."
+    echo "If they ask to clear:"
+    echo "  rm docs/rpm/~rpm-session-start"
     echo "then write a fresh marker for the current session:"
-    echo "  cat > docs/rpm/~rpm-session-active <<MARKER"
+    echo "  cat > docs/rpm/~rpm-session-start <<MARKER"
     echo "  ---"
     echo "  session_id: $HOOK_SESSION_ID"
     echo "  started: \$(date -Iseconds)"
     echo "  task: (unassigned)"
     echo "  ---"
     echo "  MARKER"
-    echo "then present the task menu. Otherwise they'll /resume the prior"
-    echo "session themselves."
+    echo "Then wait silently for the user's next instruction — do not offer"
+    echo "the task menu or suggest what to do next."
   else
     echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
     echo "  rpm: resuming — ${TASK:-unknown task}"
@@ -358,7 +382,7 @@ echo "   above to infer plausible next work. Draft 2–4 candidate task"
 echo "   titles and end your response with ONE question: \"Want me to add"
 echo "   any of these to tasks.org, or would you rather describe your own?\""
 echo "4. On task selection (from review or brainstorm), update the marker:"
-echo "   Edit docs/rpm/~rpm-session-active — change 'task: (unassigned)'"
+echo "   Edit docs/rpm/~rpm-session-start — change 'task: (unassigned)'"
 echo "   to 'task: <chosen task>'. Preserve session_id and started: fields."
 echo "   Then create a native task via TaskCreate and begin working."
 elif [ -n "$LAST_NEXT" ]; then
@@ -371,7 +395,7 @@ echo "   - If yes → proceed to step 3"
 echo "   - If no → present the task menu (title through prompt line, verbatim)"
 echo "     and handle their selection"
 echo "3. On task selection, update the marker task field:"
-echo "   Edit docs/rpm/~rpm-session-active — change 'task: (unassigned)'"
+echo "   Edit docs/rpm/~rpm-session-start — change 'task: (unassigned)'"
 echo "   to 'task: <chosen task>'. Preserve session_id and started: fields"
 echo "   (the hook already set them)."
 echo "4. Create a native task via TaskCreate."
@@ -395,7 +419,7 @@ echo "   - S: <description> → use their custom task, proceed to step 4"
 echo "   - R  → show ALL tasks from tasks.org (including DONE/BLOCKED) with statuses,"
 echo "          then re-present the actionable menu"
 echo "4. On task selection, update the marker task field:"
-echo "   Edit docs/rpm/~rpm-session-active — change 'task: (unassigned)'"
+echo "   Edit docs/rpm/~rpm-session-start — change 'task: (unassigned)'"
 echo "   to 'task: <chosen task>'. Preserve session_id and started: fields"
 echo "   (the hook already set them)."
 echo "5. Create a native task via TaskCreate."

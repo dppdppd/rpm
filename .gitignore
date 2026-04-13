@@ -1,5 +1,7 @@
 # Session state — ephemeral, recreated each session
-docs/rpm/~rpm-session-active
+docs/rpm/~rpm-session-start
+docs/rpm/~rpm-session-end
 docs/rpm/~rpm-compact-state
 docs/rpm/~rpm-learnings.jsonl
+docs/rpm/~rpm-native-tasks.jsonl
 docs/rpm/~rpm-last-session

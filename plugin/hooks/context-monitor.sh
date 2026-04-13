@@ -10,7 +10,7 @@
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
-MARKER="$PM_DIR/~rpm-session-active"
+MARKER="$PM_DIR/~rpm-session-start"
 
 [ -d "$PM_DIR" ] || exit 0
 [ -f "$MARKER" ] || exit 0
