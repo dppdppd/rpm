@@ -2,12 +2,12 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
-** TODO Submit 2.5.3 to anthropics/claude-plugins-official marketplace
+** TODO Submit latest to anthropics/claude-plugins-official marketplace
    :PROPERTIES:
-   :ID: marketplace-submit-253
+   :ID: marketplace-submit
    :END:
    - Submit via claude.ai/settings/plugins/submit
-   - SHA: 7f21eada29ca930852b629e69c89c6ffa8ae0fcf (tag v2.5.3)
+   - Latest: SHA 59a47b5 (tag v2.5.4) — supersedes v2.5.3
    - Prefer unpinned source if the form allows, so future version
      bumps auto-propagate to users; otherwise expect to re-submit
      on each release
@@ -27,3 +27,12 @@
    - 6 new bats files: context-monitor, pre-compact, post-compact,
      session-end-hook, stop-learn-capture, task-capture.
    - Suite: 26 → 69 passing tests.
+
+** DONE Soften session-end nudges (v2.5.4)
+   CLOSED: [2026-04-13]
+   :PROPERTIES:
+   :ID: soften-session-end-254
+   :END:
+   - Hooks: context-monitor, session-start-auto, session-end,
+     handoff-validator. Skill: session-end SKILL.md.
+   - Plugin v2.5.4 published — origin/master at 59a47b5, tag v2.5.4.
