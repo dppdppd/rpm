@@ -1,6 +1,6 @@
 #!/bin/bash
 # PostToolUse hook: monitor actual context token usage from the transcript.
-# Three-tier soft recommendations at ~40% / ~60% / ~70% of the context window.
+# Two-tier soft recommendations at ~75% / ~90% of the context window.
 #
 # Reads the latest assistant message's usage block (input + cache_read +
 # cache_creation tokens) — this is the real context size, not a byte proxy.
@@ -48,25 +48,15 @@ TOKENS=$((INPUT + CACHE_READ + CACHE_CREATE))
 [ "$TOKENS" -le 0 ] && exit 0
 
 WINDOW="${RPM_CONTEXT_TOKENS:-1000000}"
-WARN=$((WINDOW * 40 / 100))
-ALERT=$((WINDOW * 60 / 100))
-STOP=$((WINDOW * 70 / 100))
+WARN=$((WINDOW * 75 / 100))
+ALERT=$((WINDOW * 90 / 100))
 
-if [ "$TOKENS" -gt "$STOP" ]; then
+if [ "$TOKENS" -gt "$ALERT" ]; then
   cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 70% — consider /session-end soon; detail starts getting lost to compaction beyond this point."
-  }
-}
-EOF
-elif [ "$TOKENS" -gt "$ALERT" ]; then
-  cat <<'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 60% — consider /session-end at the next natural break."
+    "additionalContext": "rpm: context past 90% — consider /session-end soon; detail starts getting lost to compaction beyond this point."
   }
 }
 EOF
@@ -75,7 +65,7 @@ elif [ "$TOKENS" -gt "$WARN" ]; then
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 40% — heads up, you may want to consider /session-end when you reach a good stopping point."
+    "additionalContext": "rpm: context past 75% — consider /session-end at the next natural break."
   }
 }
 EOF
