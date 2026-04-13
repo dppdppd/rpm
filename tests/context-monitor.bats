@@ -137,6 +137,22 @@ prime_counter() {
   [ -z "$output" ]
 }
 
+@test "skips sidechain assistant entries, uses main-chain usage" {
+  seed_marker
+  sid="ctxmon-sidechain-$$"
+  prime_counter "$sid"
+  transcript="$(mktemp)"
+  # Older main-chain entry at 80% (trips WARN), newer sidechain at 5%.
+  {
+    printf '{"type":"assistant","isSidechain":false,"message":{"role":"assistant","usage":{"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":800000,"output_tokens":1}}}\n'
+    printf '{"type":"assistant","isSidechain":true,"message":{"role":"assistant","usage":{"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":50000,"output_tokens":1}}}\n'
+  } > "$transcript"
+  run bash -c "printf '{\"session_id\":\"$sid\",\"transcript_path\":\"$transcript\"}' | bash \"\$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh\""
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"past 75%"* ]]
+  rm -f "$transcript"
+}
+
 @test "silent when transcript has no assistant usage block" {
   seed_marker
   sid="ctxmon-nousage-$$"
