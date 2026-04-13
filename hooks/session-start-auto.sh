@@ -9,11 +9,14 @@ FUTURE="$PM_DIR/future/tasks.org"
 PRESENT="$PM_DIR/present/status.md"
 LAST_SESSION="$PM_DIR/~rpm-last-session"
 
-# Read source from stdin (startup, clear, resume, compact)
+# Read source + session_id from stdin (startup, clear, resume, compact)
 PAYLOAD=$(cat)
 SOURCE=$(echo "$PAYLOAD" | jq -r '.source // empty' 2>/dev/null)
 [ -z "$SOURCE" ] && SOURCE=$(echo "$PAYLOAD" | sed -n 's/.*"source" *: *"\([^"]*\)".*/\1/p')
 [ -z "$SOURCE" ] && SOURCE="startup"
+HOOK_SESSION_ID=$(echo "$PAYLOAD" | jq -r '.session_id // empty' 2>/dev/null)
+[ -z "$HOOK_SESSION_ID" ] && HOOK_SESSION_ID=$(echo "$PAYLOAD" | sed -n 's/.*"session_id" *: *"\([^"]*\)".*/\1/p')
+[ -z "$HOOK_SESSION_ID" ] && HOOK_SESSION_ID="${CLAUDE_CODE_SESSION_ID:-unknown}"
 
 # Let PostCompact handle compaction
 [ "$SOURCE" = "compact" ] && exit 0
@@ -27,12 +30,18 @@ SOURCE=$(echo "$PAYLOAD" | jq -r '.source // empty' 2>/dev/null)
 if [ -f "$MARKER" ]; then
   TASK=$(grep -oP 'task: \K.*' "$MARKER" 2>/dev/null | head -1)
   STARTED=$(grep -oP 'started: \K.*' "$MARKER" 2>/dev/null | head -1)
+  SESSION_ID=$(grep -oP 'session_id: \K.*' "$MARKER" 2>/dev/null | head -1)
 
-  # Detect "stale" — previous Claude Code process exited without /session-end.
-  # Signal: fresh startup AND ~rpm-last-session either missing or its
-  # `ended:` timestamp predates the active marker's `started:`.
+  # Detect "stale" — we're a different session than the one that wrote
+  # the marker, AND ~rpm-last-session either doesn't exist or predates
+  # the active marker's `started:` (meaning the previous session never
+  # ran /session-end). session_id mismatch handles --continue, --resume
+  # across CC processes, and fresh startup alike; /clear and /resume
+  # within the same CC process preserve session_id, so they stay on
+  # the resume path.
   STALE=0
-  if [ "$SOURCE" = "startup" ]; then
+  if [ -n "$HOOK_SESSION_ID" ] && [ "$HOOK_SESSION_ID" != "unknown" ] \
+     && [ -n "$SESSION_ID" ] && [ "$HOOK_SESSION_ID" != "$SESSION_ID" ]; then
     if [ ! -f "$LAST_SESSION" ]; then
       STALE=1
     else
@@ -48,6 +57,7 @@ if [ -f "$MARKER" ]; then
   if [ "$STALE" = "1" ]; then
     echo "rpm: previous session didn't wrap up"
     echo "(last active task: ${TASK:-unknown}, started $STARTED)"
+    echo "(session_id: ${SESSION_ID:-unknown})"
   else
     echo "rpm: resuming — ${TASK:-unknown task}"
     [ -n "$STARTED" ] && echo "(session started $STARTED)"
@@ -69,17 +79,28 @@ if [ -f "$MARKER" ]; then
     echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
     echo "  rpm: previous session didn't wrap up"
     echo ""
-    echo "The previous Claude Code session exited without running /session-end."
-    echo "Trackers (daily log, status.md, last-session marker) are stale."
-    echo "Briefly note git state + recent commits as a statement, then end your"
-    echo "response with ONE question:"
+    echo "Then emit the following recommendation + fallback verbatim:"
     echo ""
-    echo "  \"Should I run /session-end on '${TASK:-unknown}' now?\""
+    echo "  I STRONGLY recommend going back and running /session-end."
+    echo "  /resume ${SESSION_ID:-<session id>}"
+    echo "  then"
+    echo "  /session-end"
     echo ""
-    echo "- If yes: invoke the /session-end skill on the previous task, then"
-    echo "  tell the user to /clear and start a new session."
-    echo "- If no: stop. Do NOT present the task menu and do NOT proceed with"
-    echo "  new work until the user /clear's and starts again."
+    echo "  or if you insist, i can clear the state marker and present you"
+    echo "  with the (outdated) task list."
+    echo ""
+    echo "Stop after emitting. Wait for the user. If they ask to clear:"
+    echo "  rm docs/rpm/~rpm-session-active"
+    echo "then write a fresh marker for the current session:"
+    echo "  cat > docs/rpm/~rpm-session-active <<MARKER"
+    echo "  ---"
+    echo "  session_id: $HOOK_SESSION_ID"
+    echo "  started: \$(date -Iseconds)"
+    echo "  task: (unassigned)"
+    echo "  ---"
+    echo "  MARKER"
+    echo "then present the task menu. Otherwise they'll /resume the prior"
+    echo "session themselves."
   else
     echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
     echo "  rpm: resuming — ${TASK:-unknown task}"
@@ -94,6 +115,18 @@ if [ -f "$MARKER" ]; then
   echo "rpm: don't forget to set /effort" >&2
   exit 0
 fi
+
+# --- Proactively write an "unassigned" marker ---
+# Guarantees that any work done this session (even if the user skips the menu
+# and starts typing) is visible to the next session's stale-detection.
+# Claude updates the task: field when the user picks from the menu.
+cat > "$MARKER" <<MARKER_EOF
+---
+session_id: $HOOK_SESSION_ID
+started: $(date -Iseconds)
+task: (unassigned)
+---
+MARKER_EOF
 
 # --- git ---
 echo "=== git ==="
@@ -324,8 +357,10 @@ echo "   docs/rpm/context.md, docs/rpm/present/status.md, and any daily log"
 echo "   above to infer plausible next work. Draft 2–4 candidate task"
 echo "   titles and end your response with ONE question: \"Want me to add"
 echo "   any of these to tasks.org, or would you rather describe your own?\""
-echo "4. On task selection (from review or brainstorm), write the session"
-echo "   marker and create a native task via TaskCreate, then begin working."
+echo "4. On task selection (from review or brainstorm), update the marker:"
+echo "   Edit docs/rpm/~rpm-session-active — change 'task: (unassigned)'"
+echo "   to 'task: <chosen task>'. Preserve session_id and started: fields."
+echo "   Then create a native task via TaskCreate and begin working."
 elif [ -n "$LAST_NEXT" ]; then
 echo "Then:"
 echo "1. Tell the user what was next from the last session as a statement"
@@ -335,14 +370,10 @@ echo "   continue with that or pick something else."
 echo "   - If yes → proceed to step 3"
 echo "   - If no → present the task menu (title through prompt line, verbatim)"
 echo "     and handle their selection"
-echo "3. On task selection, write the session marker:"
-echo "   cat > docs/rpm/~rpm-session-active << MARKER"
-echo "   ---"
-echo "   session_id: \${CLAUDE_CODE_SESSION_ID:-unknown}"
-echo "   started: \$(date -Iseconds)"
-echo "   task: {chosen task}"
-echo "   ---"
-echo "   MARKER"
+echo "3. On task selection, update the marker task field:"
+echo "   Edit docs/rpm/~rpm-session-active — change 'task: (unassigned)'"
+echo "   to 'task: <chosen task>'. Preserve session_id and started: fields"
+echo "   (the hook already set them)."
 echo "4. Create a native task via TaskCreate."
 echo "5. Begin working."
 else
@@ -363,14 +394,10 @@ fi
 echo "   - S: <description> → use their custom task, proceed to step 4"
 echo "   - R  → show ALL tasks from tasks.org (including DONE/BLOCKED) with statuses,"
 echo "          then re-present the actionable menu"
-echo "4. On task selection, write the session marker:"
-echo "   cat > docs/rpm/~rpm-session-active << MARKER"
-echo "   ---"
-echo "   session_id: \${CLAUDE_CODE_SESSION_ID:-unknown}"
-echo "   started: \$(date -Iseconds)"
-echo "   task: {chosen task}"
-echo "   ---"
-echo "   MARKER"
+echo "4. On task selection, update the marker task field:"
+echo "   Edit docs/rpm/~rpm-session-active — change 'task: (unassigned)'"
+echo "   to 'task: <chosen task>'. Preserve session_id and started: fields"
+echo "   (the hook already set them)."
 echo "5. Create a native task via TaskCreate."
 echo "6. Begin working."
 fi
