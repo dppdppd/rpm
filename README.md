@@ -98,28 +98,25 @@ perspective on the project's overall health. ~30 minutes.
 
 ### Session start
 
-Each session opens with a scoreboard and a task menu pulled from your
-backlog. Pick a number to start working, add `?` to read the detail
-file first, or choose `S` to name your own task:
+Each session opens with a task menu pulled from your backlog. Pick a
+number to start working, add `?` to read the detail file first, or
+choose `S` to name your own task:
 
 ```
 rpm: session active
 
 2 untracked files, 3 commits of drift since status.md updated.
 
-rpm: 5 done · 1 in-progress · 6 todo · 1 blocked
+Your task backlog:
 
-What would you like to work on? Open tasks from your backlog:
 API Layer
    1. Rate limiter middleware (in-progress)
       detail: future/2026-04-08-rate-limiter.md
    2. Request validation
-
 Data Layer
    3. Migration rollback support
    4. Connection pool tuning
       detail: future/2026-04-05-pool-tuning.md
-
 Polish
    5. Error message consistency
    6. OpenAPI spec generation

@@ -52,7 +52,7 @@ Parse `$ARGUMENTS`:
 ## List
 
 1. Read `docs/rpm/future/tasks.org`.
-2. Print a scoreboard and full task list:
+2. Print a summary line and the full task list:
 
    ```
    ## Tasks — N done · N in-progress · N todo · N blocked
