@@ -34,11 +34,15 @@ TRANSCRIPT=$(echo "$PAYLOAD" | jq -r '.transcript_path // empty' 2>/dev/null)
 [ -z "$TRANSCRIPT" ] && exit 0
 [ ! -f "$TRANSCRIPT" ] && exit 0
 
-# Pull the last assistant usage block from the transcript. tac walks from
-# the end, so this is cheap even on very large transcripts.
+# Pull the last main-chain assistant usage block from the transcript.
+# tac walks from the end; jq's first() stops at the first match. We skip
+# sidechain entries (subagent runs) so a Task/Agent call can't mask the
+# parent session's true context size.
 USAGE=$(tac "$TRANSCRIPT" 2>/dev/null \
-  | grep -m1 '"role":"assistant"' \
-  | jq -r '.message.usage // empty' 2>/dev/null)
+  | jq -nr 'first(inputs
+             | select(.type=="assistant")
+             | select(.isSidechain != true)
+             | .message.usage // empty)' 2>/dev/null)
 [ -z "$USAGE" ] && exit 0
 
 INPUT=$(echo "$USAGE" | jq -r '.input_tokens // 0' 2>/dev/null)
