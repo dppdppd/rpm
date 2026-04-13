@@ -4,7 +4,7 @@
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
 LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"
-MARKER="$PM_DIR/~rpm-session-active"
+MARKER="$PM_DIR/~rpm-session-start"
 
 # Only capture during active rpm sessions
 [ -d "$PM_DIR" ] || exit 0

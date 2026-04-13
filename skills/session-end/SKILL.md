@@ -80,7 +80,7 @@ this message — do NOT re-run these checks as tool calls.
 - `daily_log` — today's date, most recent log date, days since,
   commits since. If `today_exists=false` and `commits_since > 0`,
   Phase 2 needs to create today's log.
-- `session_marker` — whether `docs/rpm/~rpm-session-active` exists.
+- `session_marker` — whether `docs/rpm/~rpm-session-start` exists.
   Phase 5 will remove it only if it exists.
 - `specs_inventory` — if a spec dir exists, `total` / `listed` /
   `unlisted` counts against `present/status.md`. `unlisted > 0` is a
@@ -152,7 +152,7 @@ list for Phase 3 presentation. Suppress trivial meta-matches.
 
 ### 1e. Backfill an unassigned task title
 
-If `docs/rpm/~rpm-session-active` has `task: (unassigned)` — the
+If `docs/rpm/~rpm-session-start` has `task: (unassigned)` — the
 user started the session without picking from the menu — derive a
 concise title (5–8 words, imperative form) from the 1c synthesis,
 git log, and modified files. Do NOT ask the user; auto-assign.
@@ -326,10 +326,14 @@ and the handoff text go in the same message:
 
 - Save last session info before cleanup:
   ```bash
-  TASK=$(grep -oP 'task: \K.*' docs/rpm/~rpm-session-active 2>/dev/null | head -1)
+  TASK=$(grep -oP 'task: \K.*' docs/rpm/~rpm-session-start 2>/dev/null | head -1)
+  SID=$(grep -oP 'session_id: \K.*' docs/rpm/~rpm-session-start 2>/dev/null | head -1)
   printf 'task: %s\nended: %s\nnext: %s\n' "${TASK:-unknown}" "$(date -Iseconds)" "{what's next text}" > docs/rpm/~rpm-last-session
+  # Handoff marker — session-start consumes this to silently clear any
+  # orphan ~rpm-session-start left behind by /clear in this same process.
+  printf 'session_id: %s\n' "${SID:-unknown}" > docs/rpm/~rpm-session-end
   ```
-- Clear session files: `rm -rf docs/rpm/~rpm-session-active docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-native-tasks.jsonl`
+- Clear session files: `rm -rf docs/rpm/~rpm-session-start docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-native-tasks.jsonl`
 - Output the handoff text below as the **very last lines**:
 
 ```

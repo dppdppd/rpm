@@ -21,7 +21,7 @@ teardown() { teardown_sandbox; }
 
 @test "active marker + clear source — resume path regardless of last-session state" {
   seed_minimal_trackers
-  cat > "$PM_DIR/~rpm-session-active" <<EOF
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
 task: fix flux capacitor
 started: 2026-04-12T10:00:00Z
 EOF
@@ -30,29 +30,29 @@ EOF
   [ "$status" -eq 0 ]
   [[ "$output" == *"rpm: resuming"* ]]
   [[ "$output" == *"fix flux capacitor"* ]]
-  [[ "$output" != *"didn't wrap up"* ]]
+  [[ "$output" != *"wasn't ended with /session-end"* ]]
 }
 
 @test "active marker + startup + no last-session = stale — emits /resume recommendation" {
   seed_minimal_trackers
-  cat > "$PM_DIR/~rpm-session-active" <<EOF
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
 task: fix flux capacitor
 started: 2026-04-12T10:00:00Z
 session_id: abc123def
 EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
-  [[ "$output" == *"previous session didn't wrap up"* ]]
-  [[ "$output" == *"I STRONGLY recommend going back and running /session-end"* ]]
+  [[ "$output" == *"previous session wasn't ended with /session-end"* ]]
   [[ "$output" == *"/resume abc123def"* ]]
-  [[ "$output" == *"or if you insist, i can clear the state marker"* ]]
+  [[ "$output" == *"clear the marker"* ]]
   [[ "$output" == *"session_id: abc123def"* ]]
   [[ "$output" != *"rpm: resuming"* ]]
+  [[ "$output" != *"Your task backlog"* ]]
 }
 
 @test "active marker + startup + fresh last-session = resume" {
   seed_minimal_trackers
-  cat > "$PM_DIR/~rpm-session-active" <<EOF
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
 task: fix flux capacitor
 started: 2026-04-12T10:00:00Z
 EOF
@@ -65,7 +65,7 @@ EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
   [[ "$output" == *"rpm: resuming"* ]]
-  [[ "$output" != *"didn't wrap up"* ]]
+  [[ "$output" != *"wasn't ended with /session-end"* ]]
 }
 
 @test "--continue workflow (source=resume, mismatched session_id) still detects stale" {
@@ -74,7 +74,7 @@ EOF
   # comes through as "resume". Stale detection must fire on session_id
   # mismatch regardless of source.
   seed_minimal_trackers
-  cat > "$PM_DIR/~rpm-session-active" <<EOF
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
 task: old task
 started: 2026-04-12T10:00:00Z
 session_id: old-process-sess
@@ -82,12 +82,12 @@ EOF
   # last-session is missing → stale
   run run_session_start resume  # new CC process via --continue
   [ "$status" -eq 0 ]
-  [[ "$output" == *"previous session didn't wrap up"* ]]
+  [[ "$output" == *"previous session wasn't ended with /session-end"* ]]
 }
 
 @test "active marker + mismatched session_id + stale last-session = stale path" {
   seed_minimal_trackers
-  cat > "$PM_DIR/~rpm-session-active" <<EOF
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
 task: current task
 started: 2026-04-12T15:00:00Z
 session_id: prior-sess-id
@@ -101,7 +101,94 @@ EOF
   # default hook session_id is test-sess-123 — mismatch from marker's prior-sess-id
   run run_session_start startup
   [ "$status" -eq 0 ]
-  [[ "$output" == *"previous session didn't wrap up"* ]]
+  [[ "$output" == *"previous session wasn't ended with /session-end"* ]]
+}
+
+@test "paired start + handoff markers — silently cleaned, no stale warning" {
+  # Repro for the /clear-after-/session-end bug: prior CC process ran
+  # /session-end (writing ~rpm-session-end) then /clear proactively rewrote
+  # ~rpm-session-start with the same session_id. The next CC process
+  # should see the pair and silently reset — nothing to wrap up.
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: prior-proc-sess
+started: 2026-04-12T10:30:00Z
+task: (unassigned)
+EOF
+  cat > "$PM_DIR/~rpm-session-end" <<EOF
+session_id: prior-proc-sess
+EOF
+  run run_session_start startup new-sess
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"wasn't ended with /session-end"* ]]
+  [[ "$output" != *"rpm: resuming"* ]]
+  # Both paired markers are consumed; proactive block writes a fresh one.
+  [ ! -f "$PM_DIR/~rpm-session-end" ]
+  marker_content=$(cat "$PM_DIR/~rpm-session-start")
+  [[ "$marker_content" == *"session_id: new-sess"* ]]
+  [[ "$marker_content" == *"task: (unassigned)"* ]]
+}
+
+@test "start marker without handoff = stale (unpaired)" {
+  # A start marker from a prior CC process without a matching handoff
+  # means /session-end never ran — real unfinished work.
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: prior-proc-sess
+started: 2026-04-12T10:30:00Z
+task: real work
+EOF
+  run run_session_start startup new-sess
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"wasn't ended with /session-end"* ]]
+}
+
+@test "handoff with mismatched session_id does not rescue stale marker" {
+  # Handoff claims session-a wrapped up, but the start marker belongs to
+  # session-b. They don't pair — session-b never wrapped up.
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: session-b
+started: 2026-04-12T12:00:00Z
+task: real work
+EOF
+  cat > "$PM_DIR/~rpm-session-end" <<EOF
+session_id: session-a
+EOF
+  run run_session_start startup session-c
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"wasn't ended with /session-end"* ]]
+}
+
+@test "orphan handoff (no start marker) is cleaned up" {
+  # A handoff left over from a prior CC process with no active marker
+  # should just be deleted — nothing to pair with.
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-end" <<EOF
+session_id: long-gone-sess
+EOF
+  run run_session_start startup fresh-sess
+  [ "$status" -eq 0 ]
+  [ ! -f "$PM_DIR/~rpm-session-end" ]
+  # Fresh proactive marker written for the new session
+  marker_content=$(cat "$PM_DIR/~rpm-session-start")
+  [[ "$marker_content" == *"session_id: fresh-sess"* ]]
+}
+
+@test "handoff matching current CC session is preserved (mid-/clear)" {
+  # /session-end just wrote the handoff for this CC process; /clear fires
+  # SessionStart, marker is absent. The handoff must survive so the next
+  # proactive-created start marker pairs with it on the NEXT restart.
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-end" <<EOF
+session_id: same-proc-sess
+EOF
+  run run_session_start clear same-proc-sess
+  [ "$status" -eq 0 ]
+  [ -f "$PM_DIR/~rpm-session-end" ]
+  # Proactive block still wrote the new start marker with same session_id
+  marker_content=$(cat "$PM_DIR/~rpm-session-start")
+  [[ "$marker_content" == *"session_id: same-proc-sess"* ]]
 }
 
 @test "fresh session renders task menu with backlog title" {
@@ -208,8 +295,8 @@ EOF
   seed_minimal_trackers
   run run_session_start startup test-sess-xyz
   [ "$status" -eq 0 ]
-  [ -f "$PM_DIR/~rpm-session-active" ]
-  marker_content=$(cat "$PM_DIR/~rpm-session-active")
+  [ -f "$PM_DIR/~rpm-session-start" ]
+  marker_content=$(cat "$PM_DIR/~rpm-session-start")
   [[ "$marker_content" == *"session_id: test-sess-xyz"* ]]
   [[ "$marker_content" == *"task: (unassigned)"* ]]
   [[ "$marker_content" == *"started:"* ]]
@@ -217,14 +304,14 @@ EOF
 
 @test "stale-path does not overwrite existing marker" {
   seed_minimal_trackers
-  cat > "$PM_DIR/~rpm-session-active" <<EOF
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
 session_id: original-sess
 started: 2026-04-12T10:00:00Z
 task: original task
 EOF
   run run_session_start startup new-sess
   [ "$status" -eq 0 ]
-  marker_content=$(cat "$PM_DIR/~rpm-session-active")
+  marker_content=$(cat "$PM_DIR/~rpm-session-start")
   [[ "$marker_content" == *"session_id: original-sess"* ]]
   [[ "$marker_content" == *"original task"* ]]
   [[ "$marker_content" != *"new-sess"* ]]
