@@ -207,22 +207,25 @@ if [ -f "$FUTURE" ]; then
   done <<< "$MENU_ITEMS"
 
   if [ "$NUM" -eq 0 ]; then
+    BACKLOG_EMPTY=1
     echo "(no actionable tasks)"
-  fi
-
-  echo ""
-  echo "S: something else"
-  echo "R: review tasks"
-  if [ -n "$LAST_TASK" ]; then
-    echo "C: continue working on ${LAST_TASK}"
-  fi
-  echo ""
-  if [ -n "$LAST_TASK" ]; then
-    echo "Pick #, #? for details, C, S, or R."
   else
-    echo "Pick #, #? for details, S, or R."
+    BACKLOG_EMPTY=0
+    echo ""
+    echo "S: something else"
+    echo "R: review tasks"
+    if [ -n "$LAST_TASK" ]; then
+      echo "C: continue working on ${LAST_TASK}"
+    fi
+    echo ""
+    if [ -n "$LAST_TASK" ]; then
+      echo "Pick #, #? for details, C, S, or R."
+    else
+      echo "Pick #, #? for details, S, or R."
+    fi
   fi
 else
+  BACKLOG_EMPTY=1
   echo "(no tasks.org found)"
 fi
 
@@ -264,7 +267,26 @@ echo "=== instructions ==="
 echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
 echo "  rpm: session active"
 echo ""
-if [ -n "$LAST_NEXT" ]; then
+if [ "$BACKLOG_EMPTY" = "1" ] && [ -z "$LAST_NEXT" ]; then
+echo "Then the backlog has no actionable tasks. Do NOT present a menu or"
+echo "ask the user to pick. Instead:"
+echo "1. Read docs/rpm/future/tasks.org in full. Review every TODO/BLOCKED/"
+echo "   DONE entry and decide honestly whether any could be made actionable"
+echo "   now (e.g. BLOCKED tasks whose :BLOCKED_BY: dep is already complete,"
+echo "   IN-PROGRESS items that are actually finished, TODOs that were"
+echo "   filtered because a parent heading is ambiguous)."
+echo "2. If one or more ARE actually actionable, say so as a statement,"
+echo "   then end your response with a single question asking whether to"
+echo "   start on the one you think is most promising — do not print the"
+echo "   full menu; just name the task."
+echo "3. If truly none are actionable, say so briefly, then look at"
+echo "   docs/rpm/context.md, docs/rpm/present/status.md, and any daily log"
+echo "   above to infer plausible next work. Draft 2–4 candidate task"
+echo "   titles and end your response with ONE question: \"Want me to add"
+echo "   any of these to tasks.org, or would you rather describe your own?\""
+echo "4. On task selection (from review or brainstorm), write the session"
+echo "   marker and create a native task via TaskCreate, then begin working."
+elif [ -n "$LAST_NEXT" ]; then
 echo "Then:"
 echo "1. Tell the user what was next from the last session as a statement"
 echo "   (not a question): \"$LAST_NEXT\""

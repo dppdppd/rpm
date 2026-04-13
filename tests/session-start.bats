@@ -112,6 +112,26 @@ EOF
   [[ "$output" == *"second"* ]]
 }
 
+@test "empty backlog — no Pick prompt, brainstorm instructions instead" {
+  seed_minimal_trackers
+  # tasks.org exists but has no actionable TODOs
+  cat > "$PM_DIR/future/tasks.org" <<'EOF'
+#+TITLE: test
+* Active
+** DONE already done
+   :PROPERTIES:
+   :ID: d1
+   :END:
+EOF
+  run run_session_start startup
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"(no actionable tasks)"* ]]
+  [[ "$output" != *"Pick #"* ]]
+  [[ "$output" != *"S: something else"* ]]
+  [[ "$output" == *"Review every TODO/BLOCKED/"* ]]
+  [[ "$output" == *"Draft 2"*"candidate task"* ]]
+}
+
 @test "last-session next message appears when present" {
   seed_minimal_trackers
   : > "$PM_DIR/future/tasks.org"
