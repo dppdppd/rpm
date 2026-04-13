@@ -225,7 +225,7 @@ Eight hooks drive the automatic behavior:
 | **SessionStart** | Loads git state, open tasks, daily log, tracker drift. Proposes a task. |
 | **SessionEnd** | Detects sessions that ended without `/session-end`; writes stub log + stderr warning. |
 | **Stop** | Captures learning signals + validates that `/session-end` wrote a complete handoff. |
-| **PostToolUse** | Reads actual token usage from the transcript; soft recommendations at ~40% / ~60% / ~70% of the context window. |
+| **PostToolUse** | Reads actual token usage from the transcript; soft recommendations at ~75% / ~90% of the context window. |
 | **PreCompact** | Checkpoints progress before context compaction. |
 | **PostCompact** | Re-injects session state after compaction. |
 | **TaskCreated** | Persists native task creations to a JSONL log (survives unexpected termination). |
