@@ -78,18 +78,22 @@ if [ -f "$HANDOFF" ] && [ ! -f "$MARKER" ]; then
   fi
 fi
 
-# If the marker block above consumed the marker (resume / stale), emit
-# the appropriate header + instructions and exit. Otherwise fall through
-# to proactive creation + the normal startup flow.
+# Stale marker: emit a soft note, clear the marker, and fall through to
+# the normal startup flow (including the task menu). The user can pick
+# up where they left off or move on — nothing is forced.
+if [ -f "$MARKER" ] && [ "$STALE" = "1" ]; then
+  echo "rpm: previous session didn't wrap up"
+  echo "(task: ${TASK:-unknown}, started ${STARTED:-unknown})"
+  echo "(to resume and close it out: /resume ${SESSION_ID:-<session id>} then /session-end — otherwise pick from the backlog below)"
+  echo ""
+  rm -f "$MARKER"
+fi
+
+# Active resume path: same CC process, marker still valid. Emit resume
+# header + task-menu-style options and exit.
 if [ -f "$MARKER" ]; then
-  if [ "$STALE" = "1" ]; then
-    echo "rpm: previous session wasn't ended with /session-end"
-    echo "(last active task: ${TASK:-unknown}, started $STARTED)"
-    echo "(session_id: ${SESSION_ID:-unknown})"
-  else
-    echo "rpm: resuming — ${TASK:-unknown task}"
-    [ -n "$STARTED" ] && echo "(session started $STARTED)"
-  fi
+  echo "rpm: resuming — ${TASK:-unknown task}"
+  [ -n "$STARTED" ] && echo "(session started $STARTED)"
   echo ""
   if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
     PORCELAIN=$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null || true)
@@ -103,39 +107,15 @@ if [ -f "$MARKER" ]; then
   fi
   echo ""
   echo "=== instructions ==="
-  if [ "$STALE" = "1" ]; then
-    echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-    echo "  rpm: your previous session wasn't ended with /session-end"
-    echo ""
-    echo "Then emit this verbatim:"
-    echo ""
-    echo "  You can /resume ${SESSION_ID:-<session id>} and run /session-end to"
-    echo "  close it out, or I can clear the marker and we'll move on."
-    echo ""
-    echo "Stop after emitting. Do NOT present the task menu. Wait for the user."
-    echo "If they ask to clear:"
-    echo "  rm docs/rpm/~rpm-session-start"
-    echo "then write a fresh marker for the current session:"
-    echo "  cat > docs/rpm/~rpm-session-start <<MARKER"
-    echo "  ---"
-    echo "  session_id: $HOOK_SESSION_ID"
-    echo "  started: \$(date -Iseconds)"
-    echo "  task: (unassigned)"
-    echo "  ---"
-    echo "  MARKER"
-    echo "Then wait silently for the user's next instruction — do not offer"
-    echo "the task menu or suggest what to do next."
-  else
-    echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-    echo "  rpm: resuming — ${TASK:-unknown task}"
-    echo ""
-    echo "An rpm session marker is present — unfinished work on this task."
-    echo "Check git state and recent commits to orient, then end your response"
-    echo "with ONE question offering these options:"
-    echo "  A. Continue the in-flight task"
-    echo "  B. Wrap it up with /session-end"
-    echo "  C. Switch to something else (then present the task menu)"
-  fi
+  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+  echo "  rpm: resuming — ${TASK:-unknown task}"
+  echo ""
+  echo "An rpm session marker is present — unfinished work on this task."
+  echo "Check git state and recent commits to orient, then end your response"
+  echo "with ONE question offering these options:"
+  echo "  A. Continue the in-flight task"
+  echo "  B. Switch to something else (then present the task menu)"
+  echo "  C. Wrap up with /session-end"
   echo "rpm: don't forget to set /effort" >&2
   exit 0
 fi

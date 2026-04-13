@@ -51,12 +51,11 @@ run_end_hook() {
   [ -z "$output" ]
 }
 
-@test "logout reason warns and backfills daily log" {
+@test "logout reason silently backfills daily log" {
   seed_marker
   run run_end_hook logout
   [ "$status" -eq 0 ]
-  [[ "$output" == *"session ended without /session-end"* ]]
-  [[ "$output" == *"write tests"* ]]
+  [ -z "$output" ]
   today=$(date +%Y-%m-%d)
   [ -f "$PM_DIR/past/$today.md" ]
   grep -q "session ended without wrap-up" "$PM_DIR/past/$today.md"
@@ -65,28 +64,31 @@ run_end_hook() {
   grep -Fq "Session:** sess-1" "$PM_DIR/past/$today.md"
 }
 
-@test "other reason also warns" {
+@test "other reason backfills daily log without stderr noise" {
   seed_marker
   run run_end_hook other
   [ "$status" -eq 0 ]
-  [[ "$output" == *"session ended without /session-end"* ]]
+  [ -z "$output" ]
+  today=$(date +%Y-%m-%d)
+  grep -q "session ended without wrap-up" "$PM_DIR/past/$today.md"
 }
 
-@test "empty reason defaults to 'other' and warns" {
+@test "empty reason defaults to 'other' and silently backfills" {
   seed_marker
   run bash -c 'echo "{}" | bash "$CLAUDE_PLUGIN_ROOT/hooks/session-end.sh" 2>&1'
   [ "$status" -eq 0 ]
-  [[ "$output" == *"session ended without /session-end"* ]]
+  [ -z "$output" ]
   today=$(date +%Y-%m-%d)
   grep -Fq "Reason:** other" "$PM_DIR/past/$today.md"
 }
 
-@test "task field missing from marker shows 'unknown'" {
+@test "task field missing from marker logs 'unknown' in daily log" {
   cat > "$TEST_DIR/$MARKER_REL" <<EOF
 session_id: sess-2
 started: 2026-04-13T10:00:00Z
 EOF
   run run_end_hook logout
   [ "$status" -eq 0 ]
-  [[ "$output" == *"task: unknown"* ]]
+  today=$(date +%Y-%m-%d)
+  grep -Fq "Task:** unknown" "$PM_DIR/past/$today.md"
 }
