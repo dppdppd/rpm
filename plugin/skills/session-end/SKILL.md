@@ -150,6 +150,17 @@ From the 1a scan output and the 1b tracker reads, collect any
 drift items that warrant user action into a `drift_findings`
 list for Phase 3 presentation. Suppress trivial meta-matches.
 
+### 1e. Backfill an unassigned task title
+
+If `docs/rpm/~rpm-session-active` has `task: (unassigned)` — the
+user started the session without picking from the menu — derive a
+concise title (5–8 words, imperative form) from the 1c synthesis,
+git log, and modified files. Do NOT ask the user; auto-assign.
+
+Edit the marker to replace `task: (unassigned)` with the derived
+title. All downstream phases (daily log header, `~rpm-last-session`,
+handoff text) will then see the real title instead of "(unassigned)".
+
 ---
 
 ## Phase 2: Auto-apply tracker updates (parallel writes)

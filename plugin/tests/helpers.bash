@@ -29,7 +29,10 @@ seed_minimal_trackers() {
 }
 
 # Invoke a hook with a given SessionStart source payload. Captures stdout.
+# Optional second arg: session_id (defaults to test-sess-123).
 run_session_start() {
   local source="${1:-startup}"
-  echo "{\"source\":\"$source\"}" | bash "$CLAUDE_PLUGIN_ROOT/hooks/session-start-auto.sh"
+  local sid="${2:-test-sess-123}"
+  echo "{\"source\":\"$source\",\"session_id\":\"$sid\"}" \
+    | bash "$CLAUDE_PLUGIN_ROOT/hooks/session-start-auto.sh"
 }

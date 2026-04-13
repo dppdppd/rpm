@@ -1,6 +1,6 @@
 {
   "name": "rpm",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "Relentless Project Manager. Prevents drift and keeps you on task across LLM-assisted development sessions.",
   "author": {
     "name": "dppdppd"
