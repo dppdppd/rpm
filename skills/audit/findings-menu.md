@@ -20,14 +20,29 @@ Reply: `fix 1 2 4` · `all` · `none` · `<#>?` for details
 Each option leads with a bolded 2–4 word phrase (no line break after),
 then the full finding inline. **Blank line between options.**
 
+### Single-finding form
+
+When `N == 1`, skip the numbered list and the `all · none` grammar —
+they read awkwardly with one item. Use:
+
+```
+## Audit finding — {date}
+
+**{quick phrase}** — {description} ({score})
+
+Fix it? (yes / no / `?` for details)
+```
+
 ## Reply grammar (interpret liberally)
 
 - `fix 1 2 4` / `1 2 4` / `1,2,4` → fix those rows
 - `all` / `fix all` → fix every finding
 - `none` / `skip all` / `cancel` → skip every finding; log as cancelled
-- `<#>?` / `<#>` alone / `tell me about 2` → show full details
-  (location, evidence, proposed fix) for that finding, then re-print
-  the list and wait for another reply
+- `yes` / `fix it` (single-finding form) → fix the one finding
+- `no` / `skip` (single-finding form) → skip it; log as cancelled
+- `<#>?` / `<#>` alone / `?` (single-finding) / `tell me about 2` → show
+  full details (location, evidence, proposed fix), then re-print the
+  menu and wait for another reply
 - natural phrasings like `fix the first two` → map to the obvious action
 
 When in doubt, ask.
