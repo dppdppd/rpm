@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-04-13
-- **Version**: 2.5.4
+- **Version**: 2.5.5
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -35,6 +35,7 @@
 - Paired session markers (v2.5.3) — `~rpm-session-start` (SessionStart) + `~rpm-session-end` (/session-end) pair on session_id for deterministic orphan detection; softer "wasn't ended with /session-end" stale UX, no task menu on stale path
 - v2.5.3 published — plugin-only split at `7f21ead`, tagged `v2.5.3`
 - Softened session-end nudges (v2.5.4) — context-monitor drops "HARD WRAP-UP GATE" / "do not start new tasks" language; session-end hook stops printing stderr warnings on unclean exit; session-start stale path becomes a soft note that falls through to the task menu instead of blocking; handoff-validator drops the "review trackers" directive; session-end SKILL description no longer pushes proactive auto-invocation
+- Context monitor reads real tokens (v2.5.5) — pulls `input + cache_read + cache_creation` from the latest assistant `usage` block instead of transcript byte size; defaults to a 1M-token window with `RPM_CONTEXT_TOKENS` env override for 200K users; bats coverage extended to override path + transcripts without usage
 
 ## Active Specs
 
