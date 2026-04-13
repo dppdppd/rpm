@@ -51,6 +51,7 @@ if [ -f "$MARKER" ]; then
   echo "  B. Wrap it up with /session-end"
   echo "  C. Switch to something else (then present the task menu)"
   echo "Wait for the user's choice before acting."
+  echo "rpm: don't forget to set /effort" >&2
   exit 0
 fi
 
@@ -259,6 +260,8 @@ if [ -f "$TIPS_FILE" ]; then
   TIP=$(shuf -n 1 "$TIPS_FILE" 2>/dev/null)
   [ -n "$TIP" ] && echo "rpm tip: $TIP" >&2
 fi
+
+echo "rpm: don't forget to set /effort" >&2
 
 # --- Instructions for Claude ---
 echo ""
