@@ -262,6 +262,13 @@ Possible actions (include only when applicable):
 Which actions? (e.g., `1,2` · `all` · `none`)
 ```
 
+If exactly one action remains after filtering, drop the numbered
+list and the `all · none` grammar — ask directly:
+
+```
+Run **{action name}**? (yes / no)
+```
+
 If no actions remain after filtering, skip the menu entirely and
 proceed directly to Phase 5.
 
@@ -292,6 +299,8 @@ followup questions needed before acting.
   2. [learning summary] → CLAUDE.md
   ```
   Then ask: "Which to promote? (e.g., `1,2` · `all` · `none`)"
+- If only one learning remains, skip the numbered list and ask
+  directly: `Promote **[summary]** → {destination}? (yes / no)`
 - One list, one question. Do not pre-filter, recommend, or renumber.
 - Only promote the ones the user picks
 - Show the addition before writing
