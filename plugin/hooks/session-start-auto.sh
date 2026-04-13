@@ -111,20 +111,14 @@ fi
 echo ""
 echo "=== task_menu ==="
 if [ -f "$FUTURE" ]; then
-  # Scoreboard
-  DONE_N=$(grep -cE '^\*\* DONE ' "$FUTURE" 2>/dev/null || true)
-  IP_N=$(grep -cE '^\*\* IN-PROGRESS ' "$FUTURE" 2>/dev/null || true)
-  TODO_N=$(grep -cE '^\*\* TODO ' "$FUTURE" 2>/dev/null || true)
-  BLOCKED_N=$(grep -cE '^\*\* BLOCKED ' "$FUTURE" 2>/dev/null || true)
-  echo "scoreboard: $DONE_N done · $IP_N in-progress · $TODO_N todo · $BLOCKED_N blocked"
-  echo ""
   # Check for last session task
   LAST_TASK="" LAST_NEXT=""
   if [ -f "$LAST_SESSION" ]; then
     LAST_TASK=$(grep -oP 'task: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
     LAST_NEXT=$(grep -oP 'next: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
   fi
-  echo "What would you like to work on? Open tasks from your backlog:"
+  echo "Your task backlog:"
+  echo ""
 
   # Pass 1: collect task IDs and statuses for dependency resolution
   san() { echo "$1" | tr '-' '_'; }
@@ -202,7 +196,6 @@ if [ -f "$FUTURE" ]; then
   while IFS='|' read -r parent label detail status; do
     [ -z "$label" ] && continue
     if [ "$parent" != "$LAST_PARENT" ]; then
-      [ -n "$LAST_PARENT" ] && echo ""
       [ -n "$parent" ] && echo "$parent"
       LAST_PARENT="$parent"
     fi
@@ -273,11 +266,12 @@ echo "  rpm: session active"
 echo ""
 if [ -n "$LAST_NEXT" ]; then
 echo "Then:"
-echo "1. Tell the user what was next from the last session:"
-echo "   \"$LAST_NEXT\""
-echo "2. Ask if they want to continue with that or pick something else."
+echo "1. Tell the user what was next from the last session as a statement"
+echo "   (not a question): \"$LAST_NEXT\""
+echo "2. End your response by asking — and ONLY at the end — whether to"
+echo "   continue with that or pick something else."
 echo "   - If yes → proceed to step 3"
-echo "   - If no → present the task menu (scoreboard through prompt line, verbatim)"
+echo "   - If no → present the task menu (title through prompt line, verbatim)"
 echo "     and handle their selection"
 echo "3. On task selection, write the session marker:"
 echo "   cat > docs/rpm/~rpm-session-active << MARKER"
@@ -291,9 +285,12 @@ echo "4. Create a native task via TaskCreate."
 echo "5. Begin working."
 else
 echo "Then:"
-echo "1. Note leftover state (uncommitted work, drift) — ask the developer how to handle it."
+echo "1. If there's leftover state (uncommitted work, drift), note it briefly"
+echo "   as a statement — do NOT ask a question about it here."
+echo "   You'll handle it after the user picks a task."
 echo "2. Present the task menu in a code block (triple backticks) to preserve formatting."
-echo "   Include everything from the scoreboard through the prompt line, verbatim."
+echo "   Include everything from the \"Your task backlog:\" title through the prompt line, verbatim."
+echo "   The final \"Pick #...\" line is the ONLY question in your response — ask nothing else."
 echo "3. Handle the user's response:"
 echo "   - #  → select that task, proceed to step 4"
 echo "   - #? → read the detail file (path shown under the task), summarize it,"

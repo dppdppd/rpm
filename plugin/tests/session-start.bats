@@ -32,7 +32,7 @@ EOF
   [[ "$output" != *"task_menu"* ]]
 }
 
-@test "fresh session renders scoreboard and task menu" {
+@test "fresh session renders task menu with backlog title" {
   seed_minimal_trackers
   cat > "$PM_DIR/future/tasks.org" <<'EOF'
 * Work
@@ -47,9 +47,32 @@ EOF
 EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
-  [[ "$output" == *"scoreboard:"* ]]
+  [[ "$output" == *"Your task backlog:"* ]]
+  [[ "$output" != *"scoreboard:"* ]]
   [[ "$output" == *"alpha task"* ]]
   [[ "$output" != *"done task"* ]]
+}
+
+@test "menu has no blank lines between parent groups" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/future/tasks.org" <<'EOF'
+* First group
+** TODO task-a
+   :PROPERTIES:
+   :ID: a
+   :END:
+* Second group
+** TODO task-b
+   :PROPERTIES:
+   :ID: b
+   :END:
+EOF
+  run run_session_start startup
+  [ "$status" -eq 0 ]
+  # Between the last item of First group and the "Second group" heading
+  # there should be no blank line.
+  [[ "$output" != *$'1. task-a\n\nSecond group'* ]]
+  [[ "$output" == *$'1. task-a\nSecond group'* ]]
 }
 
 @test "BLOCKED_BY with incomplete dep hides task" {
