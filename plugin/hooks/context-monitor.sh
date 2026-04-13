@@ -1,11 +1,16 @@
 #!/bin/bash
-# PostToolUse hook: monitor transcript size as a proxy for context usage.
-# Three-tier soft recommendations at ~40% / ~60% / ~70% of context window.
-# Pattern adapted from shihchengwei-lab/claude-code-session-kit.
+# PostToolUse hook: monitor actual context token usage from the transcript.
+# Three-tier soft recommendations at ~40% / ~60% / ~70% of the context window.
 #
-# Only runs on every 10th tool call (skipping the first 3) to keep
-# overhead negligible. Does nothing unless rpm is initialized AND a
-# session is active.
+# Reads the latest assistant message's usage block (input + cache_read +
+# cache_creation tokens) — this is the real context size, not a byte proxy.
+#
+# Context window defaults to 1,000,000 tokens (Opus/Sonnet 4.6 with 1M beta).
+# Users on the standard 200K window can override:
+#   export RPM_CONTEXT_TOKENS=200000
+#
+# Runs every 10th tool call (after the first 3) to keep overhead negligible.
+# No-op unless rpm is initialized AND a session is active.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
@@ -16,31 +21,38 @@ MARKER="$PM_DIR/~rpm-session-start"
 
 PAYLOAD=$(cat)
 
-# Session-local counter (reset per session via /tmp)
 SESSION_ID=$(echo "$PAYLOAD" | jq -r '.session_id // "unknown"' 2>/dev/null)
 COUNTER_FILE="/tmp/rpm-ctx-counter-${SESSION_ID}"
 COUNT=$(cat "$COUNTER_FILE" 2>/dev/null || echo 0)
 COUNT=$((COUNT + 1))
 echo "$COUNT" > "$COUNTER_FILE"
 
-# Skip first 3 calls, then every 10th. Keeps overhead near zero.
 [ "$COUNT" -lt 3 ] && exit 0
 [ $((COUNT % 10)) -ne 0 ] && exit 0
 
-# transcript_path arrives on stdin for PostToolUse events
 TRANSCRIPT=$(echo "$PAYLOAD" | jq -r '.transcript_path // empty' 2>/dev/null)
 [ -z "$TRANSCRIPT" ] && exit 0
 [ ! -f "$TRANSCRIPT" ] && exit 0
 
-SIZE=$(wc -c < "$TRANSCRIPT" 2>/dev/null || echo 0)
+# Pull the last assistant usage block from the transcript. tac walks from
+# the end, so this is cheap even on very large transcripts.
+USAGE=$(tac "$TRANSCRIPT" 2>/dev/null \
+  | grep -m1 '"role":"assistant"' \
+  | jq -r '.message.usage // empty' 2>/dev/null)
+[ -z "$USAGE" ] && exit 0
 
-# Thresholds — rough estimates calibrated for ~1MB context window.
-# Adjust if your workflow uses a different model/context size.
-WARN=400000       # ~40% → soft heads-up
-ALERT=600000      # ~60% → recommend wrap-up at next break
-STOP=700000       # ~70% → strong recommendation (still user's call)
+INPUT=$(echo "$USAGE" | jq -r '.input_tokens // 0' 2>/dev/null)
+CACHE_READ=$(echo "$USAGE" | jq -r '.cache_read_input_tokens // 0' 2>/dev/null)
+CACHE_CREATE=$(echo "$USAGE" | jq -r '.cache_creation_input_tokens // 0' 2>/dev/null)
+TOKENS=$((INPUT + CACHE_READ + CACHE_CREATE))
+[ "$TOKENS" -le 0 ] && exit 0
 
-if [ "$SIZE" -gt "$STOP" ]; then
+WINDOW="${RPM_CONTEXT_TOKENS:-1000000}"
+WARN=$((WINDOW * 40 / 100))
+ALERT=$((WINDOW * 60 / 100))
+STOP=$((WINDOW * 70 / 100))
+
+if [ "$TOKENS" -gt "$STOP" ]; then
   cat <<'EOF'
 {
   "hookSpecificOutput": {
@@ -49,7 +61,7 @@ if [ "$SIZE" -gt "$STOP" ]; then
   }
 }
 EOF
-elif [ "$SIZE" -gt "$ALERT" ]; then
+elif [ "$TOKENS" -gt "$ALERT" ]; then
   cat <<'EOF'
 {
   "hookSpecificOutput": {
@@ -58,7 +70,7 @@ elif [ "$SIZE" -gt "$ALERT" ]; then
   }
 }
 EOF
-elif [ "$SIZE" -gt "$WARN" ]; then
+elif [ "$TOKENS" -gt "$WARN" ]; then
   cat <<'EOF'
 {
   "hookSpecificOutput": {

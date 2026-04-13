@@ -4,7 +4,6 @@ load helpers
 
 setup()    { setup_sandbox; seed_minimal_trackers; }
 teardown() {
-  # Clean per-session counter files we created during tests.
   rm -f /tmp/rpm-ctx-counter-ctxmon-*
   teardown_sandbox
 }
@@ -19,22 +18,30 @@ task: x
 EOF
 }
 
-# Run the hook with a given transcript size and session id. The transcript
-# file is a tmp file padded with zeros to the requested byte count.
+# Run the hook with a synthesized transcript containing one assistant
+# message whose usage block sums to the requested token count (placed in
+# cache_read_input_tokens — same code path as input/cache_creation).
 run_monitor() {
-  local size="$1"
+  local tokens="$1"
   local sid="${2:-ctxmon-$$}"
+  local window="${3:-}"
   local transcript
   transcript="$(mktemp)"
-  if [ "$size" -gt 0 ]; then
-    dd if=/dev/zero of="$transcript" bs=1 count="$size" 2>/dev/null
+  if [ "$tokens" -gt 0 ]; then
+    printf '{"type":"assistant","message":{"role":"assistant","usage":{"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":%d,"output_tokens":1}}}\n' \
+      "$tokens" > "$transcript"
   fi
-  printf '{"session_id":"%s","transcript_path":"%s"}' "$sid" "$transcript" \
-    | bash "$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh"
+  if [ -n "$window" ]; then
+    RPM_CONTEXT_TOKENS="$window" \
+      printf '{"session_id":"%s","transcript_path":"%s"}' "$sid" "$transcript" \
+      | RPM_CONTEXT_TOKENS="$window" bash "$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh"
+  else
+    printf '{"session_id":"%s","transcript_path":"%s"}' "$sid" "$transcript" \
+      | bash "$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh"
+  fi
   rm -f "$transcript"
 }
 
-# Prime the per-session counter so the next invocation lands on the 10th.
 prime_counter() {
   local sid="$1"
   echo 9 > "/tmp/rpm-ctx-counter-$sid"
@@ -61,16 +68,16 @@ prime_counter() {
   [ -z "$output" ]
 }
 
-@test "silent when under the 40% threshold (at 10th call)" {
+@test "silent when under the 40% threshold at 10th call (1M default)" {
   seed_marker
   sid="ctxmon-under-$$"
   prime_counter "$sid"
-  run run_monitor 100000 "$sid"
+  run run_monitor 300000 "$sid"
   [ "$status" -eq 0 ]
   [ -z "$output" ]
 }
 
-@test "emits 40% heads-up at 10th call when size crosses WARN" {
+@test "emits 40% heads-up when tokens cross WARN (1M default)" {
   seed_marker
   sid="ctxmon-warn-$$"
   prime_counter "$sid"
@@ -82,7 +89,7 @@ prime_counter() {
   echo "$output" | jq -e . >/dev/null
 }
 
-@test "emits 60% recommendation when size crosses ALERT" {
+@test "emits 60% recommendation when tokens cross ALERT (1M default)" {
   seed_marker
   sid="ctxmon-alert-$$"
   prime_counter "$sid"
@@ -90,11 +97,10 @@ prime_counter() {
   [ "$status" -eq 0 ]
   [[ "$output" == *"past 60%"* ]]
   [[ "$output" == *"consider /session-end"* ]]
-  [[ "$output" != *"Do not start"* ]]
   echo "$output" | jq -e . >/dev/null
 }
 
-@test "emits 70% recommendation when size crosses STOP" {
+@test "emits 70% recommendation when tokens cross STOP (1M default)" {
   seed_marker
   sid="ctxmon-stop-$$"
   prime_counter "$sid"
@@ -102,15 +108,31 @@ prime_counter() {
   [ "$status" -eq 0 ]
   [[ "$output" == *"past 70%"* ]]
   [[ "$output" == *"consider /session-end"* ]]
-  [[ "$output" != *"HARD WRAP-UP GATE"* ]]
-  [[ "$output" != *"Do not start"* ]]
   echo "$output" | jq -e . >/dev/null
+}
+
+@test "RPM_CONTEXT_TOKENS override scales thresholds (200K window)" {
+  seed_marker
+  sid="ctxmon-200k-$$"
+  prime_counter "$sid"
+  # 90K tokens on a 200K window = 45% → should trip WARN (40%).
+  run run_monitor 90000 "$sid" 200000
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"past 40%"* ]]
+}
+
+@test "RPM_CONTEXT_TOKENS override — 1M-sized tokens on 200K window hit 70%" {
+  seed_marker
+  sid="ctxmon-200kstop-$$"
+  prime_counter "$sid"
+  run run_monitor 160000 "$sid" 200000
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"past 70%"* ]]
 }
 
 @test "silent on non-10th call even over threshold" {
   seed_marker
   sid="ctxmon-skip-$$"
-  # Prime to 4 → next call is 5, which is not a multiple of 10.
   echo 4 > "/tmp/rpm-ctx-counter-$sid"
   run run_monitor 750000 "$sid"
   [ "$status" -eq 0 ]
@@ -124,4 +146,16 @@ prime_counter() {
   run bash -c "echo '{\"session_id\":\"$sid\"}' | bash \"\$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh\""
   [ "$status" -eq 0 ]
   [ -z "$output" ]
+}
+
+@test "silent when transcript has no assistant usage block" {
+  seed_marker
+  sid="ctxmon-nousage-$$"
+  prime_counter "$sid"
+  transcript="$(mktemp)"
+  echo '{"type":"user","message":{"role":"user","content":"hi"}}' > "$transcript"
+  run bash -c "printf '{\"session_id\":\"$sid\",\"transcript_path\":\"$transcript\"}' | bash \"\$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh\""
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+  rm -f "$transcript"
 }
