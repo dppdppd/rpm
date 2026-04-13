@@ -19,7 +19,21 @@ teardown() { teardown_sandbox; }
   [ -z "$output" ]
 }
 
-@test "active marker triggers resume path with task name" {
+@test "active marker + clear source — resume path regardless of last-session state" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-active" <<EOF
+task: fix flux capacitor
+started: 2026-04-12T10:00:00Z
+EOF
+  # No ~rpm-last-session file — but source=clear means same CC process, so resume.
+  run run_session_start clear
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"rpm: resuming"* ]]
+  [[ "$output" == *"fix flux capacitor"* ]]
+  [[ "$output" != *"didn't wrap up"* ]]
+}
+
+@test "active marker + startup + no last-session = stale — offers wrap-up" {
   seed_minimal_trackers
   cat > "$PM_DIR/~rpm-session-active" <<EOF
 task: fix flux capacitor
@@ -27,9 +41,45 @@ started: 2026-04-12T10:00:00Z
 EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
-  [[ "$output" == *"rpm: resuming"* ]]
+  [[ "$output" == *"previous session didn't wrap up"* ]]
+  [[ "$output" == *"Wrap up the previous task now"* ]]
   [[ "$output" == *"fix flux capacitor"* ]]
-  [[ "$output" != *"task_menu"* ]]
+  [[ "$output" != *"rpm: resuming"* ]]
+}
+
+@test "active marker + startup + fresh last-session = resume" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-active" <<EOF
+task: fix flux capacitor
+started: 2026-04-12T10:00:00Z
+EOF
+  # last-session ended AFTER current marker started — current work is in-flight.
+  cat > "$PM_DIR/~rpm-last-session" <<EOF
+task: earlier thing
+ended: 2026-04-12T11:00:00Z
+next: follow-up
+EOF
+  run run_session_start startup
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"rpm: resuming"* ]]
+  [[ "$output" != *"didn't wrap up"* ]]
+}
+
+@test "active marker + startup + stale last-session = stale path" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-active" <<EOF
+task: current task
+started: 2026-04-12T15:00:00Z
+EOF
+  # last-session predates current marker — stale.
+  cat > "$PM_DIR/~rpm-last-session" <<EOF
+task: some older thing
+ended: 2026-04-11T12:00:00Z
+next: something
+EOF
+  run run_session_start startup
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"previous session didn't wrap up"* ]]
 }
 
 @test "fresh session renders task menu with backlog title" {

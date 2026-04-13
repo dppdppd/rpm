@@ -22,13 +22,36 @@ SOURCE=$(echo "$PAYLOAD" | jq -r '.source // empty' 2>/dev/null)
 # If the user hasn't bootstrapped, don't assume they want rpm here.
 [ ! -d "$PM_DIR" ] && exit 0
 
-# --- Active marker present — resume the in-flight task ---
+# --- Active marker present — resume or offer to wrap up stale session ---
 # Covers clear, resume, and fresh startup where the user exited without /session-end.
 if [ -f "$MARKER" ]; then
   TASK=$(grep -oP 'task: \K.*' "$MARKER" 2>/dev/null | head -1)
   STARTED=$(grep -oP 'started: \K.*' "$MARKER" 2>/dev/null | head -1)
-  echo "rpm: resuming — ${TASK:-unknown task}"
-  [ -n "$STARTED" ] && echo "(session started $STARTED)"
+
+  # Detect "stale" — previous Claude Code process exited without /session-end.
+  # Signal: fresh startup AND ~rpm-last-session either missing or its
+  # `ended:` timestamp predates the active marker's `started:`.
+  STALE=0
+  if [ "$SOURCE" = "startup" ]; then
+    if [ ! -f "$LAST_SESSION" ]; then
+      STALE=1
+    else
+      LAST_ENDED=$(grep -oP 'ended: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
+      if [ -z "$LAST_ENDED" ]; then
+        STALE=1
+      elif [ -n "$STARTED" ] && [[ "$LAST_ENDED" < "$STARTED" ]]; then
+        STALE=1
+      fi
+    fi
+  fi
+
+  if [ "$STALE" = "1" ]; then
+    echo "rpm: previous session didn't wrap up"
+    echo "(last active task: ${TASK:-unknown}, started $STARTED)"
+  else
+    echo "rpm: resuming — ${TASK:-unknown task}"
+    [ -n "$STARTED" ] && echo "(session started $STARTED)"
+  fi
   echo ""
   if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
     PORCELAIN=$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null || true)
@@ -42,15 +65,32 @@ if [ -f "$MARKER" ]; then
   fi
   echo ""
   echo "=== instructions ==="
-  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-  echo "  rpm: resuming — ${TASK:-unknown task}"
-  echo ""
-  echo "An rpm session marker is present — the user has unfinished work on this task."
-  echo "Check git state and recent commits to orient, then offer options:"
-  echo "  A. Continue the in-flight task"
-  echo "  B. Wrap it up with /session-end"
-  echo "  C. Switch to something else (then present the task menu)"
-  echo "Wait for the user's choice before acting."
+  if [ "$STALE" = "1" ]; then
+    echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+    echo "  rpm: previous session didn't wrap up"
+    echo ""
+    echo "The previous Claude Code session exited without running /session-end,"
+    echo "so the trackers (daily log, status.md, last-session marker) are stale."
+    echo "Orient from git state and recent commits as a statement, then end your"
+    echo "response with ONE question offering these options:"
+    echo "  A. Wrap up the previous task now — run /session-end on '${TASK:-unknown}'"
+    echo "     first so trackers reflect the actual work; then present the task menu"
+    echo "  B. Continue working on '${TASK:-unknown}' (it's still in-flight for you)"
+    echo "  C. Abandon it — clear the marker and present the task menu"
+    echo "On A: invoke the /session-end skill against the previous task before"
+    echo "doing anything else. On C: remove docs/rpm/~rpm-session-active, then"
+    echo "present the task menu."
+  else
+    echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
+    echo "  rpm: resuming — ${TASK:-unknown task}"
+    echo ""
+    echo "An rpm session marker is present — unfinished work on this task."
+    echo "Check git state and recent commits to orient, then end your response"
+    echo "with ONE question offering these options:"
+    echo "  A. Continue the in-flight task"
+    echo "  B. Wrap it up with /session-end"
+    echo "  C. Switch to something else (then present the task menu)"
+  fi
   echo "rpm: don't forget to set /effort" >&2
   exit 0
 fi
