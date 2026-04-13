@@ -2,12 +2,12 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
-** TODO Submit 2.5.2 to anthropics/claude-plugins-official marketplace
+** TODO Submit 2.5.3 to anthropics/claude-plugins-official marketplace
    :PROPERTIES:
-   :ID: marketplace-submit-252
+   :ID: marketplace-submit-253
    :END:
    - Submit via claude.ai/settings/plugins/submit
-   - SHA: 83734ce145b849c58b5c1c06131246489c9a21f4 (tag v2.5.2)
+   - SHA: 7f21eada29ca930852b629e69c89c6ffa8ae0fcf (tag v2.5.3)
    - Prefer unpinned source if the form allows, so future version
      bumps auto-propagate to users; otherwise expect to re-submit
      on each release
