@@ -5,15 +5,17 @@ drifting across LLM-assisted dev sessions.
 
 ## Commands
 - Build: n/a (no build toolchain)
-- Test: verify by re-installing plugin and running skills in a real session
-- Lint: n/a
+- Test: `bash plugin/tests/run.sh` (bats suite, covers hooks)
+- Lint: shellcheck on `plugin/hooks/*.sh` (CI runs this)
 - Publish: `git subtree split --prefix=plugin -b plugin-only && git push origin plugin-only:master --force`
 
 ## Architecture
-- `plugin/` — publishable plugin root (skills, agents, hooks)
+- `plugin/` — publishable plugin root (skills, agents, hooks, tests)
 - `plugin/skills/` — command surface (audit, bootstrap, deep-research, rpm, session-end, tasks)
 - `plugin/agents/` — subagents (auditor.md)
-- `plugin/hooks/` — lifecycle hooks (session-start, session-end, stop-learn, context-monitor, pre-compact, post-compact)
+- `plugin/hooks/` — lifecycle hooks (session-start, session-end, stop-learn, context-monitor, pre-compact, post-compact, handoff-validator, task-capture)
+- `plugin/tests/` — bats suite + helpers (fixtures built on the fly)
+- `plugin/.github/workflows/` — CI (bats + shellcheck on push/PR)
 - `docs/rpm/` — PM state (context.md, past/, present/, future/, reviews/)
 - `docs/spec/` — feature specs
 

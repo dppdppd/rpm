@@ -17,7 +17,7 @@ You are a documentation audit scanner. Read-only — do NOT edit files.
 Scan the project and report findings.
 
 1. **DISCOVER:** Scan for all `.md` files (root, `docs/`, `.claude/`,
-   `specs/`). Get line counts and last-modified dates.
+   `docs/spec/`). Get line counts and last-modified dates.
 
 2. **VALIDITY:** For each doc, verify:
    - File path references resolve on disk

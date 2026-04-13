@@ -2,3 +2,24 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
+** TODO Submit 2.5.1 to anthropics/claude-plugins-official marketplace
+   :PROPERTIES:
+   :ID: marketplace-submit-251
+   :END:
+   - Let 2.5.1 soak through a few sessions first
+   - Open PR against anthropics/claude-plugins-official
+
+** TODO Draft Reddit post for r/ClaudeAI
+   :PROPERTIES:
+   :ID: reddit-post
+   :END:
+   - Recurring "Next" item across Apr 10–11 logs
+   - Pitch: rpm as drift-prevention plugin
+
+** TODO Extend bats coverage to remaining hooks
+   :PROPERTIES:
+   :ID: bats-extend
+   :END:
+   - Current suite covers session-start-auto + handoff-validator
+   - Add tests for pre-compact, post-compact, stop-learn-capture,
+     context-monitor, task-capture, session-end

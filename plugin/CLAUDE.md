@@ -29,8 +29,11 @@ slash commands, doc auditing, and deep research.
   to an absolute path that won't match `Bash(bash:*)` rules.
 - After meaningful changes, bump `version` in
   `.claude-plugin/plugin.json`.
-- No build, test, or lint toolchain. Verify changes by re-installing
-  the plugin and running the skill in a real Claude Code session.
+- Tests: bats suite at `tests/` (`bash tests/run.sh` locally; CI runs
+  bats + shellcheck via `.github/workflows/test.yml`). Covers hook
+  logic — not LLM-driven skill behavior.
+- For end-to-end skill verification, re-install the plugin and run
+  the skill in a real Claude Code session.
 - Recent commit style: short conventional-ish prefixes (`chore:`,
   `audit:`, `rpm:`). One commit per deliverable.
 - To publish to GitHub (pushes only `plugin/` contents):

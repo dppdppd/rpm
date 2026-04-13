@@ -16,6 +16,17 @@ Referenced from `docs/rpm/context.md` when needed.
   - F5: 5 memory files carried stale `/pm:` prefixes (60)
   - F6: plugin/CLAUDE.md implied `/session-start` existed (60)
   - F7: scan.sh broken_refs doesn't cover plugin/CLAUDE.md (50, suppressed)
+- 2026-04-12 — audit documents — 10 findings, 10 fixed, 0 skipped
+  - F1: status.md version drift — 2.5.0 vs plugin.json 2.5.1 (90)
+  - F2: bats suite + CI undocumented in CLAUDE.md / status.md / past log (88)
+  - F3: root CLAUDE.md hooks list missing handoff-validator + task-capture (85)
+  - F4: status.md Last updated stale (2026-04-11; 3 commits since) (82)
+  - F5: auditor.md DISCOVER scanned `specs/` (actual: `docs/spec/`) (78)
+  - F6: tasks.org effectively empty — no backlog captured (75)
+  - F7: past/log.md missing Apr 12 entries (73)
+  - F8: root CLAUDE.md Architecture missing plugin/tests + plugin/.github (70)
+  - F9: plugin/CLAUDE.md "no test toolchain" contradicts new bats suite (68)
+  - F10: ~rpm-last-session next points to unfiled marketplace submission (60)
 - 2026-04-11 — audit project (re-run, max effort) — 10 findings, plan saved to reviews/2026-04-11b-plan.md
   - T1: project CLAUDE.md ghost `prompt-nudge` hook + missing `tasks` skill (90, High)
   - T2: Session 4 uncommitted — context.md + bootstrap/SKILL.md (85, High)
@@ -29,6 +40,10 @@ Referenced from `docs/rpm/context.md` when needed.
   - T10: ~rpm-last-session `next:` field stale (55, Low)
 
 ## Sessions Reviewed
+- 2026-04-12 — 3 sessions reviewed by audit documents
+  - `a392d2f1` (Apr 12) — /audit documents (this run) — N/A
+  - `e027f1ee` (Apr 12) — bats suite + CI (UNJUSTIFIED drift; backfilled by this audit)
+  - `eedfc339` (Apr 11→12) — handoff-validator + session-start UX — JUSTIFIED
 - 2026-04-11 — 5 sessions reviewed by audit documents
   - `1854b515` (Apr 11) — /audit documents, 6 fixes — JUSTIFIED
   - `d66616ec` (Apr 11) — C: continue UX fix, silent exit — JUSTIFIED
