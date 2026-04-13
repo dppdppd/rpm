@@ -42,8 +42,8 @@ EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
   [[ "$output" == *"previous session didn't wrap up"* ]]
-  [[ "$output" == *"Wrap up the previous task now"* ]]
-  [[ "$output" == *"fix flux capacitor"* ]]
+  [[ "$output" == *"Should I run /session-end on 'fix flux capacitor' now?"* ]]
+  [[ "$output" == *"/clear and start a new session"* ]]
   [[ "$output" != *"rpm: resuming"* ]]
 }
 
