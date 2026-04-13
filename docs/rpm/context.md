@@ -14,7 +14,6 @@ and drift across LLM sessions. Solo dev; published via git subtree split.
 | Hooks | `plugin/hooks/` + `hooks.json` |
 | Agent | `plugin/agents/auditor.md` |
 | README | `plugin/README.md` |
-| Plugin CLAUDE.md | `plugin/CLAUDE.md` |
 
 ## Focus Areas for Review
 - Skill instructions producing correct LLM behavior
