@@ -19,10 +19,11 @@
    - Recurring "Next" item across Apr 10–11 logs
    - Pitch: rpm as drift-prevention plugin
 
-** TODO Extend bats coverage to remaining hooks
+** DONE Extend bats coverage to remaining hooks
+   CLOSED: [2026-04-13]
    :PROPERTIES:
    :ID: bats-extend
    :END:
-   - Current suite covers session-start-auto + handoff-validator
-   - Add tests for pre-compact, post-compact, stop-learn-capture,
-     context-monitor, task-capture, session-end
+   - 6 new bats files: context-monitor, pre-compact, post-compact,
+     session-end-hook, stop-learn-capture, task-capture.
+   - Suite: 26 → 69 passing tests.
