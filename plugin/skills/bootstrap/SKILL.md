@@ -55,7 +55,10 @@ Classify silently (do NOT ask the user):
 
 **Say to user:** "A few quick questions I can't answer from the code:"
 
-Ask the user ONLY these questions (skip any answerable from codebase):
+Ask the user ONLY these questions (skip any answerable from codebase).
+Ask **one at a time** — each question ends its response, and you wait
+for the answer before asking the next. Never stack multiple questions
+in a single response.
 
 1. **What is this project?** (one sentence)
 2. **What's the tech stack?** (or confirm what was detected)
