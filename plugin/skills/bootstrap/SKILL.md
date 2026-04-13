@@ -12,7 +12,37 @@ First-run setup. Creates rpm context for a project. Run once per project.
 If `docs/rpm/context.md` already exists, read it and **augment** — do not
 overwrite. Merge in missing sections only.
 
+Narrate as you go. At each phase, tell the user what's about to happen
+in one short sentence before doing it — users should never be surprised
+by what `/bootstrap` creates or writes.
+
+## Phase 0: Introduce
+
+Before running anything, tell the user what bootstrap will do. Use
+roughly this wording (adapt freely):
+
+```
+## /bootstrap — rpm first-run setup
+
+I'll set up rpm (Relentless Project Manager) for this project. Here's
+what I'm about to do:
+
+1. Detect the project — language, tests, existing docs
+2. Ask 1–3 questions I can't answer from the codebase
+3. Create `docs/rpm/` scaffolding (context, trackers, past/future/reviews)
+4. Create `CLAUDE.md` if it's missing
+5. Ask once for permission to let rpm read/write `docs/rpm/`
+6. Summarize what was created
+
+Starting with detection.
+```
+
+Do NOT wait for confirmation — this is informative, not gating.
+Proceed immediately to Phase 1.
+
 ## Phase 1: Detect Project State
+
+**Say to user:** "Scanning the project…"
 
 !bash "${CLAUDE_SKILL_DIR}/scripts/detect.sh"
 
@@ -23,6 +53,8 @@ Classify silently (do NOT ask the user):
 
 ## Phase 2: Gather Project Context
 
+**Say to user:** "A few quick questions I can't answer from the code:"
+
 Ask the user ONLY these questions (skip any answerable from codebase):
 
 1. **What is this project?** (one sentence)
@@ -32,6 +64,9 @@ Ask the user ONLY these questions (skip any answerable from codebase):
 Do NOT ask more than 3 questions.
 
 ## Phase 3: Create rpm Infrastructure
+
+**Say to user:** "Creating the rpm scaffolding under `docs/rpm/` —
+context.md, past/log.md, reviews/ directory."
 
 Create or update these files:
 
@@ -89,6 +124,9 @@ mkdir -p docs/rpm/reviews
 ```
 
 ## Phase 4: Scaffold Missing Project Infrastructure
+
+**Say to user:** "Checking for missing project files (CLAUDE.md, spec
+template, trackers) and creating only what isn't already there."
 
 For each item below, **check if it exists first**. Only create what's
 missing. Never overwrite existing files.
@@ -190,6 +228,8 @@ Each task entry is one short sentence + a link to a detail file
 
 ## Phase 5: Adapt for Team Size
 
+**Say to user:** "Tuning the scaffolding for your team size."
+
 **Solo/Small:** Use template as-is. Single agent with spec workflow.
 
 **Medium (5-10):** Consider adding agent roles when a single agent
@@ -198,6 +238,9 @@ demonstrably struggles. Cap at 4. Communicate via typed artifacts.
 **Large (10+):** Module ownership, git worktrees for parallel agent isolation.
 
 ## Phase 6: Permissions
+
+**Say to user:** "One permission prompt — so rpm doesn't ask on every
+file write inside `docs/rpm/`."
 
 rpm hooks and skills frequently read/write files under `docs/rpm/`.
 Without explicit permissions, every file operation prompts the user.
@@ -222,12 +265,17 @@ existing entries.
 
 ## Phase 7: Create All Files
 
+**Say to user:** "Writing the scaffolding now."
+
 Create all files from Phase 3 and Phase 4 that do not already exist.
 Do NOT prompt the user to select which files to create — all are
 required for the plugin to function. After creating files, proceed to
 Phase 8.
 
 ## Phase 8: Present and Confirm
+
+Print the completion summary exactly like this (fill in the created
+files list):
 
 ```
 ## /bootstrap complete
@@ -239,6 +287,10 @@ Next steps:
 - `/tasks add <description>` — add tasks to your backlog
 - `/audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
+
+To de-rpm this project later: delete `docs/rpm/`. The plugin hooks
+exit silently when that directory is missing, so nothing else needs
+changing.
 ```
 
 ## Scaling Notes
