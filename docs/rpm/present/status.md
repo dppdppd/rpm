@@ -8,7 +8,7 @@
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
 - Session lifecycle (start, compact, end)
-- Session-start task menu (hierarchical, interactive, scoreboard)
+- Session-start task menu (hierarchical, interactive)
 - Session continuity across /clear and resume (source field detection)
 - Audit system (quick, documents, project) with 8 analysis dimensions
 - Deep research skill
