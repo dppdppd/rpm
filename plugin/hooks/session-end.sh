@@ -2,8 +2,9 @@
 # SessionEnd hook: detect sessions that ended without running /session-end.
 # If the session-active marker is still present when this fires, the user
 # ended via /exit, /clear, resume, logout, etc. without the wrap-up skill.
-# This hook appends a stub entry to today's daily log so the gap is at
-# least documented, and writes a stderr warning so the terminal shows it.
+# This hook silently appends a stub entry to today's daily log so the gap
+# is documented. No stderr warning — stale detection is handled softly on
+# the next session start.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
@@ -30,19 +31,11 @@ esac
 TASK=$(grep -oP 'task: \K.*' "$MARKER" 2>/dev/null | head -1)
 SESSION_ID=$(grep -oP 'session_id: \K.*' "$MARKER" 2>/dev/null | head -1)
 
-# Uncommitted file count for the warning
+# Uncommitted file count for the daily-log stub
 MOD_COUNT=0
 if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
   MOD_COUNT=$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null | grep -cE '^.M|^M |^\?\?' || echo 0)
 fi
-
-# Terminal-visible warning
-{
-  echo "rpm: session ended without /session-end"
-  echo "rpm:   task: ${TASK:-unknown}"
-  [ "$MOD_COUNT" -gt 0 ] && echo "rpm:   uncommitted: $MOD_COUNT files"
-  echo "rpm:   next session: run /session-end to backfill or start fresh"
-} >&2
 
 # Append a stub to today's daily log if one doesn't already note this
 mkdir -p "$PM_DIR/past"

@@ -30,10 +30,10 @@ EOF
   [ "$status" -eq 0 ]
   [[ "$output" == *"rpm: resuming"* ]]
   [[ "$output" == *"fix flux capacitor"* ]]
-  [[ "$output" != *"wasn't ended with /session-end"* ]]
+  [[ "$output" != *"didn't wrap up"* ]]
 }
 
-@test "active marker + startup + no last-session = stale — emits /resume recommendation" {
+@test "active marker + startup + no last-session = stale — soft note, falls through to backlog" {
   seed_minimal_trackers
   cat > "$PM_DIR/~rpm-session-start" <<EOF
 task: fix flux capacitor
@@ -42,12 +42,12 @@ session_id: abc123def
 EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
-  [[ "$output" == *"previous session wasn't ended with /session-end"* ]]
+  [[ "$output" == *"previous session didn't wrap up"* ]]
   [[ "$output" == *"/resume abc123def"* ]]
-  [[ "$output" == *"clear the marker"* ]]
-  [[ "$output" == *"session_id: abc123def"* ]]
+  [[ "$output" != *"Do NOT present the task menu"* ]]
   [[ "$output" != *"rpm: resuming"* ]]
-  [[ "$output" != *"Your task backlog"* ]]
+  # Falls through to normal flow — task menu visible.
+  [[ "$output" == *"Your task backlog"* ]]
 }
 
 @test "active marker + startup + fresh last-session = resume" {
@@ -65,7 +65,7 @@ EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
   [[ "$output" == *"rpm: resuming"* ]]
-  [[ "$output" != *"wasn't ended with /session-end"* ]]
+  [[ "$output" != *"didn't wrap up"* ]]
 }
 
 @test "--continue workflow (source=resume, mismatched session_id) still detects stale" {
@@ -82,7 +82,7 @@ EOF
   # last-session is missing → stale
   run run_session_start resume  # new CC process via --continue
   [ "$status" -eq 0 ]
-  [[ "$output" == *"previous session wasn't ended with /session-end"* ]]
+  [[ "$output" == *"previous session didn't wrap up"* ]]
 }
 
 @test "active marker + mismatched session_id + stale last-session = stale path" {
@@ -101,7 +101,7 @@ EOF
   # default hook session_id is test-sess-123 — mismatch from marker's prior-sess-id
   run run_session_start startup
   [ "$status" -eq 0 ]
-  [[ "$output" == *"previous session wasn't ended with /session-end"* ]]
+  [[ "$output" == *"previous session didn't wrap up"* ]]
 }
 
 @test "paired start + handoff markers — silently cleaned, no stale warning" {
@@ -120,7 +120,7 @@ session_id: prior-proc-sess
 EOF
   run run_session_start startup new-sess
   [ "$status" -eq 0 ]
-  [[ "$output" != *"wasn't ended with /session-end"* ]]
+  [[ "$output" != *"didn't wrap up"* ]]
   [[ "$output" != *"rpm: resuming"* ]]
   # Both paired markers are consumed; proactive block writes a fresh one.
   [ ! -f "$PM_DIR/~rpm-session-end" ]
@@ -140,7 +140,7 @@ task: real work
 EOF
   run run_session_start startup new-sess
   [ "$status" -eq 0 ]
-  [[ "$output" == *"wasn't ended with /session-end"* ]]
+  [[ "$output" == *"didn't wrap up"* ]]
 }
 
 @test "handoff with mismatched session_id does not rescue stale marker" {
@@ -157,7 +157,7 @@ session_id: session-a
 EOF
   run run_session_start startup session-c
   [ "$status" -eq 0 ]
-  [[ "$output" == *"wasn't ended with /session-end"* ]]
+  [[ "$output" == *"didn't wrap up"* ]]
 }
 
 @test "orphan handoff (no start marker) is cleaned up" {
@@ -302,7 +302,9 @@ EOF
   [[ "$marker_content" == *"started:"* ]]
 }
 
-@test "stale-path does not overwrite existing marker" {
+@test "stale-path clears the old marker and writes a fresh one for the new session" {
+  # Soft stale handling: old task info is surfaced in the note, then the
+  # marker is rewritten for the current session so the user can move on.
   seed_minimal_trackers
   cat > "$PM_DIR/~rpm-session-start" <<EOF
 session_id: original-sess
@@ -311,10 +313,14 @@ task: original task
 EOF
   run run_session_start startup new-sess
   [ "$status" -eq 0 ]
+  # Note preserves the old task + session_id for manual /resume.
+  [[ "$output" == *"original task"* ]]
+  [[ "$output" == *"/resume original-sess"* ]]
+  # But the marker is refreshed for the new session.
   marker_content=$(cat "$PM_DIR/~rpm-session-start")
-  [[ "$marker_content" == *"session_id: original-sess"* ]]
-  [[ "$marker_content" == *"original task"* ]]
-  [[ "$marker_content" != *"new-sess"* ]]
+  [[ "$marker_content" == *"session_id: new-sess"* ]]
+  [[ "$marker_content" == *"task: (unassigned)"* ]]
+  [[ "$marker_content" != *"original-sess"* ]]
 }
 
 @test "last-session next message appears when present" {

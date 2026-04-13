@@ -70,35 +70,40 @@ prime_counter() {
   [ -z "$output" ]
 }
 
-@test "emits 40% warning at 10th call when size crosses WARN" {
+@test "emits 40% heads-up at 10th call when size crosses WARN" {
   seed_marker
   sid="ctxmon-warn-$$"
   prime_counter "$sid"
   run run_monitor 450000 "$sid"
   [ "$status" -eq 0 ]
   [[ "$output" == *"past 40%"* ]]
+  [[ "$output" == *"consider /session-end"* ]]
   [[ "$output" == *"hookSpecificOutput"* ]]
   echo "$output" | jq -e . >/dev/null
 }
 
-@test "emits 60% alert when size crosses ALERT" {
+@test "emits 60% recommendation when size crosses ALERT" {
   seed_marker
   sid="ctxmon-alert-$$"
   prime_counter "$sid"
   run run_monitor 650000 "$sid"
   [ "$status" -eq 0 ]
   [[ "$output" == *"past 60%"* ]]
+  [[ "$output" == *"consider /session-end"* ]]
+  [[ "$output" != *"Do not start"* ]]
   echo "$output" | jq -e . >/dev/null
 }
 
-@test "emits 70% hard wrap-up gate when size crosses STOP" {
+@test "emits 70% recommendation when size crosses STOP" {
   seed_marker
   sid="ctxmon-stop-$$"
   prime_counter "$sid"
   run run_monitor 750000 "$sid"
   [ "$status" -eq 0 ]
   [[ "$output" == *"past 70%"* ]]
-  [[ "$output" == *"HARD WRAP-UP GATE"* ]]
+  [[ "$output" == *"consider /session-end"* ]]
+  [[ "$output" != *"HARD WRAP-UP GATE"* ]]
+  [[ "$output" != *"Do not start"* ]]
   echo "$output" | jq -e . >/dev/null
 }
 

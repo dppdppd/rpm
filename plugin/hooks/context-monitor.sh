@@ -1,8 +1,7 @@
 #!/bin/bash
 # PostToolUse hook: monitor transcript size as a proxy for context usage.
-# Three-tier alerts at ~40% / ~60% / ~70% of context window, with a hard
-# wrap-up gate at 70%. Pattern adapted from
-# shihchengwei-lab/claude-code-session-kit.
+# Three-tier soft recommendations at ~40% / ~60% / ~70% of context window.
+# Pattern adapted from shihchengwei-lab/claude-code-session-kit.
 #
 # Only runs on every 10th tool call (skipping the first 3) to keep
 # overhead negligible. Does nothing unless rpm is initialized AND a
@@ -37,16 +36,16 @@ SIZE=$(wc -c < "$TRANSCRIPT" 2>/dev/null || echo 0)
 
 # Thresholds — rough estimates calibrated for ~1MB context window.
 # Adjust if your workflow uses a different model/context size.
-WARN=400000       # ~40% → start thinking about wrap-up
-ALERT=600000      # ~60% → save progress, finish current task
-STOP=700000       # ~70% → hard gate, run /session-end before continuing
+WARN=400000       # ~40% → soft heads-up
+ALERT=600000      # ~60% → recommend wrap-up at next break
+STOP=700000       # ~70% → strong recommendation (still user's call)
 
 if [ "$SIZE" -gt "$STOP" ]; then
   cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 70% — HARD WRAP-UP GATE. Stop current work. Run /session-end immediately to update trackers and commit. Do not start new tasks. Continuing risks losing detail to compaction."
+    "additionalContext": "rpm: context past 70% — consider /session-end soon; detail starts getting lost to compaction beyond this point."
   }
 }
 EOF
@@ -55,7 +54,7 @@ elif [ "$SIZE" -gt "$ALERT" ]; then
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 60% — finish the current task, then run /session-end. Do not start new tasks."
+    "additionalContext": "rpm: context past 60% — consider /session-end at the next natural break."
   }
 }
 EOF
@@ -64,7 +63,7 @@ elif [ "$SIZE" -gt "$WARN" ]; then
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 40% — start thinking about wrap-up timing. Finish what you're working on, then consider /session-end."
+    "additionalContext": "rpm: context past 40% — heads up, you may want to consider /session-end when you reach a good stopping point."
   }
 }
 EOF

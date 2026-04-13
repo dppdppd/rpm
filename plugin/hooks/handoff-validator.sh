@@ -65,7 +65,6 @@ if [ -n "$ERRORS" ]; then
   {
     echo "rpm: /session-end handoff looks incomplete:"
     printf "%b" "$ERRORS"
-    echo "rpm: review trackers before starting the next session"
   } >&2
 fi
 

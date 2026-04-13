@@ -1,6 +1,6 @@
 ---
 name: session-end
-description: End the current rpm session. Five phases — analyze → auto-apply tracker updates (past/present/future) → present action menu → execute → handoff. Commits rpm bookkeeping. Invoke when the user signals wrap-up, OR recommend proactively when conversation context grows long enough to degrade response quality (long-context productivity drop-off). Auto-invocations MUST propose first and wait for confirmation before Phase 1 — do not auto-commit.
+description: End the current rpm session. Five phases — analyze → auto-apply tracker updates (past/present/future) → present action menu → execute → handoff. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
 argument-hint: ""
 allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 ---
@@ -28,27 +28,18 @@ to the session.
 
 ## Pre-flight: Auto-invocation check
 
-**If this skill was auto-loaded** — because Claude noticed the user
-seems ready to wrap up, or because conversation context has grown
-long enough to hurt response quality — **STOP before Phase 1** and
-propose session-end to the user first:
+**If this skill was auto-loaded** — because Claude judged the user
+seems ready to wrap up — **STOP before Phase 1** and propose first:
 
-> "Context is getting long / you seem ready to wrap up. Want me to
-> run `/session-end`? It'll auto-update past/present/future,
-> surface uncommitted work, and present an action menu."
+> "You seem ready to wrap up. Want me to run `/session-end`?"
 
-Only proceed to Phase 1 after the user confirms. The reason: Phase 2
-auto-applies tracker updates and commits them without further approval —
-that side effect must not happen on a false-positive auto-trigger.
+Only proceed to Phase 1 after the user confirms. Phase 2 auto-applies
+tracker updates and commits them; that side effect must not happen on
+a false-positive trigger. Never ask twice in the same session — if
+they declined, drop it.
 
 **If the user explicitly typed `/session-end`**, skip this
 pre-flight and proceed directly to Phase 1.
-
-**Research context for proactive recommendation:** LLM response
-quality degrades as context length grows (lost-in-the-middle,
-recency bias, context dilution). Recommending `/session-end` +
-`/clear` when context starts costing productivity is a legitimate
-and useful intervention — not an interruption.
 
 ---
 
