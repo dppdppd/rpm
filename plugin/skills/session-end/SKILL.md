@@ -1,6 +1,6 @@
 ---
 name: session-end
-description: End the current rpm session. Four user-visible phases — Findings (auto-applied tracker updates + summary) → Actions (commit/record/fix) → Next task → Session done. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
+description: End the current rpm session. Four user-visible phases — Collecting Findings (auto-applied tracker updates + summary) → Housekeeping (commit/record/fix) → Reviewing Tasks → Handing Off. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
 argument-hint: ""
 allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 ---
@@ -9,10 +9,10 @@ allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 
 End the current work session in four user-visible phases:
 
-1. **Findings** — analyze, auto-apply tracker updates, present summary + actions menu
-2. **Actions** — execute chosen actions (commit, record findings, fix drift)
-3. **Next task** — reconcile tasks.org priority, decide What's next
-4. **Session done** — handoff
+1. **Collecting Findings** — analyze, auto-apply tracker updates, present summary + actions menu
+2. **Housekeeping** — execute chosen actions (commit, record findings, fix drift)
+3. **Reviewing Tasks** — reconcile tasks.org priority, decide What's next
+4. **Handing Off** — write last-session info, output the handoff text
 
 **Print a phase header** (`## Phase N. Title (of 4)`) at the start of
 each user-visible response. Sub-sections inside a phase use letters
@@ -34,7 +34,7 @@ false positive, and don't ask twice. If the user explicitly typed
 
 ---
 
-## Phase 1. Findings (of 4)
+## Phase 1. Collecting Findings (of 4)
 
 Analyze, auto-apply tracker updates, then emit one user-visible
 response with the findings block + actions menu. The prep steps
@@ -213,7 +213,7 @@ Print this block. The Actions menu at the bottom is what waits for
 the user's pick.
 
 ```
-## Phase 1. Findings (of 4)
+## Phase 1. Collecting Findings (of 4)
 
 ### 1a. Accomplishments
 - [Bullet list of what was completed]
@@ -264,15 +264,15 @@ Run **{action name}**? (yes / no)
 ```
 
 If no actions remain after filtering, skip the menu entirely and
-proceed directly to Phase 3 (Next task).
+proceed directly to Phase 3 (Reviewing Tasks).
 
 Otherwise wait for the user's choice.
 
 ---
 
-## Phase 2. Actions (of 4)
+## Phase 2. Housekeeping (of 4)
 
-Start this response with `## Phase 2. Actions (of 4)`. Only run the
+Start this response with `## Phase 2. Housekeeping (of 4)`. Only run the
 actions the user picked; for each, ask any followup questions before
 acting.
 
@@ -313,9 +313,9 @@ After ALL chosen actions complete, proceed to Phase 3.
 
 ---
 
-## Phase 3. Next task (of 4)
+## Phase 3. Reviewing Tasks (of 4)
 
-Start this response with `## Phase 3. Next task (of 4)`. Reconcile
+Start this response with `## Phase 3. Reviewing Tasks (of 4)`. Reconcile
 tasks.org priority before handoff.
 
 `tasks.org` is priority-ordered; the top actionable task (topmost
@@ -341,7 +341,7 @@ state the top as `What's next` and proceed to Phase 4.
 
 ---
 
-## Phase 4. Session done (of 4)
+## Phase 4. Handing Off (of 4)
 
 Only after Phase 3 is resolved. **Single response** — the rm tool
 call and the handoff text go in the same message:
@@ -359,7 +359,7 @@ call and the handoff text go in the same message:
 - Output the handoff text below as the **very last lines**:
 
 ```
-## Phase 4. Session done (of 4)
+## Phase 4. Handing Off (of 4)
 
 **What's next:** [reconciled top task from Phase 3, or
 "unknown — pick from future/tasks.org" if the list is empty]
