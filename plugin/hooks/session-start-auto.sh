@@ -204,7 +204,9 @@ if [ -f "$FUTURE" ]; then
 
   flush_item() {
     [ -z "$CUR_H" ] && return
+    # DONE and CANCELLED are both terminal — hide from the actionable menu
     [ "$CUR_S" = "DONE" ] && return
+    [ "$CUR_S" = "CANCELLED" ] && return
     MENU_ITEMS="${MENU_ITEMS}${CUR_TASK_PARENT}|${CUR_H}|${CUR_D}|${CUR_S}|${CUR_B}"$'\n'
   }
 
@@ -212,10 +214,10 @@ if [ -f "$FUTURE" ]; then
     if [[ "$line" == "* "* && "$line" != "** "* ]]; then
       p="${line#\* }"
       case "$p" in
-        "TODO "*|"DONE "*|"IN-PROGRESS "*|"BLOCKED "*) p="${p#* }" ;;
+        "TODO "*|"DONE "*|"IN-PROGRESS "*|"BLOCKED "*|"CANCELLED "*) p="${p#* }" ;;
       esac
       CUR_PARENT="$p"
-    elif [[ "$line" =~ ^\*\*\ (TODO|IN-PROGRESS|BLOCKED|DONE)\ (.+)$ ]]; then
+    elif [[ "$line" =~ ^\*\*\ (TODO|IN-PROGRESS|BLOCKED|DONE|CANCELLED)\ (.+)$ ]]; then
       flush_item
       CUR_S="${BASH_REMATCH[1]}"
       CUR_H="${BASH_REMATCH[2]}"
@@ -253,7 +255,8 @@ if [ -f "$FUTURE" ]; then
           for dep in $blocked; do
             safe="${dep//-/_}"
             eval "ds=\${STATUS_${safe}:-UNKNOWN}"
-            if [ "$ds" != "DONE" ]; then show=0; break; fi
+            # A CANCELLED dep is still terminal — treat as unblocked
+            case "$ds" in DONE|CANCELLED) ;; *) show=0; break ;; esac
           done
         fi
         ;;
