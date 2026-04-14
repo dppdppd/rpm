@@ -326,12 +326,18 @@ check for a mismatch:
 - User worked below the top → order probably doesn't reflect priority.
 - Top is blocked by an incomplete dep → blocker moves up, or blocked moves down.
 - User flagged the list during the session.
+- **User deferred a task** during the session ("let's do X later",
+  "postpone Y", "that can wait") → apply `/tasks postpone <task>`
+  to move it to the bottom of its `* Parent` group and stamp
+  `:POSTPONED: YYYY-MM-DD`.
 
 If any holds, end this response with ONE question (e.g. "You worked
-on X today; move it above Y?") and wait. Apply the agreed reordering
-by editing `tasks.org`, commit as `rpm: session end — reorder
-tasks.org priority`. Otherwise briefly state the top as `What's
-next` and proceed to Phase 4.
+on X today; move it above Y?" or "You said Y can wait — postpone
+it to the bottom of its group?") and wait. Apply the agreed change
+by editing `tasks.org` (use the Postpone procedure in the `/tasks`
+skill for deferrals; otherwise just reorder), commit as
+`rpm: session end — reorder tasks.org priority`. Otherwise briefly
+state the top as `What's next` and proceed to Phase 4.
 
 ---
 
