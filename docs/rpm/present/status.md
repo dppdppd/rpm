@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-04-13
-- **Version**: 2.5.8
+- **Version**: 2.5.9
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -39,6 +39,7 @@
 - Context monitor thresholds raised to 75% / 90% (v2.5.6) — drops the early 40% heads-up and 60% mid-tier; lower thresholds were noisy on the 1M window and triggered session-end pressure long before context loss was real
 - Context monitor filters sidechain entries (v2.5.7) — `jq first()` with `isSidechain != true` picks the most recent main-chain assistant usage; subagent/Task runs no longer mask the parent session's true context size
 - Single-option menu forms (v2.5.8) — audit findings, /session-end Actions, and /session-end Record findings now switch to a direct `yes / no` prompt when only one option remains, instead of the awkward `1 · all · none` grammar
+- marketplace.json source → object form (v2.5.9) — Claude Code marketplace spec requires `{ source: "url", url: "..." }`; a bare URL string was breaking `/plugin marketplace add dppdppd/rpm`
 
 ## Active Specs
 
