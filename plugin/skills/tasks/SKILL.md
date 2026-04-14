@@ -1,7 +1,7 @@
 ---
 name: tasks
-description: Manage the project task backlog. Add, list, review, or complete tasks. Use when the user wants to add a task, see what's on the backlog, reorganize or reprioritize tasks, mark something done, or evaluate task health.
-argument-hint: "[add <description> | list | review | done <#>]"
+description: Manage the project task backlog. Add, list, review, postpone, or complete tasks. Use when the user wants to add a task, see what's on the backlog, reorganize or reprioritize tasks, defer a task to the bottom of its group, mark something done, or evaluate task health.
+argument-hint: "[add <description> | list | review | postpone <#> | done <#>]"
 allowed-tools: Read Write Edit Glob Grep
 ---
 
@@ -17,15 +17,17 @@ Parse `$ARGUMENTS`:
 - `add <description>` → **Add** below
 - `list` → **List** below
 - `review` → **Review** below
+- `postpone <task text or number>` → **Postpone** below
 - `done <task text or number>` → **Done** below
 - empty or natural language → infer intent from context. If unclear,
   show usage:
 
   ```
-  /tasks add <description> — add a new task
-  /tasks list             — show all tasks with statuses
-  /tasks review           — evaluate and reorganize backlog
-  /tasks done <task>      — mark a task complete
+  /tasks add <description>   — add a new task
+  /tasks list                — show all tasks with statuses
+  /tasks review              — evaluate and reorganize backlog
+  /tasks postpone <task>     — defer to the bottom of its group
+  /tasks done <task>         — mark a task complete
   ```
 
 ---
@@ -82,8 +84,36 @@ Parse `$ARGUMENTS`:
      Suggest decomposition.
    - **Duplicates:** overlapping tasks?
    - **Priority:** highest-value work at the top?
+   - **Deferrals:** anything the user has set aside or signaled they
+     want to come back to later? Surface as candidates for **Postpone**.
 3. Present findings and proposed changes. Wait for confirmation
-   before editing.
+   before editing. For postpones, apply the move using the
+   **Postpone** procedure below.
+
+---
+
+## Postpone
+
+Defer a task to the bottom of its `* Parent` group. Status stays
+`TODO` (the task isn't dropped, just deprioritized). Adds a
+`:POSTPONED: YYYY-MM-DD` property so the deferral is auditable.
+
+1. Read `docs/rpm/future/tasks.org`.
+2. Match the argument to a task — by number (from most recent
+   `/tasks list`), by text match, or by asking if ambiguous.
+3. Identify the task's `* Parent` heading. Find the last `**` task
+   under that parent (regardless of status — DONE/CANCELLED count
+   for positioning).
+4. Edit the file to move the matched task's heading + its property
+   drawer to just below that last sibling. **Do not change status**;
+   keep `** TODO`.
+5. Add (or update) `:POSTPONED: YYYY-MM-DD` inside the property
+   drawer with today's date. Create the drawer if the task didn't
+   have one.
+6. Confirm: print the moved task's new position.
+
+If the task is already at the bottom of its group, just stamp the
+`:POSTPONED:` property and note "already at bottom".
 
 ---
 
