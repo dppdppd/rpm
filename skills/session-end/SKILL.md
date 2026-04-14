@@ -17,29 +17,13 @@ that scope: committing uncommitted items, recording findings
 (promoting learnings to permanent docs), and anything else specific
 to the session.
 
-**Response rules:**
-- Questions go at the **end** of a response, never mid-stream.
-- When asking the user to choose, use a numbered menu (e.g.,
-  `1,2` · `all` · `none`).
-- Never present an action whose precondition is empty (e.g., don't
-  offer "Commit changes" when nothing is uncommitted).
+## Pre-flight
 
----
-
-## Pre-flight: Auto-invocation check
-
-**If this skill was auto-loaded** — because Claude judged the user
-seems ready to wrap up — **STOP before Phase 1** and propose first:
-
-> "You seem ready to wrap up. Want me to run `/session-end`?"
-
-Only proceed to Phase 1 after the user confirms. Phase 2 auto-applies
-tracker updates and commits them; that side effect must not happen on
-a false-positive trigger. Never ask twice in the same session — if
-they declined, drop it.
-
-**If the user explicitly typed `/session-end`**, skip this
-pre-flight and proceed directly to Phase 1.
+If this skill auto-loaded (you judged the user is wrapping up), ask
+first — "You seem ready to wrap up. Want me to run `/session-end`?"
+— and wait. Phase 2 commits tracker updates; don't trigger on a
+false positive, and don't ask twice. If the user explicitly typed
+`/session-end`, skip this and go to Phase 1.
 
 ---
 
@@ -109,11 +93,6 @@ sequence them:
   parallel with no hidden pre-read.
 - Call `TaskList` — native task state for reconciliation
 
-(The scan in 1a has already covered git state, CLAUDE.md size,
-NOT_IMPLEMENTED, broken refs, today's daily log existence, the
-session marker, spec inventory drift, and loose log/tracker
-staleness. Do not duplicate those checks.)
-
 ### 1c. Synthesize the conversation (concurrent with 1b)
 
 While the 1b reads are in flight, look back through this session's
@@ -125,10 +104,6 @@ conversation for:
 - **Learnings**: corrections from the user, new patterns, debugging
   approaches that worked or didn't
 - **Mid-task state**: anything left unfinished
-
-This is main-thread-only work (subagents can't see the parent
-conversation), so the win is running it CONCURRENTLY with the 1b
-tool calls, not sequentially after them.
 
 If the 1a scan shows `learnings_capture entries > 0`, use those
 excerpts as a head start — they were auto-captured by the Stop
@@ -175,18 +150,13 @@ update, skip it and note "no changes" in the Phase 3 report.
 
 ### Native task reconciliation (within the `future/tasks.org` edit above)
 
-- For each native task **completed this session**, mark the
-  corresponding `future/tasks.org` entry DONE with today's date. If no
-  matching entry exists, append a DONE line.
-- For each native task still **in-progress or pending** created
-  this session without a `future/tasks.org` counterpart, append as
-  TODO (or IN-PROGRESS if active).
-- **Do not delete** native tasks — they persist for the next session.
-- If `docs/rpm/~rpm-native-tasks.jsonl` has entries from prior
-  unwrapped sessions (different `session` IDs than the current
-  `TaskList` state), those represent abandoned work. Offer to promote
-  them to `future/tasks.org` as TODOs before the file is cleared in
-  Phase 5.
+- Native task done this session → mark its tasks.org entry DONE
+  (append if missing).
+- Native task still in-progress/pending → append as TODO/IN-PROGRESS
+  if no tasks.org counterpart.
+- Never delete native tasks; they persist across sessions.
+- Orphan entries in `~rpm-native-tasks.jsonl` from prior sessions →
+  offer to promote as TODOs before Phase 5 cleanup.
 
 ### Commit tracker updates + present findings (same response)
 
@@ -242,13 +212,11 @@ for the user to pick.**
 
 ## Actions (pick any, multiple OK)
 
-**Only list items that are actionable this session.** Omit any
-action whose precondition is empty (e.g., don't show "Commit
-changes" when there are no uncommitted files; don't show "Fix
-drift" when `drift_findings` is empty). Number the items that
-remain sequentially — the numbers are session-specific, not fixed.
+List only actions whose precondition holds (e.g. `Commit changes`
+only if something's uncommitted). Number sequentially — numbers are
+session-specific.
 
-Possible actions (include only when applicable):
+Possible actions:
 
 - **Commit changes** — group and commit uncommitted files
   *(only if scan shows modified/untracked/staged > 0)*
@@ -325,35 +293,20 @@ Only after Phase 4 is done.
 
 ### 5a. Decide What's next (reconcile tasks.org priority)
 
-`tasks.org` is **priority-ordered top-to-bottom** — the top
-actionable task is the default `What's next`. Before writing the
-handoff, reconcile:
+`tasks.org` is priority-ordered; the top actionable task (topmost
+`** TODO` or `** IN-PROGRESS` with all `:BLOCKED_BY:` deps DONE) is
+the default `What's next`. Re-read the file (post-Phase 2) and check
+for a mismatch:
 
-1. Re-read `docs/rpm/future/tasks.org` (post-Phase 2). Identify the
-   top actionable task: topmost `** TODO` or `** IN-PROGRESS` whose
-   `:BLOCKED_BY:` deps (if any) are all DONE.
+- User worked below the top → order probably doesn't reflect priority.
+- Top is blocked by an incomplete dep → blocker moves up, or blocked moves down.
+- User flagged the list during the session.
 
-2. Check for a priority mismatch:
-   - **User worked below the top.** The task they worked on this
-     session sits below position #1 — the order probably doesn't
-     reflect real priority.
-   - **Top is blocked.** The topmost non-DONE task's
-     `:BLOCKED_BY:` dep isn't done. Either the blocker moves up or
-     the blocked task moves down.
-   - **User flagged the list during the session.** They said or
-     implied the ordering was wrong.
-
-3. If any mismatch holds, end this response with ONE question and
-   wait. E.g.:
-   - "You worked on X today, but Y is at the top of tasks.org.
-     Move X up?"
-   - "Top task X is BLOCKED_BY Y. Move Y up, or X down?"
-   Apply the agreed reordering by editing `tasks.org`, then commit
-   as `rpm: session end — reorder tasks.org priority`.
-
-4. If no mismatch (top matches session work, nothing blocked near
-   the top), proceed to 5b with the top actionable task as
-   `What's next`. No question asked.
+If any holds, end this response with ONE question (e.g. "You worked
+on X today; move it above Y?") and wait. Apply the agreed reordering
+by editing `tasks.org`, commit as `rpm: session end — reorder
+tasks.org priority`. Otherwise proceed to 5b with the top as
+`What's next`.
 
 ### 5b. Finalize handoff (single response)
 
