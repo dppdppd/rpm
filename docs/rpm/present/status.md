@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-04-13
-- **Version**: 2.5.9
+- **Version**: 2.6.0
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -40,6 +40,7 @@
 - Context monitor filters sidechain entries (v2.5.7) — `jq first()` with `isSidechain != true` picks the most recent main-chain assistant usage; subagent/Task runs no longer mask the parent session's true context size
 - Single-option menu forms (v2.5.8) — audit findings, /session-end Actions, and /session-end Record findings now switch to a direct `yes / no` prompt when only one option remains, instead of the awkward `1 · all · none` grammar
 - marketplace.json source → object form (v2.5.9) — Claude Code marketplace spec requires `{ source: "url", url: "..." }`; a bare URL string was breaking `/plugin marketplace add dppdppd/rpm`
+- Session-lifecycle hooks optimized (v2.6.0) — task_menu parser rewritten with bash builtins (~4.6× faster, 900ms→200ms on a 30-task backlog); `session-end.sh` daily-log stub bug fixed (`0\n0` corruption); `scan.sh` caches `git status`; "first response" boilerplate compressed in 4 hooks; `/effort` stderr nag removed
 
 ## Active Specs
 
