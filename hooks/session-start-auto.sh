@@ -107,8 +107,7 @@ if [ -f "$MARKER" ]; then
   fi
   echo ""
   echo "=== instructions ==="
-  echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-  echo "  rpm: resuming — ${TASK:-unknown task}"
+  echo "Open your first response with exactly this line: rpm: resuming — ${TASK:-unknown task}"
   echo ""
   echo "An rpm session marker is present — unfinished work on this task."
   echo "Check git state and recent commits to orient, then end your response"
@@ -116,7 +115,6 @@ if [ -f "$MARKER" ]; then
   echo "  A. Continue the in-flight task"
   echo "  B. Switch to something else (then present the task menu)"
   echo "  C. Wrap up with /session-end"
-  echo "rpm: don't forget to set /effort" >&2
   exit 0
 fi
 
@@ -197,81 +195,94 @@ if [ -f "$FUTURE" ]; then
   echo "Your task backlog:"
   echo ""
 
-  # Pass 1: collect task IDs and statuses for dependency resolution
-  san() { echo "$1" | tr '-' '_'; }
-  _S=""
-  while IFS= read -r line; do
-    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) '; then
-      _S=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) .*/\1/')
-    fi
-    if echo "$line" | grep -qE '^\s+:ID:\s'; then
-      _I=$(echo "$line" | sed -E 's/^\s+:ID:\s+//' | tr -d ' ')
-      eval "STATUS_$(san "$_I")=$_S"
-    fi
-  done < "$FUTURE"
-
-  # Pass 2: collect menu items in document order with parent context
-  MENU_ITEMS=""
+  # Single-pass parse → collect tasks into MENU_ITEMS + build an
+  # ID→status map; filter BLOCKED_BY on emit so forward refs work.
+  # Uses bash builtins ([[ =~ ]], parameter expansion) — no per-line
+  # echo|grep|sed subshells.
   CUR_PARENT="" CUR_TASK_PARENT="" CUR_S="" CUR_H="" CUR_B="" CUR_D=""
+  MENU_ITEMS=""
 
   flush_item() {
     [ -z "$CUR_H" ] && return
     [ "$CUR_S" = "DONE" ] && return
+    MENU_ITEMS="${MENU_ITEMS}${CUR_TASK_PARENT}|${CUR_H}|${CUR_D}|${CUR_S}|${CUR_B}"$'\n'
+  }
 
-    local show=false
-    case "$CUR_S" in
-      IN-PROGRESS) show=true ;;
+  while IFS= read -r line; do
+    if [[ "$line" == "* "* && "$line" != "** "* ]]; then
+      p="${line#\* }"
+      case "$p" in
+        "TODO "*|"DONE "*|"IN-PROGRESS "*|"BLOCKED "*) p="${p#* }" ;;
+      esac
+      CUR_PARENT="$p"
+    elif [[ "$line" =~ ^\*\*\ (TODO|IN-PROGRESS|BLOCKED|DONE)\ (.+)$ ]]; then
+      flush_item
+      CUR_S="${BASH_REMATCH[1]}"
+      CUR_H="${BASH_REMATCH[2]}"
+      CUR_TASK_PARENT="$CUR_PARENT"
+      CUR_B="" CUR_D=""
+    elif [[ "$line" =~ ^[[:space:]]+:ID:[[:space:]]+([^[:space:]]+) ]]; then
+      safe="${BASH_REMATCH[1]//-/_}"
+      eval "STATUS_${safe}=\$CUR_S"
+    elif [[ "$line" =~ ^[[:space:]]+:BLOCKED_BY:[[:space:]]+(.+) ]]; then
+      CUR_B="${BASH_REMATCH[1]}"
+      # rtrim (drawers sometimes have trailing whitespace)
+      [[ "$CUR_B" =~ ^(.*[^[:space:]])[[:space:]]*$ ]] && CUR_B="${BASH_REMATCH[1]}"
+    fi
+    # Detail file from any line with [[file:X]] — first wins
+    if [ -z "$CUR_D" ] && [[ "$line" =~ \[\[file:([^]]+)\]\] ]]; then
+      CUR_D="${BASH_REMATCH[1]}"
+    fi
+  done < "$FUTURE"
+  flush_item
+
+  # Emit menu: filter BLOCKED_BY, clean labels, number by parent.
+  NUM=0 LAST_PARENT=""
+  while IFS='|' read -r raw_parent raw_heading detail status blocked; do
+    [ -z "$raw_heading" ] && continue
+
+    show=0
+    case "$status" in
+      IN-PROGRESS) show=1 ;;
       TODO|BLOCKED)
-        if [ -z "$CUR_B" ]; then
-          [ "$CUR_S" = "TODO" ] && show=true
+        if [ -z "$blocked" ]; then
+          [ "$status" = "TODO" ] && show=1
         else
-          show=true
-          local ds=""
-          for dep in $CUR_B; do
-            eval "ds=\${STATUS_$(san "$dep"):-UNKNOWN}"
-            [ "$ds" != "DONE" ] && { show=false; break; }
+          show=1
+          ds=""
+          for dep in $blocked; do
+            safe="${dep//-/_}"
+            eval "ds=\${STATUS_${safe}:-UNKNOWN}"
+            if [ "$ds" != "DONE" ]; then show=0; break; fi
           done
         fi
         ;;
     esac
-    $show || return
+    [ "$show" = "1" ] || continue
 
-    # Use detail from heading or body, strip [[file:...]] and org tags from label
-    local detail="$CUR_D"
-    [ -z "$detail" ] && detail=$(echo "$CUR_H" | grep -oP '\[\[file:\K[^\]]+' | head -1)
-    local label parent
-    label=$(echo "$CUR_H" | sed -E 's/\[\[file:[^]]*\]\]//g; s/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
-    parent=$(echo "$CUR_TASK_PARENT" | sed -E 's/\s+:[a-zA-Z0-9_:-]+:\s*$//; s/^\s+|\s+$//g; s/\s+/ /g')
+    label="$raw_heading"
+    # Strip every [[file:...]] link from the label
+    while [[ "$label" == *"[[file:"*"]]"* ]]; do
+      pre="${label%%\[\[file:*}"
+      rest="${label#*\[\[file:}"
+      post="${rest#*\]\]}"
+      label="${pre}${post}"
+    done
+    # Drop trailing org-mode :tag1:tag2: clusters
+    [[ "$label" =~ ^(.*)[[:space:]]+:[a-zA-Z0-9_:-]+:[[:space:]]*$ ]] && label="${BASH_REMATCH[1]}"
+    # Trim + collapse internal whitespace
+    [[ "$label" =~ ^[[:space:]]*(.*[^[:space:]])[[:space:]]*$ ]] && label="${BASH_REMATCH[1]}"
+    while [[ "$label" == *"  "* ]]; do label="${label//  / }"; done
 
-    MENU_ITEMS="${MENU_ITEMS}${parent}|${label}|${detail}|${CUR_S}"$'\n'
-  }
+    parent="$raw_parent"
+    [[ "$parent" =~ ^(.*)[[:space:]]+:[a-zA-Z0-9_:-]+:[[:space:]]*$ ]] && parent="${BASH_REMATCH[1]}"
+    [[ "$parent" =~ ^[[:space:]]*(.*[^[:space:]])[[:space:]]*$ ]] && parent="${BASH_REMATCH[1]}"
 
-  while IFS= read -r line; do
-    # Track * parent headings
-    if echo "$line" | grep -qE '^\* '; then
-      CUR_PARENT=$(echo "$line" | sed -E 's/^\* (DONE |TODO |IN-PROGRESS |BLOCKED )?//')
+    # Fallback: detail file embedded in the heading if no body line set it
+    if [ -z "$detail" ] && [[ "$raw_heading" =~ \[\[file:([^]]+)\]\] ]]; then
+      detail="${BASH_REMATCH[1]}"
     fi
-    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) '; then
-      flush_item
-      CUR_S=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) .*/\1/')
-      CUR_H=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) //')
-      CUR_TASK_PARENT="$CUR_PARENT"
-      CUR_B="" CUR_D=""
-    fi
-    # Capture detail file from body lines: [[file:...]] or - Detail: [[file:...]]
-    if [ -z "$CUR_D" ]; then
-      _d=$(echo "$line" | grep -oP '\[\[file:\K[^\]]+' 2>/dev/null | head -1)
-      [ -n "$_d" ] && CUR_D="$_d"
-    fi
-    echo "$line" | grep -qE '^\s+:BLOCKED_BY:\s' && \
-      CUR_B=$(echo "$line" | sed -E 's/^\s+:BLOCKED_BY:\s+//')
-  done < "$FUTURE"
-  flush_item
 
-  # Output numbered menu grouped by parent
-  NUM=0 LAST_PARENT=""
-  while IFS='|' read -r parent label detail status; do
-    [ -z "$label" ] && continue
     if [ "$parent" != "$LAST_PARENT" ]; then
       [ -n "$parent" ] && echo "$parent"
       LAST_PARENT="$parent"
@@ -336,13 +347,10 @@ if [ -f "$TIPS_FILE" ]; then
   [ -n "$TIP" ] && echo "rpm tip: $TIP" >&2
 fi
 
-echo "rpm: don't forget to set /effort" >&2
-
 # --- Instructions for Claude ---
 echo ""
 echo "=== instructions ==="
-echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-echo "  rpm: session active"
+echo "Open your first response with exactly this line: rpm: session active"
 echo ""
 if [ "$BACKLOG_EMPTY" = "1" ] && [ -z "$LAST_NEXT" ]; then
 echo "Then the backlog has no actionable tasks. Do NOT present a menu or"

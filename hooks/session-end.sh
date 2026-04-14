@@ -31,10 +31,12 @@ esac
 TASK=$(grep -oP 'task: \K.*' "$MARKER" 2>/dev/null | head -1)
 SESSION_ID=$(grep -oP 'session_id: \K.*' "$MARKER" 2>/dev/null | head -1)
 
-# Uncommitted file count for the daily-log stub
+# Uncommitted file count for the daily-log stub. grep -c already prints
+# "0" when no matches AND exits 1, so `|| echo 0` would append a stray
+# "0\n" — use `|| true`.
 MOD_COUNT=0
 if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
-  MOD_COUNT=$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null | grep -cE '^.M|^M |^\?\?' || echo 0)
+  MOD_COUNT=$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null | grep -cE '^.M|^M |^\?\?' || true)
 fi
 
 # Append a stub to today's daily log if one doesn't already note this
