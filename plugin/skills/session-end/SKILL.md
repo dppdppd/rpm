@@ -321,14 +321,50 @@ actions complete, move to Phase 5.
 
 ## Phase 5: Handoff
 
-Only after Phase 4 is done. **Single response** — the rm tool call
-and the handoff text go in the same message:
+Only after Phase 4 is done.
+
+### 5a. Decide What's next (reconcile tasks.org priority)
+
+`tasks.org` is **priority-ordered top-to-bottom** — the top
+actionable task is the default `What's next`. Before writing the
+handoff, reconcile:
+
+1. Re-read `docs/rpm/future/tasks.org` (post-Phase 2). Identify the
+   top actionable task: topmost `** TODO` or `** IN-PROGRESS` whose
+   `:BLOCKED_BY:` deps (if any) are all DONE.
+
+2. Check for a priority mismatch:
+   - **User worked below the top.** The task they worked on this
+     session sits below position #1 — the order probably doesn't
+     reflect real priority.
+   - **Top is blocked.** The topmost non-DONE task's
+     `:BLOCKED_BY:` dep isn't done. Either the blocker moves up or
+     the blocked task moves down.
+   - **User flagged the list during the session.** They said or
+     implied the ordering was wrong.
+
+3. If any mismatch holds, end this response with ONE question and
+   wait. E.g.:
+   - "You worked on X today, but Y is at the top of tasks.org.
+     Move X up?"
+   - "Top task X is BLOCKED_BY Y. Move Y up, or X down?"
+   Apply the agreed reordering by editing `tasks.org`, then commit
+   as `rpm: session end — reorder tasks.org priority`.
+
+4. If no mismatch (top matches session work, nothing blocked near
+   the top), proceed to 5b with the top actionable task as
+   `What's next`. No question asked.
+
+### 5b. Finalize handoff (single response)
+
+**Single response** — the rm tool call and the handoff text go in
+the same message:
 
 - Save last session info before cleanup:
   ```bash
   TASK=$(grep -oP 'task: \K.*' docs/rpm/~rpm-session-start 2>/dev/null | head -1)
   SID=$(grep -oP 'session_id: \K.*' docs/rpm/~rpm-session-start 2>/dev/null | head -1)
-  printf 'task: %s\nended: %s\nnext: %s\n' "${TASK:-unknown}" "$(date -Iseconds)" "{what's next text}" > docs/rpm/~rpm-last-session
+  printf 'task: %s\nended: %s\nnext: %s\n' "${TASK:-unknown}" "$(date -Iseconds)" "{reconciled What's next from 5a}" > docs/rpm/~rpm-last-session
   # Handoff marker — session-start consumes this to silently clear any
   # orphan ~rpm-session-start left behind by /clear in this same process.
   printf 'session_id: %s\n' "${SID:-unknown}" > docs/rpm/~rpm-session-end
@@ -339,8 +375,8 @@ and the handoff text go in the same message:
 ```
 ## Session done
 
-**What's next:** [specific task for the next session, or
-"unknown — pick from future/tasks.org"]
+**What's next:** [reconciled top task from 5a, or
+"unknown — pick from future/tasks.org" if the list is empty]
 
 [If mid-task: note exactly where it left off so the next session
 can resume without re-investigation]
