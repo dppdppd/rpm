@@ -14,7 +14,7 @@ End the current work session in four user-visible phases:
 3. **Reviewing Tasks** — reconcile tasks.org priority, decide What's next
 4. **Handing Off** — write last-session info, output the handoff text
 
-**Print a phase header** (`## Phase N. Title (of 4)`) at the start of
+**Print a phase header** (`## Phase N (of 4): Title`) at the start of
 each user-visible response. Sub-sections inside a phase use letters
 (`### 1b. Uncommitted changes`).
 
@@ -34,7 +34,7 @@ false positive, and don't ask twice. If the user explicitly typed
 
 ---
 
-## Phase 1. Collecting Findings (of 4)
+## Phase 1 (of 4): Collecting Findings
 
 Analyze, auto-apply tracker updates, then emit one user-visible
 response with the findings block + actions menu. The prep steps
@@ -213,7 +213,7 @@ Print this block. The Actions menu at the bottom is what waits for
 the user's pick.
 
 ```
-## Phase 1. Collecting Findings (of 4)
+## Phase 1 (of 4): Collecting Findings
 
 ### 1a. Accomplishments
 - [Bullet list of what was completed]
@@ -270,9 +270,9 @@ Otherwise wait for the user's choice.
 
 ---
 
-## Phase 2. Housekeeping (of 4)
+## Phase 2 (of 4): Housekeeping
 
-Start this response with `## Phase 2. Housekeeping (of 4)`. Only run the
+Start this response with `## Phase 2 (of 4): Housekeeping`. Only run the
 actions the user picked; for each, ask any followup questions before
 acting.
 
@@ -313,9 +313,9 @@ After ALL chosen actions complete, proceed to Phase 3.
 
 ---
 
-## Phase 3. Reviewing Tasks (of 4)
+## Phase 3 (of 4): Reviewing Tasks
 
-Start this response with `## Phase 3. Reviewing Tasks (of 4)`. Reconcile
+Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Reconcile
 tasks.org priority before handoff.
 
 `tasks.org` is priority-ordered; the top actionable task (topmost
@@ -341,7 +341,7 @@ state the top as `What's next` and proceed to Phase 4.
 
 ---
 
-## Phase 4. Handing Off (of 4)
+## Phase 4 (of 4): Handing Off
 
 Only after Phase 3 is resolved. **Single response** — the rm tool
 call and the handoff text go in the same message:
@@ -359,7 +359,7 @@ call and the handoff text go in the same message:
 - Output the handoff text below as the **very last lines**:
 
 ```
-## Phase 4. Handing Off (of 4)
+## Phase 4 (of 4): Handing Off
 
 **What's next:** [reconciled top task from Phase 3, or
 "unknown — pick from future/tasks.org" if the list is empty]
