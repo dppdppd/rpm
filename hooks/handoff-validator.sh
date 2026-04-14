@@ -49,7 +49,7 @@ fi
 
 # Active-session marker should be gone after session-end.
 for f in ~rpm-session-start ~rpm-compact-state ~rpm-learnings.jsonl ~rpm-native-tasks.jsonl ~rpm-task-candidates.jsonl; do
-  [ -e "$PM_DIR/$f" ] && ERRORS="${ERRORS}  - $f still present (should be cleared in Phase 5)\n"
+  [ -e "$PM_DIR/$f" ] && ERRORS="${ERRORS}  - $f still present (should be cleared in Phase 4)\n"
 done
 
 # status.md: Last updated field should be today.
