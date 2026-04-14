@@ -271,6 +271,42 @@ EOF
   [[ "$output" == *"second"* ]]
 }
 
+@test "CANCELLED tasks are hidden like DONE" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/future/tasks.org" <<'EOF'
+* Work
+** TODO visible task
+   :PROPERTIES:
+   :ID: v1
+   :END:
+** CANCELLED abandoned task
+   :PROPERTIES:
+   :ID: c1
+   :END:
+EOF
+  run run_session_start startup
+  [[ "$output" == *"visible task"* ]]
+  [[ "$output" != *"abandoned task"* ]]
+}
+
+@test "BLOCKED_BY with CANCELLED dep unblocks (terminal states)" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/future/tasks.org" <<'EOF'
+* Work
+** CANCELLED killed prerequisite
+   :PROPERTIES:
+   :ID: killed
+   :END:
+** BLOCKED downstream
+   :PROPERTIES:
+   :ID: down
+   :BLOCKED_BY: killed
+   :END:
+EOF
+  run run_session_start startup
+  [[ "$output" == *"downstream"* ]]
+}
+
 @test "empty backlog — no Pick prompt, brainstorm instructions instead" {
   seed_minimal_trackers
   # tasks.org exists but has no actionable TODOs

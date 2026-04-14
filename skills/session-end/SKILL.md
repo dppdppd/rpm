@@ -158,6 +158,32 @@ update, skip it and note "no changes" in the Phase 3 report.
 - Orphan entries in `~rpm-native-tasks.jsonl` from prior sessions →
   offer to promote as TODOs before Phase 5 cleanup.
 
+### Task candidates (from TaskCompleted hook)
+
+If `docs/rpm/~rpm-task-candidates.jsonl` exists, each line is a
+completed native task scored against a tasks.org heading by the
+`task-capture.sh` hook. Schema:
+
+```jsonl
+{"ts":"...","session":"...","event":"complete","native_id":"t7","native_subject":"...","match":{"heading":"...","id":"...","confidence":85}}
+{"ts":"...","session":"...","event":"complete","native_id":"t9","native_subject":"...","match":null}
+```
+
+Consume as follows:
+
+- **`match.confidence >= 80`**: auto-mark the tasks.org entry DONE
+  with today's date. No question. Note it in Phase 3 under
+  "Tracker updates".
+- **`match.confidence` 40–79**: surface as one consolidated finding
+  in Phase 3 — list `native_subject → heading (confidence N)` and
+  ask yes/no per row (or `all`/`none`). Apply DONE edits on the
+  user's picks.
+- **`match:null`** or missing: ignore mechanically; conversation
+  synthesis in Phase 1c may still catch it.
+
+Prefer `match.id` (via the `:ID:` property) over heading-text edits
+when the entry has one — ID-targeted edits survive heading rewrites.
+
 ### Commit tracker updates + present findings (same response)
 
 After all three writes land, combine the commit and the Phase 3
@@ -322,7 +348,7 @@ the same message:
   # orphan ~rpm-session-start left behind by /clear in this same process.
   printf 'session_id: %s\n' "${SID:-unknown}" > docs/rpm/~rpm-session-end
   ```
-- Clear session files: `rm -rf docs/rpm/~rpm-session-start docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-native-tasks.jsonl`
+- Clear session files: `rm -rf docs/rpm/~rpm-session-start docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-native-tasks.jsonl docs/rpm/~rpm-task-candidates.jsonl`
 - Output the handoff text below as the **very last lines**:
 
 ```

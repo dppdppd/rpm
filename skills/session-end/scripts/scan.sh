@@ -271,8 +271,8 @@ if [ -f "$FUTURE" ]; then
 
   while IFS= read -r line; do
     # Heading line: ** STATUS Text
-    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) '; then
-      CUR_STATUS=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE) .*/\1/')
+    if echo "$line" | grep -qE '^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE|CANCELLED) '; then
+      CUR_STATUS=$(echo "$line" | sed -E 's/^\*\* (TODO|IN-PROGRESS|BLOCKED|DONE|CANCELLED) .*/\1/')
       CUR_ID=""
       CUR_BLOCKED=""
     fi
@@ -303,7 +303,7 @@ if [ -f "$FUTURE" ]; then
         DANGLING="$DANGLING $id→$dep"
       else
         eval "dep_status=\${STATUS_$(san "$dep"):-}"
-        [ "$dep_status" != "DONE" ] && ALL_DONE=false
+        case "$dep_status" in DONE|CANCELLED) ;; *) ALL_DONE=false ;; esac
       fi
     done
     if [ "$my_status" = "TODO" ] || [ "$my_status" = "BLOCKED" ]; then
