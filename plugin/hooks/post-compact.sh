@@ -28,8 +28,7 @@ if [ -n "$SUMMARY" ]; then
 fi
 
 echo ""
-echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-echo "  rpm: session recovered after compaction"
+echo "Open your first response with exactly this line: rpm: session recovered after compaction"
 echo "Then continue with the active task. The compact_summary above"
 echo "captures what was being discussed before compaction — use it"
 echo "alongside the saved state to resume without re-investigation."

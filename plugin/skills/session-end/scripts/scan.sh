@@ -17,9 +17,10 @@ cd "$ROOT" 2>/dev/null || { echo "error=cannot_cd_to_root"; exit 0; }
 # ----------------------------------------------------------------
 echo "=== git ==="
 if git rev-parse --git-dir > /dev/null 2>&1; then
-  MODIFIED=$(git status --porcelain 2>/dev/null | grep -cE '^.M|^M ' || true)
-  UNTRACKED=$(git status --porcelain 2>/dev/null | grep -cE '^\?\?' || true)
-  STAGED=$(git status --porcelain 2>/dev/null | grep -cE '^M |^A |^D ' || true)
+  PORCELAIN=$(git status --porcelain 2>/dev/null || true)
+  MODIFIED=$(echo "$PORCELAIN" | grep -cE '^.M|^M ' || true)
+  UNTRACKED=$(echo "$PORCELAIN" | grep -cE '^\?\?' || true)
+  STAGED=$(echo "$PORCELAIN" | grep -cE '^M |^A |^D ' || true)
   STASHES=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
   echo "modified=${MODIFIED:-0}"
   echo "untracked=${UNTRACKED:-0}"

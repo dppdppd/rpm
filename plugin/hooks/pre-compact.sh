@@ -101,5 +101,4 @@ echo "rpm: checkpoint saved" >&2
 # Context for Claude
 echo "rpm: checkpoint saved"
 echo ""
-echo "IMPORTANT: Begin your first response with exactly this line (no markdown, no extras):"
-echo "  rpm: checkpoint saved — compaction OK"
+echo "Open your first response with exactly this line: rpm: checkpoint saved — compaction OK"
