@@ -32,3 +32,5 @@ echo "Open your first response with exactly this line: rpm: session recovered af
 echo "Then continue with the active task. The compact_summary above"
 echo "captures what was being discussed before compaction — use it"
 echo "alongside the saved state to resume without re-investigation."
+echo ""
+echo "When you discover a root cause or change approach, lead with \"Key finding:\" so learnings are captured automatically."
