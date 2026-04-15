@@ -30,6 +30,19 @@
    - Change: only append when Claude judges the native task represents
      genuine future work; otherwise let it die with the session.
 
+** TODO Port rpm to opencode [[file:2026-04-14-opencode-port.md]]
+   :PROPERTIES:
+   :ID: opencode-port
+   :END:
+   - Skills + agents + commands drop in with near-zero changes
+     (opencode reads `.claude/skills/` natively; same SKILL.md format).
+   - Hooks require full rewrite as a TypeScript plugin subscribing to
+     opencode's event stream; ~8 bash scripts become one TS module.
+   - New `opencode/` sibling directory in the monorepo — don't rename
+     `plugin/`. Sync script keeps skills/agents/hooks in step.
+   - See detail file for layout + publish flow + content-sharing
+     options.
+
 ** DONE Extend bats coverage to remaining hooks
    CLOSED: [2026-04-13]
    :PROPERTIES:
