@@ -115,6 +115,8 @@ if [ -f "$MARKER" ]; then
   echo "  A. Continue the in-flight task"
   echo "  B. Switch to something else (then present the task menu)"
   echo "  C. Wrap up with /session-end"
+  echo ""
+  echo "When you discover a root cause or change approach, lead with \"Key finding:\" so learnings are captured automatically."
   exit 0
 fi
 
