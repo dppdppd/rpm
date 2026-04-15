@@ -34,6 +34,12 @@ Parse `$ARGUMENTS`:
 
 ## Add
 
+**Do NOT call `TaskCreate` for backlog additions.** `tasks.org` is
+the long-term backlog; native tasks (`TaskCreate`/`TaskList`) are
+reserved for work actually happening *this session*. Adding to
+`tasks.org` without a mirrored native task is the correct, intended
+behavior.
+
 1. Read `docs/rpm/future/tasks.org` to see existing parent headings
    and task structure.
 2. Ask which parent heading the task belongs under (suggest one if
