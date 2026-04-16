@@ -164,9 +164,10 @@ updates section.
   that backlog entry DONE.
 - Completed native with no backlog counterpart → let it die. It was
   ephemeral session sub-work, not backlog material.
-- **In-progress or pending natives → do NOT auto-append.** They are
-  surfaced to the user in **Phase 3 (Reviewing Tasks → 3a)** for
-  per-row disposition, then cleared via `TaskUpdate`.
+- **In-progress or pending natives → do NOT append here.**
+  **Phase 3 (Reviewing Tasks → 3a)** auto-promotes them to the
+  backlog and clears the live list via `TaskUpdate`. No user
+  question — creation-time was the vetting step.
 
 ##### Task candidates (from TaskCompleted hook)
 
@@ -320,37 +321,30 @@ Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Two
 sub-steps before handoff: dispose of remaining native tasks, then
 reconcile rpm backlog priority.
 
-### 3a. Native task disposition
+### 3a. Clear native tasks (auto-promote then clear)
 
-Native tasks (`TaskList`) are session-scoped — they should not carry
-into the next session. Sweep them now:
+Native tasks are session-scoped and need clearing before handoff.
+A native task's creation *is* the vetting step — if Claude put it
+on the list, it was worth tracking — so every uncleared native
+auto-promotes to your rpm backlog. No user question.
 
-1. Call `TaskList`. For every task with status `in_progress` or
-   `pending`, it needs disposition (completed ones were already
-   handled in Phase 1 prep via candidate matching).
+1. Call `TaskList`. Collect every task with status `in_progress`
+   or `pending` (completed ones were handled in Phase 1 prep via
+   candidate matching — skip them).
 
-2. Present them as a single numbered mini-menu and ask in ONE
-   question which to promote to your rpm backlog:
+2. For each, append `** TODO <subject>` under a sensible `* Parent`
+   group in your rpm backlog (match the native's scope; create a
+   group if no fit). Order within the parent: append to the bottom
+   (priority is the user's call at the next 3b reconciliation).
 
-   ```
-   ### 3a. Native tasks to dispose of
-   1. "<subject-of-native-1>"
-   2. "<subject-of-native-2>"
+3. Call `TaskUpdate` on every surfaced task to set status=`completed`.
+   This clears the live native list.
 
-   Promote which to your rpm backlog? (e.g., `1,2` · `all` · `none`)
-   ```
+4. Report what was promoted in one line at the start of this
+   response (e.g., `Promoted 3 native tasks to backlog.`), then
+   proceed to 3b. No question for 3a.
 
-   If only one remains, skip the list and ask directly:
-   `Promote **"<subject>"** to your rpm backlog? (yes / no)`.
-   If zero remain, skip 3a silently and go to 3b.
-
-3. Apply the user's picks: append each promoted task as `** TODO`
-   under a sensible `* Parent` group (create one if needed).
-
-4. **Clear the live native task list.** Call `TaskUpdate` on every
-   task surfaced in step 1 to set status=`completed`. Do this
-   regardless of whether the user promoted it — clearing is
-   mandatory; promotion is the optional-capture step.
+If there were zero in-progress/pending natives, skip 3a silently.
 
 ### 3b. Reconcile rpm backlog priority
 
