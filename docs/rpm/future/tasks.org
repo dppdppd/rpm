@@ -30,6 +30,18 @@
    - Change: only append when Claude judges the native task represents
      genuine future work; otherwise let it die with the session.
 
+** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
+   :PROPERTIES:
+   :ID: codex-port
+   :END:
+   - Skills port 1:1 (same SKILL.md + YAML frontmatter format)
+   - Plugin manifest similar (.codex-plugin/plugin.json)
+   - Hooks are experimental — only SessionStart, Stop, PostToolUse (Bash only);
+     no SessionEnd, PreCompact, PostCompact, TaskCreated/TaskCompleted
+   - Agents need translation: TOML not markdown
+   - No native task UI (no TaskCreate/TaskList/TaskUpdate equivalent)
+   - Overall: about half ports; rest blocked on missing lifecycle events
+
 ** TODO Port rpm to opencode [[file:2026-04-14-opencode-port.md]]
    :PROPERTIES:
    :ID: opencode-port
