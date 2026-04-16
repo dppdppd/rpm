@@ -321,28 +321,47 @@ Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Two
 sub-steps before handoff: dispose of remaining native tasks, then
 reconcile rpm backlog priority.
 
-### 3a. Clear native tasks (auto-promote then clear)
+### 3a. Clear native tasks (dedup, promote, clear)
 
 Native tasks are session-scoped and need clearing before handoff.
 A native task's creation *is* the vetting step — if Claude put it
-on the list, it was worth tracking — so every uncleared native
-auto-promotes to your rpm backlog. No user question.
+on the list, it was worth tracking — so every uncleared native gets
+captured in your rpm backlog before the live list is wiped. No user
+question.
 
-1. Call `TaskList`. Collect every task with status `in_progress`
-   or `pending` (completed ones were handled in Phase 1 prep via
-   candidate matching — skip them).
+**Order matters.** Phase 1 prep already handled every *completed*
+native with a high-confidence candidate match (it DONE'd the matching
+backlog entry). So 3a only deals with in_progress/pending natives.
+For each, dedup against the live backlog *before* appending — a
+native picked from the backlog at session-start will already have
+an entry, and we must not duplicate it.
 
-2. For each, append `** TODO <subject>` under a sensible `* Parent`
-   group in your rpm backlog (match the native's scope; create a
-   group if no fit). Order within the parent: append to the bottom
-   (priority is the user's call at the next 3b reconciliation).
+1. Call `TaskList`. Collect every task with status `in_progress` or
+   `pending`. (Completed natives are already handled; skip them.)
 
-3. Call `TaskUpdate` on every surfaced task to set status=`completed`.
-   This clears the live native list.
+2. For each collected native, **look for a matching backlog entry**:
+   - Normalize the native subject and each non-DONE/non-CANCELLED
+     backlog heading (lowercase, strip punctuation, collapse
+     whitespace).
+   - Score with the same buckets the `task-capture.sh` hook uses
+     (100 exact / 80 substring / 60 Jaccard≥0.6 / 40 Jaccard≥0.3).
 
-4. Report what was promoted in one line at the start of this
-   response (e.g., `Promoted 3 native tasks to backlog.`), then
-   proceed to 3b. No question for 3a.
+3. Apply per native:
+   - **Match ≥ 80**: a backlog entry already exists for this work.
+     If its status is `** TODO`, update to `** IN-PROGRESS` (work
+     was started but not finished). If already `IN-PROGRESS` or
+     `BLOCKED`, leave alone. Do NOT append — that's the duplicate.
+   - **Match < 80 (or no match)**: append `** TODO <subject>` under
+     a sensible `* Parent` group (match the native's scope; create
+     a group if no fit). Append to the bottom of the group —
+     priority is the user's call at the next 3b reconciliation.
+
+4. Call `TaskUpdate` on every surfaced task (step 1's collected set)
+   to set status=`completed`. This clears the live native list.
+
+5. Report what happened in one line at the start of this response
+   (e.g., `Promoted 2 natives; 1 deduped into existing IN-PROGRESS.`),
+   then proceed to 3b.
 
 If there were zero in-progress/pending natives, skip 3a silently.
 
