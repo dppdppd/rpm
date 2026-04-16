@@ -159,13 +159,14 @@ updates section.
 
 ##### Native task reconciliation (within the `future/tasks.org` edit)
 
-- Native task done this session → mark its rpm backlog entry DONE
-  (append if missing).
-- Native task still in-progress/pending → append as TODO/IN-PROGRESS
-  if no rpm backlog counterpart.
-- Never delete native tasks; they persist across sessions.
-- Orphan entries in `~rpm-native-tasks.jsonl` from prior sessions →
-  offer to promote as TODOs before Phase 4 cleanup.
+- Completed native with a high-confidence candidate match (≥80 via
+  `~rpm-task-candidates.jsonl`, see "Task candidates" below) → mark
+  that backlog entry DONE.
+- Completed native with no backlog counterpart → let it die. It was
+  ephemeral session sub-work, not backlog material.
+- **In-progress or pending natives → do NOT auto-append.** They are
+  surfaced to the user in **Phase 3 (Reviewing Tasks → 3a)** for
+  per-row disposition, then cleared via `TaskUpdate`.
 
 ##### Task candidates (from TaskCompleted hook)
 
@@ -315,13 +316,48 @@ After ALL chosen actions complete, proceed to Phase 3.
 
 ## Phase 3 (of 4): Reviewing Tasks
 
-Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Reconcile
-rpm backlog priority before handoff.
+Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Two
+sub-steps before handoff: dispose of remaining native tasks, then
+reconcile rpm backlog priority.
+
+### 3a. Native task disposition
+
+Native tasks (`TaskList`) are session-scoped — they should not carry
+into the next session. Sweep them now:
+
+1. Call `TaskList`. For every task with status `in_progress` or
+   `pending`, it needs disposition (completed ones were already
+   handled in Phase 1 prep via candidate matching).
+
+2. Present them as a single numbered mini-menu and ask in ONE
+   question which to promote to your rpm backlog:
+
+   ```
+   ### 3a. Native tasks to dispose of
+   1. "<subject-of-native-1>"
+   2. "<subject-of-native-2>"
+
+   Promote which to your rpm backlog? (e.g., `1,2` · `all` · `none`)
+   ```
+
+   If only one remains, skip the list and ask directly:
+   `Promote **"<subject>"** to your rpm backlog? (yes / no)`.
+   If zero remain, skip 3a silently and go to 3b.
+
+3. Apply the user's picks: append each promoted task as `** TODO`
+   under a sensible `* Parent` group (create one if needed).
+
+4. **Clear the live native task list.** Call `TaskUpdate` on every
+   task surfaced in step 1 to set status=`completed`. Do this
+   regardless of whether the user promoted it — clearing is
+   mandatory; promotion is the optional-capture step.
+
+### 3b. Reconcile rpm backlog priority
 
 Your rpm backlog is priority-ordered; the top actionable task (topmost
 `** TODO` or `** IN-PROGRESS` with all `:BLOCKED_BY:` deps DONE) is
-the default `What's next`. Re-read the file (post-auto-apply) and
-check for a mismatch:
+the default `What's next`. Re-read the file (post-auto-apply,
+post-3a-promotions) and check for a mismatch:
 
 - User worked below the top → order probably doesn't reflect priority.
 - Top is blocked by an incomplete dep → blocker moves up, or blocked moves down.
@@ -332,10 +368,11 @@ check for a mismatch:
   `:POSTPONED: YYYY-MM-DD`.
 
 If any holds, end this response with ONE question (e.g. "You worked
-on X today; move it above Y?" or "You said Y can wait — postpone
-it to the bottom of its group?") and wait. Apply the agreed change
-by editing your rpm backlog (use the Postpone procedure in the `/tasks`
-skill for deferrals; otherwise just reorder), commit as
+on X today, but Y is at the top of your rpm backlog. Should X move
+to the top?" or "You said Y can wait — postpone it to the bottom
+of its group?") and wait. Apply the agreed change by editing your
+rpm backlog (use the Postpone procedure in the `/tasks` skill for
+deferrals; otherwise just reorder), commit as
 `rpm: session end — reorder backlog priority`. Otherwise briefly
 state the top as `What's next` and proceed to Phase 4.
 

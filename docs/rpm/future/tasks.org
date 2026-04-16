@@ -19,16 +19,15 @@
    - Recurring "Next" item across Apr 10–11 logs
    - Pitch: rpm as drift-prevention plugin
 
-** TODO Tighten session-end native-task reconciliation [[file:2026-04-14-tighten-native-reconciliation.md]]
+** DONE Tighten session-end native-task reconciliation
+   CLOSED: [2026-04-14]
    :PROPERTIES:
    :ID: tighten-native-reconciliation
    :END:
-   - Session-end Phase 1 prep currently auto-appends any in-progress
-     native task without a tasks.org counterpart as a TODO. Under the
-     new "native tasks are ephemeral" rule, this over-promotes
-     sub-step sub-tasks into the backlog.
-   - Change: only append when Claude judges the native task represents
-     genuine future work; otherwise let it die with the session.
+   - Session-end Phase 1 prep auto-append removed; in-progress/pending
+     natives now surface in Phase 3a for user-confirmed promotion,
+     then get mass-`TaskUpdate`'d to `completed` to clear the live
+     list. Completed-but-unmatched natives let die as ephemeral.
 
 ** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
    :PROPERTIES:
