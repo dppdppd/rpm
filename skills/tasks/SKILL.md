@@ -34,9 +34,9 @@ Parse `$ARGUMENTS`:
 
 ## Add
 
-**Do NOT call `TaskCreate` for backlog additions.** The rpm backlog
+**Do NOT call `TaskCreate` for backlog additions.** Your rpm backlog
 is long-term; native tasks (`TaskCreate`/`TaskList`) are reserved for
-work actually happening *this session*. Adding to the rpm backlog
+work actually happening *this session*. Adding to your rpm backlog
 without a mirrored native task is the correct, intended behavior.
 
 1. Read `docs/rpm/future/tasks.org` to see existing parent headings
