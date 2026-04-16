@@ -180,7 +180,7 @@ completed native task scored against an rpm backlog heading by the
 
 Consume as follows:
 
-- **`match.confidence >= 80`**: auto-mark the rpm backlog entry DONE
+- **`match.confidence >= 80`**: auto-mark your rpm backlog entry DONE
   with today's date. No question. Note it in the Tracker updates
   section.
 - **`match.confidence` 40–79**: surface as one consolidated finding
@@ -318,7 +318,7 @@ After ALL chosen actions complete, proceed to Phase 3.
 Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Reconcile
 rpm backlog priority before handoff.
 
-The rpm backlog is priority-ordered; the top actionable task (topmost
+Your rpm backlog is priority-ordered; the top actionable task (topmost
 `** TODO` or `** IN-PROGRESS` with all `:BLOCKED_BY:` deps DONE) is
 the default `What's next`. Re-read the file (post-auto-apply) and
 check for a mismatch:
@@ -334,7 +334,7 @@ check for a mismatch:
 If any holds, end this response with ONE question (e.g. "You worked
 on X today; move it above Y?" or "You said Y can wait — postpone
 it to the bottom of its group?") and wait. Apply the agreed change
-by editing the rpm backlog (use the Postpone procedure in the `/tasks`
+by editing your rpm backlog (use the Postpone procedure in the `/tasks`
 skill for deferrals; otherwise just reorder), commit as
 `rpm: session end — reorder backlog priority`. Otherwise briefly
 state the top as `What's next` and proceed to Phase 4.
@@ -362,7 +362,7 @@ call and the handoff text go in the same message:
 ## Phase 4 (of 4): Handing Off
 
 **What's next:** [reconciled top task from Phase 3, or
-"unknown — pick from the rpm backlog" if the list is empty]
+"unknown — pick from your rpm backlog" if the list is empty]
 
 [If mid-task: note exactly where it left off so the next session
 can resume without re-investigation]
