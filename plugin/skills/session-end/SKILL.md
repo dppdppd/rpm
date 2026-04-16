@@ -11,7 +11,7 @@ End the current work session in four user-visible phases:
 
 1. **Collecting Findings** — analyze, auto-apply tracker updates, present summary + actions menu
 2. **Housekeeping** — execute chosen actions (commit, record findings, fix drift)
-3. **Reviewing Tasks** — reconcile tasks.org priority, decide What's next
+3. **Reviewing Tasks** — reconcile rpm backlog priority, decide What's next
 4. **Handing Off** — write last-session info, output the handoff text
 
 **Print a phase header** (`## Phase N (of 4): Title`) at the start of
@@ -22,7 +22,7 @@ Core rpm bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`,
 `docs/rpm/present/status.md`, `docs/rpm/future/tasks.org`) is updated
 automatically during Phase 1's prep — no prompts, no diff approval.
 Ask only about commits, promoting findings, drift fixes, and
-tasks.org reordering.
+rpm backlog reordering.
 
 ## Pre-flight
 
@@ -159,10 +159,10 @@ updates section.
 
 ##### Native task reconciliation (within the `future/tasks.org` edit)
 
-- Native task done this session → mark its tasks.org entry DONE
+- Native task done this session → mark its rpm backlog entry DONE
   (append if missing).
 - Native task still in-progress/pending → append as TODO/IN-PROGRESS
-  if no tasks.org counterpart.
+  if no rpm backlog counterpart.
 - Never delete native tasks; they persist across sessions.
 - Orphan entries in `~rpm-native-tasks.jsonl` from prior sessions →
   offer to promote as TODOs before Phase 4 cleanup.
@@ -170,7 +170,7 @@ updates section.
 ##### Task candidates (from TaskCompleted hook)
 
 If `docs/rpm/~rpm-task-candidates.jsonl` exists, each line is a
-completed native task scored against a tasks.org heading by the
+completed native task scored against an rpm backlog heading by the
 `task-capture.sh` hook. Schema:
 
 ```jsonl
@@ -180,7 +180,7 @@ completed native task scored against a tasks.org heading by the
 
 Consume as follows:
 
-- **`match.confidence >= 80`**: auto-mark the tasks.org entry DONE
+- **`match.confidence >= 80`**: auto-mark the rpm backlog entry DONE
   with today's date. No question. Note it in the Tracker updates
   section.
 - **`match.confidence` 40–79**: surface as one consolidated finding
@@ -316,9 +316,9 @@ After ALL chosen actions complete, proceed to Phase 3.
 ## Phase 3 (of 4): Reviewing Tasks
 
 Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Reconcile
-tasks.org priority before handoff.
+rpm backlog priority before handoff.
 
-`tasks.org` is priority-ordered; the top actionable task (topmost
+The rpm backlog is priority-ordered; the top actionable task (topmost
 `** TODO` or `** IN-PROGRESS` with all `:BLOCKED_BY:` deps DONE) is
 the default `What's next`. Re-read the file (post-auto-apply) and
 check for a mismatch:
@@ -334,9 +334,9 @@ check for a mismatch:
 If any holds, end this response with ONE question (e.g. "You worked
 on X today; move it above Y?" or "You said Y can wait — postpone
 it to the bottom of its group?") and wait. Apply the agreed change
-by editing `tasks.org` (use the Postpone procedure in the `/tasks`
+by editing the rpm backlog (use the Postpone procedure in the `/tasks`
 skill for deferrals; otherwise just reorder), commit as
-`rpm: session end — reorder tasks.org priority`. Otherwise briefly
+`rpm: session end — reorder backlog priority`. Otherwise briefly
 state the top as `What's next` and proceed to Phase 4.
 
 ---
@@ -362,7 +362,7 @@ call and the handoff text go in the same message:
 ## Phase 4 (of 4): Handing Off
 
 **What's next:** [reconciled top task from Phase 3, or
-"unknown — pick from future/tasks.org" if the list is empty]
+"unknown — pick from the rpm backlog" if the list is empty]
 
 [If mid-task: note exactly where it left off so the next session
 can resume without re-investigation]
