@@ -98,8 +98,8 @@ For a startup: velocity vs quality tradeoffs.}
 
 ## Tasks
 - User mentions future work → capture as a task.
-- You suggest new work → ask "Add to tasks.org?" (don't just suggest and move on).
-- User shifts to a new task with little carry-over → suggest /session-end first; one-liner in `future/tasks.org` + detail in `future/<date>-<slug>.md`.
+- You suggest deferrable work ("we could X later", "worth Y eventually", "follow up on Z") → STOP and ask "Add to the rpm backlog?" before moving on — don't just suggest and continue.
+- User shifts to a new task with little carry-over → suggest /session-end first; one-liner in the rpm backlog + detail in `future/<date>-<slug>.md`.
 
 ## Prior Findings
 See `docs/rpm/past/log.md` Audit History.
@@ -227,7 +227,7 @@ Create `docs/rpm/future/tasks.org`:
 ```
 
 Each task entry is one short sentence + a link to a detail file
-(`future/<date>-<slug>.md`). Never inline task details in tasks.org.
+(`future/<date>-<slug>.md`). Never inline task details in the rpm backlog.
 
 ## Phase 5: Adapt for Team Size
 

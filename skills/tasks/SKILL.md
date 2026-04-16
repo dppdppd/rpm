@@ -7,8 +7,8 @@ allowed-tools: Read Write Edit Glob Grep
 
 # /tasks
 
-Manage `docs/rpm/future/tasks.org`. All operations read and write
-this file using org-mode format.
+Manage the **rpm backlog** — persisted at `docs/rpm/future/tasks.org`.
+All operations read and write this file using org-mode format.
 
 ## Routing
 
@@ -34,11 +34,10 @@ Parse `$ARGUMENTS`:
 
 ## Add
 
-**Do NOT call `TaskCreate` for backlog additions.** `tasks.org` is
-the long-term backlog; native tasks (`TaskCreate`/`TaskList`) are
-reserved for work actually happening *this session*. Adding to
-`tasks.org` without a mirrored native task is the correct, intended
-behavior.
+**Do NOT call `TaskCreate` for backlog additions.** The rpm backlog
+is long-term; native tasks (`TaskCreate`/`TaskList`) are reserved for
+work actually happening *this session*. Adding to the rpm backlog
+without a mirrored native task is the correct, intended behavior.
 
 1. Read `docs/rpm/future/tasks.org` to see existing parent headings
    and task structure.
