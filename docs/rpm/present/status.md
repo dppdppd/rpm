@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-04-13
-- **Version**: 2.7.0
+- **Version**: 2.7.1
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -42,6 +42,7 @@
 - marketplace.json source → object form (v2.5.9) — Claude Code marketplace spec requires `{ source: "url", url: "..." }`; a bare URL string was breaking `/plugin marketplace add dppdppd/rpm`
 - Session-lifecycle hooks optimized (v2.6.0) — task_menu parser rewritten with bash builtins (~4.6× faster, 900ms→200ms on a 30-task backlog); `session-end.sh` daily-log stub bug fixed (`0\n0` corruption); `scan.sh` caches `git status`; "first response" boilerplate compressed in 4 hooks; `/effort` stderr nag removed
 - Task/backlog overhaul (v2.7.0) — session-end restructured into four user-visible phases with printed headers (`Phase N (of 4): Title`): Collecting Findings → Housekeeping → Reviewing Tasks → Handing Off. New behaviors: `TaskCompleted` hook scores completions against `tasks.org` headings (auto-apply DONE ≥80 confidence, ask 40–79); `CANCELLED` workflow state recognized as terminal by parser + scan; Phase 3 reconciles `tasks.org` priority against session reality with 4 mismatch signals; `/tasks postpone` defers a task to the bottom of its `* Parent` group with `:POSTPONED:` stamp; `/tasks review` gets Deferrals dimension. SKILL.md trimmed 47 lines, then re-expanded for the 4-phase structure
+- Native task / Key finding fixes (v2.7.1) — `/tasks add` now explicitly forbids `TaskCreate` for backlog additions (native tasks = current session only, `tasks.org` = long-term backlog); session-start injection states the distinction; "Key finding:" guidance carried into resume + post-compact paths so it survives `/clear` and compaction
 
 ## Active Specs
 
