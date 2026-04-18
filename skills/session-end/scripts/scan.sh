@@ -15,6 +15,17 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 cd "$ROOT" 2>/dev/null || { echo "error=cannot_cd_to_root"; exit 0; }
 
 # ----------------------------------------------------------------
+echo "=== plugin ==="
+PLUGIN_MANIFEST="${CLAUDE_PLUGIN_ROOT:-}/.claude-plugin/plugin.json"
+RPM_VERSION=""
+if [ -f "$PLUGIN_MANIFEST" ]; then
+  RPM_VERSION=$(jq -r '.version // empty' "$PLUGIN_MANIFEST" 2>/dev/null)
+  [ -z "$RPM_VERSION" ] && RPM_VERSION=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' "$PLUGIN_MANIFEST" 2>/dev/null | head -1)
+fi
+echo "version=${RPM_VERSION:-unknown}"
+
+# ----------------------------------------------------------------
+echo
 echo "=== git ==="
 if git rev-parse --git-dir > /dev/null 2>&1; then
   PORCELAIN=$(git status --porcelain 2>/dev/null || true)

@@ -22,6 +22,13 @@ HOOK_SESSION_ID=$(echo "$PAYLOAD" | jq -r '.session_id // empty' 2>/dev/null)
 [ -z "$HOOK_SESSION_ID" ] && HOOK_SESSION_ID=$(echo "$PAYLOAD" | sed -n 's/.*"session_id" *: *"\([^"]*\)".*/\1/p')
 [ -z "$HOOK_SESSION_ID" ] && HOOK_SESSION_ID="${CLAUDE_CODE_SESSION_ID:-unknown}"
 
+# rpm plugin version — appended to session headers for visibility
+PLUGIN_MANIFEST="${CLAUDE_PLUGIN_ROOT:-$(dirname "${BASH_SOURCE[0]}")/..}/.claude-plugin/plugin.json"
+RPM_VERSION=$(jq -r '.version // empty' "$PLUGIN_MANIFEST" 2>/dev/null)
+[ -z "$RPM_VERSION" ] && RPM_VERSION=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' "$PLUGIN_MANIFEST" 2>/dev/null | head -1)
+VTAG=""
+[ -n "$RPM_VERSION" ] && VTAG=" (rpm $RPM_VERSION)"
+
 # Let PostCompact handle compaction
 [ "$SOURCE" = "compact" ] && exit 0
 
@@ -85,7 +92,7 @@ fi
 # the normal startup flow (including the task menu). The user can pick
 # up where they left off or move on — nothing is forced.
 if [ -f "$MARKER" ] && [ "$STALE" = "1" ]; then
-  echo "rpm: previous session didn't wrap up"
+  echo "rpm: previous session didn't wrap up${VTAG}"
   echo "(task: ${TASK:-unknown}, started ${STARTED:-unknown})"
   echo "(to resume and close it out: /resume ${SESSION_ID:-<session id>} then /session-end — otherwise pick from the backlog below)"
   echo ""
@@ -95,7 +102,7 @@ fi
 # Active resume path: same CC process, marker still valid. Emit resume
 # header + task-menu-style options and exit.
 if [ -f "$MARKER" ]; then
-  echo "rpm: resuming — ${TASK:-unknown task}"
+  echo "rpm: resuming — ${TASK:-unknown task}${VTAG}"
   [ -n "$STARTED" ] && echo "(session started $STARTED)"
   echo ""
   if git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
@@ -110,7 +117,7 @@ if [ -f "$MARKER" ]; then
   fi
   echo ""
   echo "=== instructions ==="
-  echo "Open your first response with exactly this line: rpm: resuming — ${TASK:-unknown task}"
+  echo "Open your first response with exactly this line: rpm: resuming — ${TASK:-unknown task}${VTAG}"
   echo ""
   echo "An rpm session marker is present — unfinished work on this task."
   echo "Check git state and recent commits to orient, then end your response"
@@ -358,7 +365,7 @@ fi
 # --- Instructions for Claude ---
 echo ""
 echo "=== instructions ==="
-echo "Open your first response with exactly this line: rpm: session active"
+echo "Open your first response with exactly this line: rpm: session active${VTAG}"
 echo ""
 if [ "$BACKLOG_EMPTY" = "1" ] && [ -z "$LAST_NEXT" ]; then
 echo "Then the backlog has no actionable tasks. Do NOT present a menu or"
