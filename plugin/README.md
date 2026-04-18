@@ -72,8 +72,8 @@ recent drift — and proposes a task from the backlog. You confirm and
 work.
 
 **Mid-session:** rpm quietly captures learnings and checkpoints your
-progress. Use `/tasks` to add, list, review, or complete tasks from
-your backlog. If you run `/compact`, rpm saves your state before
+progress. Use `/backlog` to add, list, review, or complete entries
+in your rpm backlog. If you run `/compact`, rpm saves your state before
 compaction and restores it after — so you pick up exactly where you
 left off without re-explaining anything.
 
@@ -100,7 +100,7 @@ trackers, surfaces uncommitted work and learnings, presents an action
 menu, then writes handoff notes. Run when you're done working or when
 context is getting long.
 
-### `/tasks`
+### `/backlog`
 
 Manage the **rpm backlog** (long-term project tasks in
 `docs/rpm/future/tasks.org` — distinct from Claude's native
