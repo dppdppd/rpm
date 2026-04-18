@@ -2,7 +2,8 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
-** TODO Submit latest to anthropics/claude-plugins-official marketplace
+** DONE Submit latest to anthropics/claude-plugins-official marketplace
+   CLOSED: [2026-04-17]
    :PROPERTIES:
    :ID: marketplace-submit
    :END:
