@@ -68,62 +68,54 @@ prime_counter() {
   [ -z "$output" ]
 }
 
-@test "silent when under the 75% threshold at 10th call (1M default)" {
+@test "silent when more than 50k tokens remain (1M default)" {
   seed_marker
   sid="ctxmon-under-$$"
   prime_counter "$sid"
-  run run_monitor 700000 "$sid"
+  # 940K used → 60k remaining → silent.
+  run run_monitor 940000 "$sid"
   [ "$status" -eq 0 ]
   [ -z "$output" ]
 }
 
-@test "emits 75% recommendation when tokens cross WARN (1M default)" {
+@test "emits recommendation when fewer than 50k tokens remain (1M default)" {
   seed_marker
-  sid="ctxmon-warn-$$"
+  sid="ctxmon-alert-$$"
   prime_counter "$sid"
-  run run_monitor 800000 "$sid"
+  # 960K used → 40k remaining → trips.
+  run run_monitor 960000 "$sid"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"past 75%"* ]]
+  [[ "$output" == *"under 50k tokens remaining"* ]]
   [[ "$output" == *"consider /session-end"* ]]
   [[ "$output" == *"hookSpecificOutput"* ]]
   echo "$output" | jq -e . >/dev/null
 }
 
-@test "emits 90% recommendation when tokens cross ALERT (1M default)" {
-  seed_marker
-  sid="ctxmon-alert-$$"
-  prime_counter "$sid"
-  run run_monitor 950000 "$sid"
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"past 90%"* ]]
-  [[ "$output" == *"consider /session-end"* ]]
-  echo "$output" | jq -e . >/dev/null
-}
-
-@test "RPM_CONTEXT_TOKENS override scales thresholds (200K window, 75%)" {
+@test "RPM_CONTEXT_TOKENS override — 60k remaining on 200K window is silent" {
   seed_marker
   sid="ctxmon-200k-$$"
   prime_counter "$sid"
-  # 160K tokens on a 200K window = 80% → trips WARN (75%).
-  run run_monitor 160000 "$sid" 200000
+  # 140K tokens on a 200K window → 60k remaining → silent.
+  run run_monitor 140000 "$sid" 200000
   [ "$status" -eq 0 ]
-  [[ "$output" == *"past 75%"* ]]
+  [ -z "$output" ]
 }
 
-@test "RPM_CONTEXT_TOKENS override — 95% of 200K window hits 90%" {
+@test "RPM_CONTEXT_TOKENS override — 40k remaining on 200K window trips" {
   seed_marker
   sid="ctxmon-200kstop-$$"
   prime_counter "$sid"
-  run run_monitor 190000 "$sid" 200000
+  # 160K used on a 200K window → 40k remaining → trips.
+  run run_monitor 160000 "$sid" 200000
   [ "$status" -eq 0 ]
-  [[ "$output" == *"past 90%"* ]]
+  [[ "$output" == *"under 50k tokens remaining"* ]]
 }
 
 @test "silent on non-10th call even over threshold" {
   seed_marker
   sid="ctxmon-skip-$$"
   echo 4 > "/tmp/rpm-ctx-counter-$sid"
-  run run_monitor 950000 "$sid"
+  run run_monitor 960000 "$sid"
   [ "$status" -eq 0 ]
   [ -z "$output" ]
 }
@@ -142,14 +134,14 @@ prime_counter() {
   sid="ctxmon-sidechain-$$"
   prime_counter "$sid"
   transcript="$(mktemp)"
-  # Older main-chain entry at 80% (trips WARN), newer sidechain at 5%.
+  # Older main-chain entry at 960K (40k remaining, trips), newer sidechain at 5%.
   {
-    printf '{"type":"assistant","isSidechain":false,"message":{"role":"assistant","usage":{"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":800000,"output_tokens":1}}}\n'
+    printf '{"type":"assistant","isSidechain":false,"message":{"role":"assistant","usage":{"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":960000,"output_tokens":1}}}\n'
     printf '{"type":"assistant","isSidechain":true,"message":{"role":"assistant","usage":{"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":50000,"output_tokens":1}}}\n'
   } > "$transcript"
   run bash -c "printf '{\"session_id\":\"$sid\",\"transcript_path\":\"$transcript\"}' | bash \"\$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh\""
   [ "$status" -eq 0 ]
-  [[ "$output" == *"past 75%"* ]]
+  [[ "$output" == *"under 50k tokens remaining"* ]]
   rm -f "$transcript"
 }
 
