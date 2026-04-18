@@ -12,7 +12,7 @@ you on task across LLM-assisted development sessions.
 /plugin install rpm@dppdppd-plugins
 ```
 
-**2. Run `/bootstrap`** inside the project you want to track. It
+**2. Run `/init-rpm`** inside the project you want to track. It
 scaffolds `docs/rpm/` and activates the hooks immediately — no
 restart needed.
 

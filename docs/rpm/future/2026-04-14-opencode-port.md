@@ -11,7 +11,7 @@ TypeScript instead of bash.
 
 ## What ports as-is
 
-- **Skills** (all six: `session-end`, `tasks`, `audit`, `bootstrap`,
+- **Skills** (all six: `session-end`, `tasks`, `audit`, `init-rpm`,
   `rpm`, `deep-research`) — markdown + YAML frontmatter is identical.
 - **Agents** — `agents/auditor.md` drops into `opencode/agents/`.
 - **Slash commands** — markdown + `$ARGUMENTS`, `!bash`, `@file` refs

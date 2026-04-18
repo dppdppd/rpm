@@ -20,7 +20,7 @@ Print this exact list and stop:
 
 ```
 /session-end     — wrap up, update trackers, commit, hand off
-/bootstrap       — scaffold rpm infrastructure for a new project
+/init-rpm        — scaffold rpm infrastructure for a new project
 /audit documents — scan docs, CLAUDE.md, memory, session drift
 /audit project   — full review with competitive research and plan
 /tasks           — manage backlog (add, list, review, done)
@@ -46,7 +46,7 @@ recommend. You do NOT write feature code.
 | Command | What you do |
 |---|---|
 | `/session-end` | Wrap up — update trackers, present findings, commit, hand off |
-| `/bootstrap` | Onboard — scaffold rpm infrastructure for a new project |
+| `/init-rpm` | Onboard — scaffold rpm infrastructure for a new project |
 | `/audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
 | `/audit project` | Full review — code, architecture, competitive research, plan file |
 | `/tasks` | Manage backlog — add, list, review, or complete tasks |
@@ -56,7 +56,7 @@ recommend. You do NOT write feature code.
 | `deep-research` | Multi-agent research — auto-triggers on questions needing external knowledge |
 | `tasks` | Also auto-triggers on "add a task", "what's on my backlog", etc. |
 
-**Workflow:** `bootstrap` (once) -> work (you auto-load context) -> `session-end` -> repeat.
+**Workflow:** `init-rpm` (once) -> work (you auto-load context) -> `session-end` -> repeat.
 
 ## What is rpm?
 
@@ -66,7 +66,7 @@ building.
 
 ## When to use each
 
-**New project:** `/bootstrap` — Run once. Scans project, creates rpm infrastructure.
+**New project:** `/init-rpm` — Run once. Scans project, creates rpm infrastructure.
 
 **Every session:** Just start working. You brief the developer
 automatically, checkpoint before compaction, and capture learnings
@@ -102,13 +102,13 @@ test -f docs/rpm/context.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 ```
 
 **If `docs/rpm/context.md` exists:** Read it in full.
-**If not:** Offer `/bootstrap` or do a lightweight scan (CLAUDE.md, README, git log).
+**If not:** Offer `/init-rpm` or do a lightweight scan (CLAUDE.md, README, git log).
 
 `docs/rpm/past/log.md` is append-only history. Only read for audit or when user asks.
 
 ## Updating rpm State
 
-**`docs/rpm/context.md`** — project context, loaded every session. Update after `audit project` and `bootstrap`.
+**`docs/rpm/context.md`** — project context, loaded every session. Update after `audit project` and `init-rpm`.
 
 **`docs/rpm/past/log.md`** — append-only, loaded on demand. Append after `audit documents` and `audit project`.
 
@@ -119,4 +119,4 @@ test -f docs/rpm/context.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 3. Specific fixes, not vague guidance
 4. Severity order: CONTRADICTORY > STALE > MISSING > VALID
 5. `audit project` doesn't edit project docs — it only writes to `docs/rpm/` (log entries, report, plan file)
-6. `bootstrap`, `audit documents`, and `session-end` edit project docs (with user approval for audit; automatic for session-end's drift fixes)
+6. `init-rpm`, `audit documents`, and `session-end` edit project docs (with user approval for audit; automatic for session-end's drift fixes)

@@ -11,7 +11,7 @@ drifting across LLM-assisted dev sessions.
 
 ## Architecture
 - `plugin/` — publishable plugin root (skills, agents, hooks, tests)
-- `plugin/skills/` — command surface (audit, bootstrap, deep-research, rpm, session-end, tasks)
+- `plugin/skills/` — command surface (audit, init-rpm, deep-research, rpm, session-end, tasks)
 - `plugin/agents/` — subagents (auditor.md)
 - `plugin/hooks/` — lifecycle hooks (session-start, session-end, stop-learn, context-monitor, pre-compact, post-compact, handoff-validator, task-capture)
 - `plugin/tests/` — bats suite + helpers (fixtures built on the fly)

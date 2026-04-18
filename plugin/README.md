@@ -45,11 +45,11 @@ Or for local development:
 claude --plugin-dir /path/to/rpm
 ```
 
-**2. Run `/bootstrap`** (once per project) inside the project you
+**2. Run `/init-rpm`** (once per project) inside the project you
 want to track:
 
 ```
-/bootstrap
+/init-rpm
 ```
 
 It scans the codebase, asks a few clarifying questions, scaffolds
@@ -63,7 +63,7 @@ CLI. No other dependencies — pure markdown and bash.
 
 ## The workflow
 
-**First time:** Run `/bootstrap`. It scans your project, asks a few
+**First time:** Run `/init-rpm`. It scans your project, asks a few
 questions, and scaffolds the tracking infrastructure under `docs/rpm/`.
 
 **Every session after that:** Just start working. rpm automatically
@@ -87,7 +87,7 @@ falls through the cracks between sessions.
 
 ## Commands
 
-### `/bootstrap`
+### `/init-rpm`
 
 First-run setup. Run once per project. Scans the codebase, asks 3
 questions, scaffolds `docs/rpm/` (trackers, daily logs, task
