@@ -55,36 +55,8 @@ if [ "$EVENT" != "TaskCompleted" ] || [ ! -f "$TASKS_ORG" ] || [ -z "$SUBJECT" ]
   exit 0
 fi
 
-# Lowercase, strip non-alnum → spaces, trim.
-normalize() {
-  local s
-  s=$(echo "$1" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' ' ')
-  [[ "$s" =~ ^[[:space:]]*(.*[^[:space:]])[[:space:]]*$ ]] && s="${BASH_REMATCH[1]}"
-  printf '%s' "$s"
-}
-
-# Integer confidence 0-100:
-#   100 = equal after normalize
-#    80 = one contains the other
-#    60 = Jaccard word overlap ≥ 0.6
-#    40 = Jaccard ≥ 0.3
-#     0 = below floor (emit match:null)
-confidence() {
-  local a="$1" b="$2"
-  [ -z "$a" ] || [ -z "$b" ] && { echo 0; return; }
-  [ "$a" = "$b" ] && { echo 100; return; }
-  case "$a" in *"$b"*) echo 80; return ;; esac
-  case "$b" in *"$a"*) echo 80; return ;; esac
-  local inter union pct
-  inter=$(printf '%s\n%s\n' "$a" "$b" | tr ' ' '\n' | grep -v '^$' | sort | uniq -d | wc -l)
-  union=$(printf '%s\n%s\n' "$a" "$b" | tr ' ' '\n' | grep -v '^$' | sort -u | wc -l)
-  [ "$union" -eq 0 ] && { echo 0; return; }
-  pct=$((inter * 100 / union))
-  if [ "$pct" -ge 60 ]; then echo 60
-  elif [ "$pct" -ge 30 ]; then echo 40
-  else echo 0
-  fi
-}
+# shellcheck source=./_scoring.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_scoring.sh"
 
 SUBJECT_NORM=$(normalize "$SUBJECT")
 
@@ -121,8 +93,14 @@ while IFS= read -r line; do
     # Strip trailing :tag1:tag2: clusters
     [[ "$CUR_HEADING" =~ ^(.*)[[:space:]]+:[a-zA-Z0-9_:-]+:[[:space:]]*$ ]] && CUR_HEADING="${BASH_REMATCH[1]}"
     [[ "$CUR_HEADING" =~ ^[[:space:]]*(.*[^[:space:]])[[:space:]]*$ ]] && CUR_HEADING="${BASH_REMATCH[1]}"
+  elif [[ "$line" =~ ^\*\*\ (DONE|CANCELLED) ]]; then
+    # Terminal state — score + clear, so a DONE/CANCELLED entry's
+    # :ID: drawer doesn't overwrite the prior actionable heading's ID.
+    score_current
+    CUR_HEADING=""
+    CUR_ID=""
   elif [[ "$line" =~ ^[[:space:]]+:ID:[[:space:]]+([^[:space:]]+) ]]; then
-    CUR_ID="${BASH_REMATCH[1]}"
+    [ -n "$CUR_HEADING" ] && CUR_ID="${BASH_REMATCH[1]}"
   fi
 done < "$TASKS_ORG"
 score_current
