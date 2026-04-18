@@ -16,7 +16,9 @@ End the current work session in four user-visible phases:
 
 **Print a phase header** (`## Phase N (of 4): Title`) at the start of
 each user-visible response. Sub-sections inside a phase use letters
-(`### 1b. Uncommitted changes`).
+(`### 1b. Uncommitted changes`). Append ` (rpm <version>)` to the
+**Phase 1** header only, using the `version=` value from scan.sh's
+`=== plugin ===` section — e.g. `## Phase 1 (of 4): Collecting Findings (rpm 2.7.2)`.
 
 Core rpm bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`,
 `docs/rpm/present/status.md`, `docs/rpm/future/tasks.org`) is updated
@@ -52,6 +54,8 @@ this message — do NOT re-run these checks as tool calls.
 
 **Interpreting the sections:**
 
+- `plugin` — `version=<X.Y.Z>` from `plugin.json`. Append to the Phase 1
+  header as `(rpm <version>)`.
 - `git` — modified / untracked / staged file counts + stash count.
   Your Phase 1 uncommitted-state summary.
 - `claude_md` — line count + status (`ok` / `warn` >120 / `critical`
