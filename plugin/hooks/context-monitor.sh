@@ -1,6 +1,6 @@
 #!/bin/bash
 # PostToolUse hook: monitor actual context token usage from the transcript.
-# Two-tier soft recommendations at ~75% / ~90% of the context window.
+# Soft recommendation when fewer than ~50k tokens remain in the window.
 #
 # Reads the latest assistant message's usage block (input + cache_read +
 # cache_creation tokens) — this is the real context size, not a byte proxy.
@@ -52,24 +52,14 @@ TOKENS=$((INPUT + CACHE_READ + CACHE_CREATE))
 [ "$TOKENS" -le 0 ] && exit 0
 
 WINDOW="${RPM_CONTEXT_TOKENS:-1000000}"
-WARN=$((WINDOW * 75 / 100))
-ALERT=$((WINDOW * 90 / 100))
+REMAINING=$((WINDOW - TOKENS))
 
-if [ "$TOKENS" -gt "$ALERT" ]; then
+if [ "$REMAINING" -lt 50000 ]; then
   cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 90% — consider /session-end soon; detail starts getting lost to compaction beyond this point."
-  }
-}
-EOF
-elif [ "$TOKENS" -gt "$WARN" ]; then
-  cat <<'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: context past 75% — consider /session-end at the next natural break."
+    "additionalContext": "rpm: under 50k tokens remaining in the context window — consider /session-end soon before the session hits the limit."
   }
 }
 EOF
