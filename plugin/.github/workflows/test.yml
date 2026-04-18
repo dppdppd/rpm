@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: install bats + shellcheck
         run: sudo apt-get update && sudo apt-get install -y bats shellcheck jq
-      - name: shellcheck hooks
-        run: shellcheck hooks/*.sh || true
+      - name: shellcheck hooks + skills
+        run: shellcheck hooks/*.sh skills/*/scripts/*.sh || true
       - name: bats
         run: bats tests/
