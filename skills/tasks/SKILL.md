@@ -1,6 +1,6 @@
 ---
 name: tasks
-description: Manage the project task backlog. Add, list, review, postpone, or complete tasks. Use when the user wants to add a task, see what's on the backlog, reorganize or reprioritize tasks, defer a task to the bottom of its group, mark something done, or evaluate task health.
+description: Manage the rpm backlog (long-term project tasks in docs/rpm/future/tasks.org — distinct from Claude's native TaskCreate list, which is session-scoped). Add, list, review, postpone, or complete entries. Use when the user wants to add a backlog item, see what's on the rpm backlog, reorganize or reprioritize, defer to the bottom of a group, mark something done, or evaluate backlog health.
 argument-hint: "[add <description> | list | review | postpone <#> | done <#>]"
 allowed-tools: Read Write Edit Glob Grep
 ---

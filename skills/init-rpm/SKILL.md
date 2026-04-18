@@ -301,7 +301,7 @@ Created: {list of created files}
 
 Next steps:
 - rpm is active in this session already — hooks will fire as you work
-  (you'll see the task menu on the next session-start)
+  (you'll see the backlog menu on the next session-start)
 - `/tasks add <description>` — add tasks to your backlog
 - `/audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
