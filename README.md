@@ -28,6 +28,39 @@ scans catch broken refs and stale instructions in seconds. Deep
 scans find contradictions between documentation and code. Full
 project reviews validate against external sources.
 
+## Getting started
+
+Two steps.
+
+**1. Install the plugin** (once per machine):
+
+```
+/plugin marketplace add https://github.com/dppdppd/rpm
+/plugin install rpm@dppdppd-plugins
+```
+
+Or for local development:
+
+```bash
+claude --plugin-dir /path/to/rpm
+```
+
+**2. Run `/bootstrap`** (once per project) inside the project you
+want to track:
+
+```
+/bootstrap
+```
+
+It scans the codebase, asks a few clarifying questions, scaffolds
+`docs/rpm/` (context, trackers, backlog, past/future/reviews), and
+creates `CLAUDE.md` if one doesn't exist. Hooks activate immediately
+— no restart — and every session after that auto-loads context at
+session start.
+
+Requirements: [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+CLI. No other dependencies — pure markdown and bash.
+
 ## The workflow
 
 **First time:** Run `/bootstrap`. It scans your project, asks a few
@@ -193,28 +226,6 @@ Plan saved to docs/rpm/reviews/2026-04-10-plan.md
 - Fix auth token storage — Critical, ~2 sessions
 - Add rate limiting to public endpoints — High, ~1 session
 ```
-
-## Installation
-
-### From marketplace
-
-```
-/plugin marketplace add https://github.com/dppdppd/rpm
-/plugin install rpm@dppdppd-plugins
-```
-
-### Local development
-
-```bash
-claude --plugin-dir /path/to/rpm
-```
-
-Then start a new conversation and run `/bootstrap`.
-
-## Requirements
-
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
-- No other dependencies. Pure markdown and bash.
 
 ## Hooks
 
