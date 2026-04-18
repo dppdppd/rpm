@@ -33,3 +33,4 @@ Plan → edit → verify → commit. No spec ceremony for skill-sized changes.
 - Ask before: renaming commands, changing argument shapes, restructuring dirs
 - Read command body + subagents end-to-end before proposing renames
 - No ADRs — do not propose ADR templates or directories
+- Parallel Bash calls cancel each other on error — bundle into a single script
