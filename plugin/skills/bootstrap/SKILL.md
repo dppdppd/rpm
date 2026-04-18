@@ -96,11 +96,6 @@ Injected at session start. Keep under 30 lines.
 discovered. E.g., for a clean-room project: compliance checks.
 For a startup: velocity vs quality tradeoffs.}
 
-## Tasks
-- User mentions future work → capture as a task.
-- You suggest deferrable work ("we could X later", "worth Y eventually", "follow up on Z") → STOP and ask "Add to your rpm backlog?" before moving on — don't just suggest and continue.
-- User shifts to a new task with little carry-over → suggest /session-end first; one-liner in your rpm backlog + detail in `future/<date>-<slug>.md`.
-
 ## Prior Findings
 See `docs/rpm/past/log.md` Audit History.
 ```
