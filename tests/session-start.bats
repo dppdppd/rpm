@@ -5,11 +5,19 @@ load helpers
 setup()    { setup_sandbox; }
 teardown() { teardown_sandbox; }
 
-@test "exits silently when docs/rpm/ missing" {
+@test "docs/rpm/ missing — stderr hint about /bootstrap, no stdout" {
   rm -rf "$PM_DIR"
-  run run_session_start startup
+  # Capture stdout and stderr separately — stdout (model context) must stay
+  # empty; the discoverability hint goes to stderr (user terminal only).
+  local stderr_file
+  stderr_file=$(mktemp)
+  run bash -c "echo '{\"source\":\"startup\",\"session_id\":\"test-sess-123\"}' | bash '$CLAUDE_PLUGIN_ROOT/hooks/session-start-auto.sh' 2>'$stderr_file'"
   [ "$status" -eq 0 ]
   [ -z "$output" ]
+  local stderr_content
+  stderr_content=$(cat "$stderr_file")
+  rm -f "$stderr_file"
+  [[ "$stderr_content" == *"/bootstrap"* ]]
 }
 
 @test "source=compact exits 0 with no output" {
