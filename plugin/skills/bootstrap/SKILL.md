@@ -267,8 +267,27 @@ existing entries.
 
 Create all files from Phase 3 and Phase 4 that do not already exist.
 Do NOT prompt the user to select which files to create — all are
-required for the plugin to function. After creating files, proceed to
-Phase 8.
+required for the plugin to function.
+
+**Then activate hooks for the current session.** The session-start
+hook already ran at the top of this session, before `docs/rpm/`
+existed, and exited without writing `~rpm-session-start` — so runtime
+hooks (`context-monitor`, `stop-learn-capture`, `pre-compact`,
+`session-end`, `task-capture`) are currently gated off. Write the
+marker now so every hook activates immediately, no restart needed:
+
+```bash
+SID="${CLAUDE_CODE_SESSION_ID:-unknown}"
+cat > docs/rpm/~rpm-session-start <<EOF
+---
+session_id: $SID
+started: $(date -Iseconds)
+task: (unassigned)
+---
+EOF
+```
+
+After the marker is written, proceed to Phase 8.
 
 ## Phase 8: Present and Confirm
 
@@ -281,7 +300,8 @@ files list):
 Created: {list of created files}
 
 Next steps:
-- Start a new conversation — rpm context auto-loads via SessionStart hook
+- rpm is active in this session already — hooks will fire as you work
+  (you'll see the task menu on the next session-start)
 - `/tasks add <description>` — add tasks to your backlog
 - `/audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
