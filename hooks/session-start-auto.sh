@@ -1,6 +1,9 @@
 #!/bin/bash
 # SessionStart hook: auto-inject rpm context.
 
+# shellcheck source=./_directives.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_directives.sh"
+
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 PM_DIR="$PROJECT_DIR/docs/rpm"
 MARKER="$PM_DIR/~rpm-session-start"
@@ -116,8 +119,7 @@ if [ -f "$MARKER" ]; then
   echo "  B. Switch to something else (then present the task menu)"
   echo "  C. Wrap up with /session-end"
   echo ""
-  echo "When you discover a root cause or change approach, lead with \"Key finding:\" so learnings are captured automatically."
-echo "When you suggest deferrable work (\"we could X later\", \"worth Y eventually\", \"follow up on Z\"), STOP and ask \"Add to your rpm backlog?\" before moving on — don't just suggest and continue."
+  emit_rpm_directives
   exit 0
 fi
 
@@ -423,8 +425,7 @@ echo ""
 echo "Task management: /tasks (add, list, review, postpone, done) for mid-session backlog operations."
 echo "Native tasks (TaskCreate / TaskList) = this session's active work only. Your rpm backlog (tasks.org) = long-term. Don't mirror backlog adds into the native task list."
 echo ""
-echo "When you discover a root cause or change approach, lead with \"Key finding:\" so learnings are captured automatically."
-echo "When you suggest deferrable work (\"we could X later\", \"worth Y eventually\", \"follow up on Z\"), STOP and ask \"Add to your rpm backlog?\" before moving on — don't just suggest and continue."
+emit_rpm_directives
 echo ""
 echo "Context: docs/rpm/context.md, docs/rpm/present/status.md, docs/rpm/future/tasks.org, CLAUDE.md"
 echo "Wrap up: /session-end | All commands: /rpm ?"
