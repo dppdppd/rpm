@@ -1,6 +1,6 @@
 ---
 name: deep-research
-description: "Exhaustive multi-agent research on any topic. Parallel search, URL fetching, gap analysis, adversarial validation, citation check. Use when any task requires external knowledge before proceeding, or when the user asks for deep research on a topic."
+description: "Exhaustive multi-agent research on any topic. Parallel search, URL fetching, gap analysis, adversarial validation, citation check. TRIGGER whenever the user asks for research, investigation, or an external look-up — phrasings like 'research X', 'look into X', 'investigate X', 'find out about X', 'what's the latest on X', 'compare X vs Y' all qualify. Offer the skill first (see Offer gate in the body); only run the full protocol after the user confirms."
 argument-hint: "<research question or topic>"
 allowed-tools: ["Read", "Write", "Bash(curl:*)", "Bash(mkdir:*)", "Agent", "WebSearch", "Glob", "Grep"]
 ---
@@ -13,6 +13,24 @@ Exhaustive multi-agent research on any topic. Invoked as a skill
 **Research escalation rule:** During ANY rpm command, if you encounter
 a question requiring external knowledge, pause and offer to invoke the
 `deep-research` skill before continuing.
+
+## Offer gate (before Phase 0)
+
+If the user asked for research generally (e.g. "research X", "look into
+X", "investigate X") — anything other than an explicit request for the
+full deep-research protocol — STOP and offer a choice before running
+Phase 0:
+
+> QUESTION: Want a quick websearch + summary, or the full
+> /rpm:deep-research protocol (parallel agents, validation, saved
+> report under docs/rpm/research/)? Reply `quick` or `deep`.
+
+- `quick` → do NOT run this skill. Do an inline `WebSearch` + summary
+  and return to the user's thread. No files written.
+- `deep` → proceed to Phase 0 below.
+- If the user's original message explicitly said "deep research",
+  "/deep-research", "/rpm:deep-research", or equivalently asked for
+  the full protocol, skip the gate and proceed directly to Phase 0.
 
 ## Design Principles
 
