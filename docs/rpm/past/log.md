@@ -38,8 +38,21 @@ Referenced from `docs/rpm/context.md` when needed.
   - T8: adopt SessionEnd hook for wrap-up enforcement (60, Med)
   - T9: context.md formatting drift — 31 lines, missing blank line, Prior Findings format (60, Low)
   - T10: ~rpm-last-session `next:` field stale (55, Low)
+- 2026-04-17 — audit project — 9 findings (6 merged with rpm:auditor), plan saved to reviews/2026-04-17-plan.md
+  - T1: tasks.org marketplace-submit body 8 versions stale (82, Med)
+  - T2: status.md `69 tests` — actual is 82 (80, Med)
+  - T3: CI shellcheck doesn't cover skills/**/*.sh (80, Med)
+  - T4: past/2026-04-16.md is exit stubs only — v2.5.5–v2.7.2 work undocumented (79, Med)
+  - T5: status.md "Last updated" 2 days stale (72, Med)
+  - T6: scan.sh unlinted + no direct bats coverage (70, Med)
+  - T7: past/log.md Sessions Reviewed stops at 2026-04-12 (68, Low)
+  - T8: feedback_consolidate_parallel_bash not codified (63, Low)
+  - T9: Phase 3a native-scoring duplicates task-capture.sh logic (60, Low)
 
 ## Sessions Reviewed
+- 2026-04-17 — 2 sessions reviewed by audit project
+  - `f81e37d4` (Apr 17) — /audit project (this run) — N/A
+  - `a4ee0e19` (Apr 13–16) — v2.5.5–v2.7.2 (context-monitor rewrite, task overhaul, Phase 3a, deferred-work capture) — JUSTIFIED; 2 unclean exits; past/ retrospective gap tracked as T4
 - 2026-04-12 — 3 sessions reviewed by audit documents
   - `a392d2f1` (Apr 12) — /audit documents (this run) — N/A
   - `e027f1ee` (Apr 12) — bats suite + CI (UNJUSTIFIED drift; backfilled by this audit)
