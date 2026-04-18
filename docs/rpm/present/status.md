@@ -27,7 +27,7 @@
 - Stop handoff validator — checks /session-end output completeness (Accomplished/Next sections, status.md date)
 - TaskCreated/TaskCompleted capture — native task lifecycle persisted to ~rpm-native-tasks.jsonl
 - Always-on resume prompt + handoff marker checks (v2.5.1)
-- bats test suite (`plugin/tests/`, 101 tests — full hook + scan.sh coverage) + GitHub Actions CI (bats + shellcheck)
+- bats test suite (`plugin/tests/`, 111 tests — full hook + scan.sh + score-natives coverage) + GitHub Actions CI (bats + shellcheck)
 - Session-start empty-backlog brainstorm flow — when no actionable tasks, review tasks.org for miscategorized items, otherwise draft 2–4 candidates
 - Session-start stale detection via session_id mismatch (v2.5.2) — works across `--continue` / new-process flows, not just `SOURCE=startup`
 - Proactive session marker written on every fresh session — any work survives the next session's stale check even if the user skips the task menu

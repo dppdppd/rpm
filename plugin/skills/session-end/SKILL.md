@@ -336,30 +336,39 @@ For each, dedup against the live backlog *before* appending — a
 native picked from the backlog at session-start will already have
 an entry, and we must not duplicate it.
 
-1. Call `TaskList`. Collect every task with status `in_progress` or
-   `pending`. (Completed natives are already handled; skip them.)
+1. Call `TaskList`. Filter to `in_progress` or `pending`
+   (completed natives are already handled by Phase 1 prep). Emit
+   one JSONL line per surfaced task — `{"id":"...","subject":"...","status":"..."}`
+   — and pipe the batch to the scoring script:
 
-2. For each collected native, **look for a matching backlog entry**:
-   - Normalize the native subject and each non-DONE/non-CANCELLED
-     backlog heading (lowercase, strip punctuation, collapse
-     whitespace).
-   - Score with the same buckets the `task-capture.sh` hook uses
-     (100 exact / 80 substring / 60 Jaccard≥0.6 / 40 Jaccard≥0.3).
+   ```bash
+   printf '%s\n' \
+     '{"id":"t1","subject":"...","status":"in_progress"}' \
+     '{"id":"t2","subject":"...","status":"pending"}' \
+     | bash "${CLAUDE_PLUGIN_ROOT}/skills/session-end/scripts/score-natives.sh"
+   ```
 
-3. Apply per native:
-   - **Match ≥ 80**: a backlog entry already exists for this work.
-     If its status is `** TODO`, update to `** IN-PROGRESS` (work
-     was started but not finished). If already `IN-PROGRESS` or
-     `BLOCKED`, leave alone. Do NOT append — that's the duplicate.
-   - **Match < 80 (or no match)**: append `** TODO <subject>` under
-     a sensible `* Parent` group (match the native's scope; create
-     a group if no fit). Append to the bottom of the group —
-     priority is the user's call at the next 3b reconciliation.
+   Output: one JSONL line per input with
+   `{"native_id":"...","native_subject":"...","match":{"heading","id","confidence"}|null}`.
+   Same 100/80/60/40 buckets as `task-capture.sh` — both scripts
+   share `hooks/_scoring.sh`.
 
-4. Call `TaskUpdate` on every surfaced task (step 1's collected set)
-   to set status=`completed`. This clears the live native list.
+2. Apply per output line:
+   - **`match.confidence >= 80`**: a backlog entry already exists
+     for this work. If its heading is `** TODO`, update to
+     `** IN-PROGRESS` (work was started but not finished). If
+     already `IN-PROGRESS` or `BLOCKED`, leave alone. Do NOT
+     append — that's the duplicate.
+   - **`match: null` or `match.confidence < 80`**: append
+     `** TODO <subject>` under a sensible `* Parent` group (match
+     the native's scope; create a group if no fit). Append to the
+     bottom of the group — priority is the user's call at the next
+     3b reconciliation.
 
-5. Report what happened in one line at the start of this response
+3. Call `TaskUpdate` on every surfaced task (step 1's batch) to set
+   status=`completed`. This clears the live native list.
+
+4. Report what happened in one line at the start of this response
    (e.g., `Promoted 2 natives; 1 deduped into existing IN-PROGRESS.`),
    then proceed to 3b.
 
