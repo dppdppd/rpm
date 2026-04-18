@@ -32,9 +32,16 @@ VTAG=""
 # Let PostCompact handle compaction
 [ "$SOURCE" = "compact" ] && exit 0
 
-# --- Not initialized — exit silently ---
-# If the user hasn't bootstrapped, don't assume they want rpm here.
-[ ! -d "$PM_DIR" ] && exit 0
+# --- Not initialized — emit a stderr hint and exit ---
+# Don't inject into model context (would assume the user wants rpm here),
+# but the plugin IS installed, so surface /bootstrap for discoverability.
+# Stderr goes to the user's terminal only.
+if [ ! -d "$PM_DIR" ]; then
+  VMSG=""
+  [ -n "$RPM_VERSION" ] && VMSG=" v$RPM_VERSION"
+  echo "rpm${VMSG} installed — run /bootstrap to enable rpm tracking for this project" >&2
+  exit 0
+fi
 
 # --- Active marker present — resume, wrap up stale session, or drop orphan ---
 # Covers clear, resume, and fresh startup where the user exited without /session-end.
