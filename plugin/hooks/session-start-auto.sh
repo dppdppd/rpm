@@ -96,7 +96,7 @@ if [ -f "$HANDOFF" ] && [ ! -f "$MARKER" ]; then
 fi
 
 # Stale marker: emit a soft note, clear the marker, and fall through to
-# the normal startup flow (including the task menu). The user can pick
+# the normal startup flow (including the backlog menu). The user can pick
 # up where they left off or move on — nothing is forced.
 if [ -f "$MARKER" ] && [ "$STALE" = "1" ]; then
   echo "rpm: previous session didn't wrap up${VTAG}"
@@ -130,7 +130,7 @@ if [ -f "$MARKER" ]; then
   echo "Check git state and recent commits to orient, then end your response"
   echo "with ONE question offering these options:"
   echo "  A. Continue the in-flight task"
-  echo "  B. Switch to something else (then present the task menu)"
+  echo "  B. Switch to something else (then present the backlog menu)"
   echo "  C. Wrap up with /session-end"
   echo ""
   emit_rpm_directives
@@ -181,7 +181,7 @@ if [ -f "$PRESENT" ] && git -C "$PROJECT_DIR" rev-parse --git-dir > /dev/null 2>
   fi
 fi
 
-# (ready_tasks logic moved into task_menu below)
+# (ready_tasks logic moved into backlog_menu below)
 
 # --- context ---
 echo ""
@@ -201,9 +201,9 @@ else
   echo "(missing)"
 fi
 
-# --- task_menu ---
+# --- backlog_menu ---
 echo ""
-echo "=== task_menu ==="
+echo "=== backlog_menu ==="
 if [ -f "$FUTURE" ]; then
   # Check for last session task
   LAST_TASK="" LAST_NEXT=""
@@ -211,7 +211,7 @@ if [ -f "$FUTURE" ]; then
     LAST_TASK=$(grep -oP 'task: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
     LAST_NEXT=$(grep -oP 'next: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
   fi
-  echo "Your task backlog:"
+  echo "Your rpm backlog:"
   echo ""
 
   # Single-pass parse → collect tasks into MENU_ITEMS + build an
@@ -402,7 +402,7 @@ echo "   (not a question): \"$LAST_NEXT\""
 echo "2. End your response by asking — and ONLY at the end — whether to"
 echo "   continue with that or pick something else."
 echo "   - If yes → proceed to step 3"
-echo "   - If no → present the task menu (title through prompt line, verbatim)"
+echo "   - If no → present the backlog menu (title through prompt line, verbatim)"
 echo "     and handle their selection"
 echo "3. On task selection, update the marker task field:"
 echo "   Edit docs/rpm/~rpm-session-start — change 'task: (unassigned)'"
@@ -415,8 +415,8 @@ echo "Then:"
 echo "1. If there's leftover state (uncommitted work, drift), note it briefly"
 echo "   as a statement — do NOT ask a question about it here."
 echo "   You'll handle it after the user picks a task."
-echo "2. Present the task menu in a code block (triple backticks) to preserve formatting."
-echo "   Include everything from the \"Your task backlog:\" title through the prompt line, verbatim."
+echo "2. Present the backlog menu in a code block (triple backticks) to preserve formatting."
+echo "   Include everything from the \"Your rpm backlog:\" title through the prompt line, verbatim."
 echo "   The final \"Pick #...\" line is the ONLY question in your response — ask nothing else."
 echo "3. Handle the user's response:"
 echo "   - #  → select that task, proceed to step 4"

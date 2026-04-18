@@ -102,10 +102,12 @@ context is getting long.
 
 ### `/tasks`
 
-Manage the task backlog. Add new tasks, list all tasks with statuses,
-review and reorganize the backlog, or mark tasks done. Also
-auto-triggers when you mention tasks naturally ("add a task", "what's
-on my backlog").
+Manage the **rpm backlog** (long-term project tasks in
+`docs/rpm/future/tasks.org` — distinct from Claude's native
+`TaskCreate` list, which is session-scoped and cleared at
+session-end). Add entries, list them with statuses, review and
+reorganize, or mark them done. Also auto-triggers when you mention
+backlog items naturally ("add a task", "what's on my backlog").
 
 ### `/audit quick`
 
@@ -131,16 +133,16 @@ perspective on the project's overall health. ~30 minutes.
 
 ### Session start
 
-Each session opens with a task menu pulled from your backlog. Pick a
-number to start working, add `?` to read the detail file first, or
-choose `S` to name your own task:
+Each session opens with a backlog menu pulled from your rpm
+backlog. Pick a number to start working, add `?` to read the detail
+file first, or choose `S` to name your own task:
 
 ```
-rpm: session active
+rpm: session active (rpm 2.7.4)
 
 2 untracked files, 3 commits of drift since status.md updated.
 
-Your task backlog:
+Your rpm backlog:
 
 API Layer
    1. Rate limiter middleware (in-progress)

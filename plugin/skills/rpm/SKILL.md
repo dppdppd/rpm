@@ -49,7 +49,7 @@ recommend. You do NOT write feature code.
 | `/init-rpm` | Onboard — scaffold rpm infrastructure for a new project |
 | `/audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
 | `/audit project` | Full review — code, architecture, competitive research, plan file |
-| `/tasks` | Manage backlog — add, list, review, or complete tasks |
+| `/tasks` | Manage the **rpm backlog** (long-term, `tasks.org`) — add, list, review, postpone, complete. Distinct from Claude's native `TaskCreate` list (session-scoped). |
 
 | Skill | What you do |
 |---|---|

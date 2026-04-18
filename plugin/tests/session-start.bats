@@ -52,10 +52,10 @@ EOF
   [ "$status" -eq 0 ]
   [[ "$output" == *"previous session didn't wrap up"* ]]
   [[ "$output" == *"/resume abc123def"* ]]
-  [[ "$output" != *"Do NOT present the task menu"* ]]
+  [[ "$output" != *"Do NOT present the backlog menu"* ]]
   [[ "$output" != *"rpm: resuming"* ]]
-  # Falls through to normal flow — task menu visible.
-  [[ "$output" == *"Your task backlog"* ]]
+  # Falls through to normal flow — backlog menu visible.
+  [[ "$output" == *"Your rpm backlog"* ]]
 }
 
 @test "active marker + startup + fresh last-session = resume" {
@@ -199,7 +199,7 @@ EOF
   [[ "$marker_content" == *"session_id: same-proc-sess"* ]]
 }
 
-@test "fresh session renders task menu with backlog title" {
+@test "fresh session renders backlog menu with rpm backlog title" {
   seed_minimal_trackers
   cat > "$PM_DIR/future/tasks.org" <<'EOF'
 * Work
@@ -214,7 +214,7 @@ EOF
 EOF
   run run_session_start startup
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Your task backlog:"* ]]
+  [[ "$output" == *"Your rpm backlog:"* ]]
   [[ "$output" != *"scoreboard:"* ]]
   [[ "$output" == *"alpha task"* ]]
   [[ "$output" != *"done task"* ]]
