@@ -124,7 +124,7 @@ echo "=== daily_log ==="
 TODAY=$(date +%Y-%m-%d)
 echo "today=$TODAY"
 if [ -d docs/rpm/past ]; then
-  LATEST=$(ls -1 docs/rpm/past/*.md 2>/dev/null | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}\.md$' | sort -r | head -1)
+  LATEST=$(find docs/rpm/past -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' 2>/dev/null | sort -r | head -1)
   if [ -n "$LATEST" ]; then
     LOG_DATE=$(basename "$LATEST" .md)
     echo "latest=$LOG_DATE"
@@ -313,7 +313,7 @@ if [ -f "$FUTURE" ]; then
     fi
   done
 
-  echo "ids=$(echo $ALL_IDS | wc -w | tr -d ' ')"
+  echo "ids=$(echo "$ALL_IDS" | wc -w | tr -d ' ')"
   echo "with_deps=$DEP_COUNT"
   [ -n "$DANGLING" ] && echo "dangling=$DANGLING"
   [ -n "$READY" ] && echo "ready=$READY"
