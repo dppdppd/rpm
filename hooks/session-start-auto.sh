@@ -34,12 +34,12 @@ VTAG=""
 
 # --- Not initialized — emit a stderr hint and exit ---
 # Don't inject into model context (would assume the user wants rpm here),
-# but the plugin IS installed, so surface /bootstrap for discoverability.
+# but the plugin IS installed, so surface /init-rpm for discoverability.
 # Stderr goes to the user's terminal only.
 if [ ! -d "$PM_DIR" ]; then
   VMSG=""
   [ -n "$RPM_VERSION" ] && VMSG=" v$RPM_VERSION"
-  echo "rpm${VMSG} installed — run /bootstrap to enable rpm tracking for this project" >&2
+  echo "rpm${VMSG} installed — run /init-rpm to enable rpm tracking for this project" >&2
   exit 0
 fi
 

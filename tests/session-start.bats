@@ -5,7 +5,7 @@ load helpers
 setup()    { setup_sandbox; }
 teardown() { teardown_sandbox; }
 
-@test "docs/rpm/ missing — stderr hint about /bootstrap, no stdout" {
+@test "docs/rpm/ missing — stderr hint about /init-rpm, no stdout" {
   rm -rf "$PM_DIR"
   # Capture stdout and stderr separately — stdout (model context) must stay
   # empty; the discoverability hint goes to stderr (user terminal only).
@@ -17,7 +17,7 @@ teardown() { teardown_sandbox; }
   local stderr_content
   stderr_content=$(cat "$stderr_file")
   rm -f "$stderr_file"
-  [[ "$stderr_content" == *"/bootstrap"* ]]
+  [[ "$stderr_content" == *"/init-rpm"* ]]
 }
 
 @test "source=compact exits 0 with no output" {

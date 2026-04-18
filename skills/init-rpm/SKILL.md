@@ -1,12 +1,12 @@
 ---
-name: bootstrap
+name: init-rpm
 description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (context.md, past/, present/, future/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
 disable-model-invocation: true
 argument-hint: ""
 allowed-tools: Read Write Bash(bash:*) Bash(mkdir:*) Bash(git:*) Glob Grep
 ---
 
-# /bootstrap — Full Instructions
+# /init-rpm — Full Instructions
 
 First-run setup. Creates rpm context for a project. Run once per project.
 If `docs/rpm/context.md` already exists, read it and **augment** — do not
@@ -14,15 +14,15 @@ overwrite. Merge in missing sections only.
 
 Narrate as you go. At each phase, tell the user what's about to happen
 in one short sentence before doing it — users should never be surprised
-by what `/bootstrap` creates or writes.
+by what `/init-rpm` creates or writes.
 
 ## Phase 0: Introduce
 
-Before running anything, tell the user what bootstrap will do. Use
+Before running anything, tell the user what /init-rpm will do. Use
 roughly this wording (adapt freely):
 
 ```
-## /bootstrap — rpm first-run setup
+## /init-rpm — rpm first-run setup
 
 I'll set up rpm (Relentless Project Manager) for this project. Here's
 what I'm about to do:
@@ -295,7 +295,7 @@ Print the completion summary exactly like this (fill in the created
 files list):
 
 ```
-## /bootstrap complete
+## /init-rpm complete
 
 Created: {list of created files}
 
