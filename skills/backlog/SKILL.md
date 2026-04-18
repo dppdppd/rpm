@@ -1,11 +1,11 @@
 ---
-name: tasks
+name: backlog
 description: Manage the rpm backlog (long-term project tasks in docs/rpm/future/tasks.org — distinct from Claude's native TaskCreate list, which is session-scoped). Add, list, review, postpone, or complete entries. Use when the user wants to add a backlog item, see what's on the rpm backlog, reorganize or reprioritize, defer to the bottom of a group, mark something done, or evaluate backlog health.
 argument-hint: "[add <description> | list | review | postpone <#> | done <#>]"
 allowed-tools: Read Write Edit Glob Grep
 ---
 
-# /tasks
+# /backlog
 
 Manage the **rpm backlog** — persisted at `docs/rpm/future/tasks.org`.
 All operations read and write this file using org-mode format.
@@ -23,11 +23,11 @@ Parse `$ARGUMENTS`:
   show usage:
 
   ```
-  /tasks add <description>   — add a new task
-  /tasks list                — show all tasks with statuses
-  /tasks review              — evaluate and reorganize backlog
-  /tasks postpone <task>     — defer to the bottom of its group
-  /tasks done <task>         — mark a task complete
+  /backlog add <description>   — add a backlog entry
+  /backlog list                — show all entries with statuses
+  /backlog review              — evaluate and reorganize
+  /backlog postpone <task>     — defer to the bottom of its group
+  /backlog done <task>         — mark an entry complete
   ```
 
 ---
@@ -105,7 +105,7 @@ Defer a task to the bottom of its `* Parent` group. Status stays
 
 1. Read `docs/rpm/future/tasks.org`.
 2. Match the argument to a task — by number (from most recent
-   `/tasks list`), by text match, or by asking if ambiguous.
+   `/backlog list`), by text match, or by asking if ambiguous.
 3. Identify the task's `* Parent` heading. Find the last `**` task
    under that parent (regardless of status — DONE/CANCELLED count
    for positioning).
@@ -126,7 +126,7 @@ If the task is already at the bottom of its group, just stamp the
 
 1. Read `docs/rpm/future/tasks.org`.
 2. Match the argument to a task — by number (from most recent
-   `/tasks list`), by text match, or by asking if ambiguous.
+   `/backlog list`), by text match, or by asking if ambiguous.
 3. Change `** TODO` to `** DONE` and append today's date:
    `** DONE <description> :CLOSED: [YYYY-MM-DD]`
 4. Confirm what was marked done.

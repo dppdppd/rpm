@@ -436,7 +436,7 @@ echo "5. Create a native task via TaskCreate."
 echo "6. Begin working."
 fi
 echo ""
-echo "Task management: /tasks (add, list, review, postpone, done) for mid-session backlog operations."
+echo "Backlog management: /backlog (add, list, review, postpone, done) for mid-session rpm-backlog operations."
 echo "Native tasks (TaskCreate / TaskList) = this session's active work only. Your rpm backlog (tasks.org) = long-term. Don't mirror backlog adds into the native task list."
 echo ""
 emit_rpm_directives

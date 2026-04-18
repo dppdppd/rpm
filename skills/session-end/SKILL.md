@@ -389,7 +389,7 @@ post-3a-promotions) and check for a mismatch:
 - Top is blocked by an incomplete dep → blocker moves up, or blocked moves down.
 - User flagged the list during the session.
 - **User deferred a task** during the session ("let's do X later",
-  "postpone Y", "that can wait") → apply `/tasks postpone <task>`
+  "postpone Y", "that can wait") → apply `/backlog postpone <task>`
   to move it to the bottom of its `* Parent` group and stamp
   `:POSTPONED: YYYY-MM-DD`.
 
@@ -397,7 +397,7 @@ If any holds, end this response with ONE question (e.g. "You worked
 on X today, but Y is at the top of your rpm backlog. Should X move
 to the top?" or "You said Y can wait — postpone it to the bottom
 of its group?") and wait. Apply the agreed change by editing your
-rpm backlog (use the Postpone procedure in the `/tasks` skill for
+rpm backlog (use the Postpone procedure in the `/backlog` skill for
 deferrals; otherwise just reorder), commit as
 `rpm: session end — reorder backlog priority`. Otherwise briefly
 state the top as `What's next` and proceed to Phase 4.

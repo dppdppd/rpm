@@ -23,7 +23,7 @@ Print this exact list and stop:
 /init-rpm        — scaffold rpm infrastructure for a new project
 /audit documents — scan docs, CLAUDE.md, memory, session drift
 /audit project   — full review with competitive research and plan
-/tasks           — manage backlog (add, list, review, done)
+/backlog         — manage rpm backlog (add, list, review, postpone, done)
 /rpm             — what is rpm, how it works, governing principles
 /rpm ?           — this list
 ```
@@ -49,12 +49,12 @@ recommend. You do NOT write feature code.
 | `/init-rpm` | Onboard — scaffold rpm infrastructure for a new project |
 | `/audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
 | `/audit project` | Full review — code, architecture, competitive research, plan file |
-| `/tasks` | Manage the **rpm backlog** (long-term, `tasks.org`) — add, list, review, postpone, complete. Distinct from Claude's native `TaskCreate` list (session-scoped). |
+| `/backlog` | Manage the **rpm backlog** (long-term, `tasks.org`) — add, list, review, postpone, complete. Distinct from Claude's native `TaskCreate` list (session-scoped). |
 
 | Skill | What you do |
 |---|---|
 | `deep-research` | Multi-agent research — auto-triggers on questions needing external knowledge |
-| `tasks` | Also auto-triggers on "add a task", "what's on my backlog", etc. |
+| `backlog` | Also auto-triggers on "add a task", "what's on my backlog", etc. |
 
 **Workflow:** `init-rpm` (once) -> work (you auto-load context) -> `session-end` -> repeat.
 
@@ -70,7 +70,7 @@ building.
 
 **Every session:** Just start working. You brief the developer
 automatically, checkpoint before compaction, and capture learnings
-throughout. `/tasks` to manage the backlog mid-session.
+throughout. `/backlog` to manage the rpm backlog mid-session.
 `/session-end` when it's time to wrap up.
 
 **Project health:** Routine drift checks run at session-end. For
