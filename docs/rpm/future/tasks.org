@@ -54,6 +54,15 @@
    - See detail file for layout + publish flow + content-sharing
      options.
 
+** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
+   :PROPERTIES:
+   :ID: sessionstart-clear-flake
+   :END:
+   - User hit a case where /clear on Opus 4.7 did not fire the hook;
+     quit+restart recovered it.
+   - Harness-level (CC) bug, not rpm code. Watch for repro and file
+     upstream at anthropics/claude-code if it persists.
+
 ** DONE Extend bats coverage to remaining hooks
    CLOSED: [2026-04-13]
    :PROPERTIES:
