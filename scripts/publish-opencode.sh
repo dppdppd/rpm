@@ -69,6 +69,8 @@ SPLIT_FILES=$(git ls-tree -r --name-only opencode-only | wc -l)
 echo "publish-opencode: split sha=$SPLIT_SHA files=$SPLIT_FILES"
 
 if [ "$DRY_RUN" -eq 1 ]; then
+  echo "publish-opencode: dry-run tree:"
+  git ls-tree -r --name-only opencode-only | sed 's/^/  /'
   echo "publish-opencode: dry-run, skipping push to $REMOTE/$BRANCH"
 else
   echo "publish-opencode: pushing to $REMOTE/$BRANCH"
