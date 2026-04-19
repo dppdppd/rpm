@@ -69,23 +69,27 @@
       `opencode/.opencode/plugins/hooks/`, or handle it in a publish
       script.
 
-*** TODO opencode port: verify skill bash blocks run under opencode
+*** DONE opencode port: mirror rpm surface to opencode COMMANDS
+    CLOSED: [2026-04-18]
     :PROPERTIES:
-    :ID: opencode-port-skill-shell
+    :ID: opencode-port-commands-mirror
     :END:
-    - rpm skills use `${CLAUDE_SKILL_DIR}`, `${CLAUDE_PLUGIN_ROOT}`,
-      and `!bash` inline shell blocks (see init-rpm, session-end, audit).
-    - Confirm opencode honors the same env vars + `!bash` sigil, or
-      implement an equivalent via `$` in the TS wrapper / a shim.
+    - `scripts/translate-skill.py` + sync integration. All six rpm
+      commands discovered by `opencode debug config` as slash
+      commands. Skills mirror retained in parallel. Interactive TUI
+      verification still pending.
 
-*** TODO opencode port: slash-command surface
+*** DONE opencode port: resolve ${CLAUDE_SKILL_DIR}/${CLAUDE_PLUGIN_ROOT}
+    CLOSED: [2026-04-18]
     :PROPERTIES:
-    :ID: opencode-port-slash-commands
+    :ID: opencode-port-skill-paths
     :END:
-    - Claude Code auto-exposes `/skill-name`; opencode has a separate
-      slash-command spec. Verify rpm's six skills are invocable via
-      `/<name>` in opencode, or mirror into opencode's command format
-      if not.
+    - translate-skill.py rewrites `${CLAUDE_SKILL_DIR}` →
+      `${CLAUDE_PLUGIN_ROOT}/skills/<name>`. TS plugin `shell.env`
+      hook injects `CLAUDE_PLUGIN_ROOT` (absolute via `realpathSync`)
+      on every shell invocation. Scripts execute cleanly with the
+      env var set; full command-invocation path blocked on TUI test
+      (needs a model).
 
 *** TODO opencode port: test session.deleted against real exits
     :PROPERTIES:

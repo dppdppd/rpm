@@ -12,3 +12,4 @@ docs/rpm/~rpm-task-candidates.jsonl
 # scripts/sync-opencode.sh; source of truth lives in plugin/
 opencode/.opencode/skills/
 opencode/.opencode/agents/
+opencode/.opencode/commands/

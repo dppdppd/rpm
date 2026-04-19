@@ -34,6 +34,13 @@ cd opencode && opencode debug skill | grep '"name"'
 - **Distribution** — whether to ship as an npm package or a
   subtree-split `opencode-only` branch is undecided. Both currently
   bundle `plugin/hooks/` relative to the plugin file.
+- **Commands vs skills surface** — skills mirror discovers but does
+  not invoke; rpm's slash commands need to mirror to
+  `.opencode/commands/<name>.md`, which preserves `$ARGUMENTS` and
+  `!bash` — see detail file.
+- **${CLAUDE_SKILL_DIR}/${CLAUDE_PLUGIN_ROOT}** — no opencode
+  equivalent; scripts that reference them need a path-rewrite pass
+  or a refactor to resolve paths locally.
 - **First-session `session.created`** — missed because plugins load
   lazily. Worked around by running SessionStart logic inline in the
   Plugin init function; `session.updated` has not been tested as a

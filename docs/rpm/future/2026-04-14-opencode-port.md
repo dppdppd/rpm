@@ -86,10 +86,28 @@ Smoke tested against `opencode 1.14.17` via `opencode serve` headless +
   triggered `session-end.sh` which appended a well-formed daily-log
   stub (`**Session:** plugin-init`, `**Reason:** other`) to
   `past/2026-04-18.md`. Every layer of the bridge confirmed.
-- ✅ **Skills mirror works.** `scripts/sync-opencode.sh` cp-mirrors
-  `plugin/skills/` into `opencode/.opencode/skills/`. `opencode debug
-  skill` then lists all six: `audit`, `backlog`, `deep-research`,
-  `init-rpm`, `rpm`, `session-end`. SKILL.md format is 1:1 compatible.
+- ✅ **Commands mirror landed.** `scripts/translate-skill.py` converts
+  each `plugin/skills/<name>/SKILL.md` → `.opencode/commands/<name>.md`,
+  stripping Claude-specific frontmatter (`name:`, `allowed-tools:`,
+  `argument-hint:`, `disable-model-invocation:`) while preserving the
+  body verbatim. Body `$ARGUMENTS`/`$1`/`$2` and `` !`bash ...` `` are
+  supported by opencode commands using the same contract as Claude
+  Code, so no body rewrite is needed. Verified via `opencode debug
+  config` — all six are listed as slash commands (`/backlog`, `/audit`,
+  `/session-end`, `/init-rpm`, `/rpm`, `/deep-research`). Skills mirror
+  kept in parallel for tool-invoked context loading.
+- ✅ **Env-var resolution strategy implemented.** Two-part fix:
+  (1) `translate-skill.py` rewrites every `${CLAUDE_SKILL_DIR}` in a
+  command body to `${CLAUDE_PLUGIN_ROOT}/skills/<name>` at sync time,
+  collapsing two env vars to one; (2) the TS plugin registers a
+  `shell.env` hook that injects `CLAUDE_PLUGIN_ROOT` (absolute path
+  to the monorepo's `plugin/` dir, resolved via `realpathSync`) into
+  `output.env` for every shell invocation opencode runs.
+  Scripts (`detect.sh`, `scan.sh`) verified to execute cleanly when
+  the env var is set externally — plugin version (2.7.6) read back
+  correctly from `.claude-plugin/plugin.json`. End-to-end
+  verification through a command invocation requires a model
+  (blocked on the interactive-TUI follow-up).
 - ✅ **Agent translation working.** `scripts/translate-agent.py`
   rewrites Claude Code agent frontmatter for opencode: drops `name:`
   (opencode derives from filename), drops `model:` (Claude Code
