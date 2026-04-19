@@ -111,15 +111,15 @@
     - Run an actual interactive `opencode` TUI session and confirm the
       marker writes correctly and context is injected.
 
-*** TODO opencode port: test suite for the TS plugin
+*** DONE opencode port: test suite for the TS plugin
+    CLOSED: [2026-04-18]
     :PROPERTIES:
     :ID: opencode-port-tests
     :END:
-    - bats covers Claude Code bash hooks; nothing covers the TS plugin.
-    - Write a Bun/node test that loads `rpm.ts` against a mocked
-      PluginInput, fires synthetic `session.created`/`session.deleted`
-      events, and asserts the correct bash hooks are invoked with the
-      right env + stdin.
+    - `opencode/tests/rpm.test.ts` (5 tests, all passing) exercises
+      plugin init, event dispatch (session.deleted, session.compacted,
+      no-op events), and the shell.env hook. Uses node:test via tsx —
+      no bun runtime required. Run with `npm test` from opencode/.
 
 ** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
    :PROPERTIES:

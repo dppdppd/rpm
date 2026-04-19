@@ -1,0 +1,12 @@
+{
+  "name": "rpm-opencode",
+  "version": "0.0.1-prototype",
+  "private": true,
+  "description": "rpm plugin port to opencode (prototype)",
+  "scripts": {
+    "test": "tsx --test tests/rpm.test.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

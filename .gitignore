@@ -13,3 +13,5 @@ docs/rpm/~rpm-task-candidates.jsonl
 opencode/.opencode/skills/
 opencode/.opencode/agents/
 opencode/.opencode/commands/
+opencode/node_modules/
+opencode/package-lock.json
