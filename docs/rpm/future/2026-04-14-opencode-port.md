@@ -28,23 +28,79 @@ TypeScript instead of bash.
 
 ## What needs a full rewrite
 
-- **Hooks** (8 scripts in `plugin/hooks/`). No bash-hook runtime in
-  opencode; plugins are JS/TS modules subscribing to an event stream.
-  Event mapping:
+- **Hooks** (8 scripts in `plugin/hooks/`). opencode's `Hooks` interface
+  has **no dedicated session-lifecycle hooks** — lifecycle events arrive
+  via a single generic `event` hook that receives a discriminated-union
+  `Event` object from `@opencode-ai/sdk`. Dispatch is a switch on
+  `event.type`. Corrected mapping (verified against `sst/opencode@dev`
+  `packages/plugin/src/index.ts` + `packages/sdk/js/src/gen/types.gen.ts`
+  on 2026-04-18):
 
-  | Claude Code           | opencode equivalent                    |
-  |-----------------------|----------------------------------------|
-  | `SessionStart`        | `session.created`                      |
-  | `PostCompact`         | `session.compacted`                    |
-  | `PreCompact`          | `experimental.session.compacting` hook |
-  | `PostToolUse`         | `tool.execute.after`                   |
-  | `Stop`                | `session.idle` (closest approximation) |
-  | `TaskCreated`/`TaskCompleted` | `todo.updated`                  |
-  | `SessionEnd`          | **no equivalent** — closest: `session.idle` / `session.deleted` |
+  | Claude Code             | opencode route                                      |
+  |-------------------------|-----------------------------------------------------|
+  | `SessionStart`          | `event` hook on `event.type === "session.created"`  |
+  | `SessionEnd`            | `event` hook on `event.type === "session.deleted"`  |
+  | `Stop`                  | `event` hook on `event.type === "session.idle"`     |
+  | `PostCompact`           | `event` hook on `event.type === "session.compacted"`|
+  | `PreCompact`            | dedicated `experimental.session.compacting` hook    |
+  | `PostToolUse`           | dedicated `tool.execute.after` hook                 |
+  | `TaskCreated`/`TaskCompleted` | `event` hook on `event.type === "todo.updated"` |
 
-  Stdin-JSON → stdout/stderr contract becomes `output.context.push(...)`
-  / logging API calls. The existing bash bodies can be called from TS
-  via `Bun.$`, so logic isn't lost — just the thin wrappers.
+  Stdin-JSON → stdout/stderr contract becomes a wrapper that shells out
+  to the existing bash scripts via `$` (BunShell). The existing bash
+  bodies can be reused unchanged; only the thin wrappers are new.
+
+## Prototype findings (2026-04-18)
+
+A working prototype lives at `opencode/.opencode/plugins/rpm.ts`.
+Smoke tested against `opencode 1.14.17` via `opencode serve` headless +
+`POST /session` / `DELETE /session/<id>`.
+
+- ✅ TypeScript plugin loads without any deps installed — `import type`
+  is stripped by opencode's bundled Bun runtime, so no package.json
+  dance needed for the prototype.
+- ✅ Auto-discovery works: dropping the file in
+  `.opencode/plugins/` is sufficient, no entry in `opencode.json`.
+- ✅ The `event` hook fires on `session.deleted` and the bash hook
+  (`session-end.sh`) ran cleanly with `CLAUDE_PROJECT_DIR` +
+  `CLAUDE_PLUGIN_ROOT` piped in via `$.env({...})`.
+- ⚠️ `session.created` is **not seen by the very first session** —
+  plugins load lazily on the first `POST /session`, and that session's
+  `session.created` publishes before the `event` subscription is
+  registered. Subsequent sessions fire normally. Workaround options:
+  run startup side-effects inside the plugin's init function itself
+  (called once per project bootstrap), or treat `session.updated` as a
+  fallback trigger.
+- ✅ Hook path resolution via `realpathSync(fileURLToPath(import.meta.url))`
+  works through symlinks — dev installs can symlink the plugin into a
+  test project's `.opencode/plugins/` and hooks still resolve to the
+  real monorepo path. Without `realpathSync`, `fileURLToPath` preserves
+  the symlink and the relative climb lands in the wrong place.
+- ✅ SessionStart bootstrap moved inside the Plugin init function.
+  First session's `session.created` is missed (publishes before the
+  event hook registers), but init runs unconditionally on first POST,
+  so the marker gets written and `docs/rpm/` state is consistent from
+  session 1.
+- ✅ **End-to-end proof (2026-04-18, /tmp/rpm-oc-test):** init wrote
+  `~rpm-session-start` with correct frontmatter; delete-session
+  triggered `session-end.sh` which appended a well-formed daily-log
+  stub (`**Session:** plugin-init`, `**Reason:** other`) to
+  `past/2026-04-18.md`. Every layer of the bridge confirmed.
+- ✅ **Skills mirror works.** `scripts/sync-opencode.sh` cp-mirrors
+  `plugin/skills/` into `opencode/.opencode/skills/`. `opencode debug
+  skill` then lists all six: `audit`, `backlog`, `deep-research`,
+  `init-rpm`, `rpm`, `session-end`. SKILL.md format is 1:1 compatible.
+- ✅ **Agent translation working.** `scripts/translate-agent.py`
+  rewrites Claude Code agent frontmatter for opencode: drops `name:`
+  (opencode derives from filename), drops `model:` (Claude Code
+  shortnames like `sonnet` don't map to opencode's
+  `anthropic/claude-sonnet-4-20250514` format — let opencode default),
+  inserts `mode: subagent` when absent, and converts
+  `tools: [Read, Grep, ...]` (array) →
+  `tools: {read: true, grep: true}` (record, lowercased —
+  opencode's tool names are lowercase: `read`, `grep`, `glob`, `bash`,
+  `edit`, `write`, `apply_patch`, `lsp`). Verified with
+  `opencode debug agent auditor`.
 
 ## Proposed repo layout
 
@@ -103,11 +159,20 @@ need redesign.
 ## Open questions
 
 1. Is `rpm-opencode` as an npm package the right distribution, or a
-   git-subtree-split plugin-only branch like Claude Code?
-2. Does opencode's `session.idle` fire reliably enough to replace
-   SessionEnd's "user exited without /session-end" detection? Research.
+   git-subtree-split plugin-only branch like Claude Code? (npm is the
+   shipped path docs recommend, but local-file drop-in also works.)
+2. ~~Does opencode's `session.idle` fire reliably enough to replace
+   SessionEnd's "user exited without /session-end" detection?~~
+   Superseded: `session.deleted` is the true SessionEnd analog;
+   `session.idle` maps to `Stop`. Still TBD whether `session.deleted`
+   fires on `/exit` / terminal close / kill vs only on explicit session
+   teardown.
 3. Should we write a CI job to validate skill/agent sync between
    `plugin/` and `opencode/`?
+4. How to solve the first-session `session.created` miss — run
+   startup logic inside the Plugin init function, or rely on
+   `session.updated` as a secondary trigger? Needs a test with a
+   real interactive session (not just a POST).
 
 ## Sources
 

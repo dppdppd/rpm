@@ -7,7 +7,8 @@ drifting across LLM-assisted dev sessions.
 - Build: n/a (no build toolchain)
 - Test: `bash plugin/tests/run.sh` (bats suite, covers hooks)
 - Lint: shellcheck on `plugin/hooks/*.sh` (CI runs this)
-- Publish: `git subtree split --prefix=plugin -b plugin-only && git push origin plugin-only:master --force`
+- Publish plugin: `git subtree split --prefix=plugin -b plugin-only && git push plugin plugin-only:master --force`
+- Push dev tree: `git push dev master` (full repo incl. docs/rpm, reviews, specs)
 
 ## Architecture
 - `plugin/` — publishable plugin root (skills, agents, hooks, tests)

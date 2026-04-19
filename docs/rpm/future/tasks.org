@@ -13,13 +13,6 @@
      bumps auto-propagate to users; otherwise expect to re-submit
      on each release
 
-** TODO Draft Reddit post for r/ClaudeAI
-   :PROPERTIES:
-   :ID: reddit-post
-   :END:
-   - Recurring "Next" item across Apr 10–11 logs
-   - Pitch: rpm as drift-prevention plugin
-
 ** DONE Tighten session-end native-task reconciliation
    CLOSED: [2026-04-14]
    :PROPERTIES:
@@ -46,14 +39,83 @@
    :PROPERTIES:
    :ID: opencode-port
    :END:
-   - Skills + agents + commands drop in with near-zero changes
-     (opencode reads `.claude/skills/` natively; same SKILL.md format).
-   - Hooks require full rewrite as a TypeScript plugin subscribing to
-     opencode's event stream; ~8 bash scripts become one TS module.
-   - New `opencode/` sibling directory in the monorepo — don't rename
-     `plugin/`. Sync script keeps skills/agents/hooks in step.
-   - See detail file for layout + publish flow + content-sharing
-     options.
+   - Prototype validated end-to-end (2026-04-18): event→hook bridge,
+     skills mirror, agent translation. Remaining work is packaging,
+     plumbing, and validation — see sub-tasks.
+   - Source of truth: `opencode/.opencode/plugins/rpm.ts`,
+     `scripts/sync-opencode.sh`, `scripts/translate-agent.py`.
+
+*** TODO opencode port: distribution (npm vs subtree-split)
+    :PROPERTIES:
+    :ID: opencode-port-distribution
+    :END:
+    - Decide whether `rpm-opencode` ships as an npm package or a
+      `git subtree split --prefix=opencode` branch (mirroring how
+      `plugin/` publishes to GitHub).
+    - npm matches opencode's documented install path
+      (`opencode plugin install rpm-opencode`); subtree-split keeps the
+      git-native workflow we already use for the CC plugin.
+
+*** TODO opencode port: bundle plugin/hooks into the plugin package
+    :PROPERTIES:
+    :ID: opencode-port-bundle-hooks
+    :END:
+    - Prototype resolves hooks at `${plugin-file-dir}/../../../plugin/hooks`
+      — works only inside the monorepo.
+    - For standalone install, `plugin/hooks/*.sh` must be copied into
+      the plugin package at publish time and resolved via
+      `${import.meta.dir}/hooks/<name>.sh`.
+    - Extend `scripts/sync-opencode.sh` to also populate
+      `opencode/.opencode/plugins/hooks/`, or handle it in a publish
+      script.
+
+*** TODO opencode port: verify skill bash blocks run under opencode
+    :PROPERTIES:
+    :ID: opencode-port-skill-shell
+    :END:
+    - rpm skills use `${CLAUDE_SKILL_DIR}`, `${CLAUDE_PLUGIN_ROOT}`,
+      and `!bash` inline shell blocks (see init-rpm, session-end, audit).
+    - Confirm opencode honors the same env vars + `!bash` sigil, or
+      implement an equivalent via `$` in the TS wrapper / a shim.
+
+*** TODO opencode port: slash-command surface
+    :PROPERTIES:
+    :ID: opencode-port-slash-commands
+    :END:
+    - Claude Code auto-exposes `/skill-name`; opencode has a separate
+      slash-command spec. Verify rpm's six skills are invocable via
+      `/<name>` in opencode, or mirror into opencode's command format
+      if not.
+
+*** TODO opencode port: test session.deleted against real exits
+    :PROPERTIES:
+    :ID: opencode-port-session-deleted-exits
+    :END:
+    - Only verified via explicit `DELETE /session/<id>`. Test `/exit`,
+      terminal close, SIGKILL, crash.
+    - If `session.deleted` doesn't fire on these, SessionEnd coverage
+      regresses — need an alternative (e.g. `session.idle` with a
+      debounce, or opencode-side crash handler).
+
+*** TODO opencode port: test first-session workaround in real TUI
+    :PROPERTIES:
+    :ID: opencode-port-first-session-tui
+    :END:
+    - Inline-init workaround (SessionStart logic runs inside plugin
+      init, not via `session.created`) proven only against
+      `opencode serve` + POST.
+    - Run an actual interactive `opencode` TUI session and confirm the
+      marker writes correctly and context is injected.
+
+*** TODO opencode port: test suite for the TS plugin
+    :PROPERTIES:
+    :ID: opencode-port-tests
+    :END:
+    - bats covers Claude Code bash hooks; nothing covers the TS plugin.
+    - Write a Bun/node test that loads `rpm.ts` against a mocked
+      PluginInput, fires synthetic `session.created`/`session.deleted`
+      events, and asserts the correct bash hooks are invoked with the
+      right env + stdin.
 
 ** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
    :PROPERTIES:
