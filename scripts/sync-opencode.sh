@@ -11,6 +11,18 @@ DST="$REPO_ROOT/opencode/.opencode"
 
 mkdir -p "$DST"
 
+# Hooks bundle alongside the plugin so rpm.ts can resolve them at a
+# stable path (${plugin-file-dir}/hooks) whether running from the
+# monorepo or a published package.
+rm -rf "$DST/plugins/hooks"
+cp -a "$SRC/hooks" "$DST/plugins/hooks"
+
+# plugin.json bundles so /rpm version lookup
+# (${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json) resolves off
+# the self-contained tree, no reach back into plugin/.
+rm -rf "$DST/.claude-plugin"
+cp -a "$SRC/.claude-plugin" "$DST/.claude-plugin"
+
 # Skills copy straight across so opencode can load their body as
 # tool-invoked context when an agent calls skill({name}). Frontmatter
 # fields opencode doesn't recognize are silently ignored per docs.
@@ -41,7 +53,8 @@ for f in "$SRC"/agents/*.md; do
   python3 "$REPO_ROOT/scripts/translate-agent.py" "$f" "$DST/agents/$name"
 done
 
-echo "sync-opencode: mirrored skills + translated agents + commands"
+echo "sync-opencode: mirrored hooks + skills + commands + agents"
+echo "  $SRC/hooks/   -> $DST/plugins/hooks/"
 echo "  $SRC/skills/  -> $DST/skills/"
 echo "  $SRC/skills/  -> $DST/commands/  (translated to opencode commands)"
 echo "  $SRC/agents/  -> $DST/agents/    (translated)"

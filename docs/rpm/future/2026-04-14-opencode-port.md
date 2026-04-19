@@ -72,10 +72,12 @@ Smoke tested against `opencode 1.14.17` via `opencode serve` headless +
   (called once per project bootstrap), or treat `session.updated` as a
   fallback trigger.
 - ✅ Hook path resolution via `realpathSync(fileURLToPath(import.meta.url))`
-  works through symlinks — dev installs can symlink the plugin into a
-  test project's `.opencode/plugins/` and hooks still resolve to the
-  real monorepo path. Without `realpathSync`, `fileURLToPath` preserves
-  the symlink and the relative climb lands in the wrong place.
+  works through symlinks. Initial prototype reached across to the
+  monorepo's `plugin/hooks/`; now hooks are **bundled** alongside the
+  plugin (`.opencode/plugins/hooks/`) and resolved as
+  `${plugin-file-dir}/hooks`, along with a mirrored `.claude-plugin/`
+  so `CLAUDE_PLUGIN_ROOT` points at a fully self-contained tree. Works
+  identically in monorepo dev and a future packaged form.
 - ✅ SessionStart bootstrap moved inside the Plugin init function.
   First session's `session.created` is missed (publishes before the
   event hook registers), but init runs unconditionally on first POST,

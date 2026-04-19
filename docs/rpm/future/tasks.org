@@ -56,18 +56,18 @@
       (`opencode plugin install rpm-opencode`); subtree-split keeps the
       git-native workflow we already use for the CC plugin.
 
-*** TODO opencode port: bundle plugin/hooks into the plugin package
+*** DONE opencode port: bundle plugin/hooks into the plugin package
+    CLOSED: [2026-04-18]
     :PROPERTIES:
     :ID: opencode-port-bundle-hooks
     :END:
-    - Prototype resolves hooks at `${plugin-file-dir}/../../../plugin/hooks`
-      — works only inside the monorepo.
-    - For standalone install, `plugin/hooks/*.sh` must be copied into
-      the plugin package at publish time and resolved via
-      `${import.meta.dir}/hooks/<name>.sh`.
-    - Extend `scripts/sync-opencode.sh` to also populate
-      `opencode/.opencode/plugins/hooks/`, or handle it in a publish
-      script.
+    - sync-opencode.sh now copies plugin/hooks → opencode/.opencode/plugins/hooks/
+      and plugin/.claude-plugin → opencode/.opencode/.claude-plugin/
+      so the plugin bundle is self-contained.
+    - rpm.ts resolves HOOKS_DIR = ${plugin-file-dir}/hooks and
+      PLUGIN_PKG_ROOT = ${plugin-file-dir}/.. . Works identically in
+      monorepo dev and in any future published layout.
+    - Tests updated to match; 5/5 still passing.
 
 *** DONE opencode port: mirror rpm surface to opencode COMMANDS
     CLOSED: [2026-04-18]
