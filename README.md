@@ -27,8 +27,9 @@ From inside the project you want to track:
 curl -fsSL https://raw.githubusercontent.com/dppdppd/rpm/opencode/install.sh | bash
 ```
 
-Copies the `.opencode/` tree (plugin, hooks, skills, commands, agents)
-into your project. Then run `/init-rpm` to scaffold `docs/rpm/`.
+Installs the opencode config (plugin, hooks, skills, commands,
+agents) into your project's opencode config directory. Then run
+`/init-rpm` to scaffold `docs/rpm/`.
 
 See [opencode/README.md](opencode/README.md) for the port status and
 publish flow.
