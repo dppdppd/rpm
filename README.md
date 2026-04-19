@@ -22,8 +22,12 @@ agent translation are still open.
 # after editing any plugin/skills/** file
 ../scripts/sync-opencode.sh
 
-# smoke test — list skills opencode can see
-cd opencode && opencode debug skill | grep '"name"'
+# smoke test — list skills + commands opencode can see
+cd opencode && opencode debug config | grep -E '"name"|"command"'
+
+# unit tests for the TS plugin (mocked BunShell, no opencode needed)
+npm install
+npm test
 
 # full end-to-end (session lifecycle → bash hooks → docs/rpm/ mutation):
 # run opencode serve against a project that has docs/rpm/ initialized
