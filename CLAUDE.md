@@ -7,7 +7,9 @@ drifting across LLM-assisted dev sessions.
 - Build: n/a (no build toolchain)
 - Test: `bash plugin/tests/run.sh` (bats suite, covers hooks)
 - Lint: shellcheck on `plugin/hooks/*.sh` (CI runs this)
-- Publish plugin: `git subtree split --prefix=plugin -b plugin-only && git push plugin plugin-only:master --force`
+- Publish release: `./scripts/publish-all.sh` (CC + opencode + version tag, all to plugin remote)
+- Publish CC only: `git subtree split --prefix=plugin -b plugin-only && git push plugin plugin-only:master --force && git branch -D plugin-only`
+- Publish opencode only: `./scripts/publish-opencode.sh`
 - Push dev tree: `git push dev master` (full repo incl. docs/rpm, reviews, specs)
 
 ## Architecture
