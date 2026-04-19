@@ -45,6 +45,16 @@ export const RpmPlugin: Plugin = async ({ $, directory }) => {
   })
 
   return {
+    "shell.env": async (_input, output) => {
+      // rpm's bash scripts (called from inside commands via !`bash
+      // "${CLAUDE_PLUGIN_ROOT}/..."` blocks) need CLAUDE_PLUGIN_ROOT
+      // set. Claude Code injects this per-plugin; opencode does not,
+      // so we inject it for every shell invocation in this project.
+      // translate-skill.py rewrites ${CLAUDE_SKILL_DIR} references
+      // into ${CLAUDE_PLUGIN_ROOT}/skills/<name> at sync time so one
+      // env var covers both.
+      output.env.CLAUDE_PLUGIN_ROOT = PLUGIN_PKG_ROOT
+    },
     event: async ({ event }) => {
       const type = (event as { type: string }).type
       console.log(`[rpm-opencode] event=${type}`)
