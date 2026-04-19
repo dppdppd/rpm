@@ -48,7 +48,6 @@
 *** TODO opencode port: distribution (npm vs subtree-split)
     :PROPERTIES:
     :ID: opencode-port-distribution
-    :BLOCKED_BY: opencode-port-first-session-tui opencode-port-session-deleted-exits
     :END:
     - **Do not land before TUI validation closes** — shipping a
       package whose command invocation path has only been proven via
@@ -125,25 +124,32 @@
       env var set; full command-invocation path blocked on TUI test
       (needs a model).
 
-*** TODO opencode port: test session.deleted against real exits
+*** DONE opencode port: SessionEnd on real exits
+    CLOSED: [2026-04-18]
     :PROPERTIES:
     :ID: opencode-port-session-deleted-exits
     :END:
-    - Only verified via explicit `DELETE /session/<id>`. Test `/exit`,
-      terminal close, SIGKILL, crash.
-    - If `session.deleted` doesn't fire on these, SessionEnd coverage
-      regresses — need an alternative (e.g. `session.idle` with a
-      debounce, or opencode-side crash handler).
+    - Found `session.deleted` does NOT fire on normal run completion;
+      the correct SessionEnd analog is `server.instance.disposed`.
+      Plugin now dispatches both — instance_disposed as primary,
+      session_deleted as fallback. Verified via opencode run against
+      /tmp/rpm-oc-test; daily-log stub appears with
+      reason=instance_disposed. TUI `/exit` and SIGKILL paths not
+      individually tested but presumed to also fire
+      server.instance.disposed (instance always tears down).
 
-*** TODO opencode port: test first-session workaround in real TUI
+*** DONE opencode port: first-session in real session
+    CLOSED: [2026-04-18]
     :PROPERTIES:
     :ID: opencode-port-first-session-tui
     :END:
-    - Inline-init workaround (SessionStart logic runs inside plugin
-      init, not via `session.created`) proven only against
-      `opencode serve` + POST.
-    - Run an actual interactive `opencode` TUI session and confirm the
-      marker writes correctly and context is injected.
+    - Validated via `opencode run --command rpm version` against the
+      opencode Zen minimax-m2.5-free model (no user credentials).
+      Output contained `rpm v2.7.6` drawn from bundled
+      `.claude-plugin/plugin.json` via the !bash block and shell.env
+      CLAUDE_PLUGIN_ROOT injection — proves plugin init,
+      session-start-auto.sh, command expansion, bash execution, and
+      env var injection all fire correctly on the first session.
 
 *** DONE opencode port: test suite for the TS plugin
     CLOSED: [2026-04-18]

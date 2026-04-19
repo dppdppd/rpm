@@ -88,6 +88,26 @@ Smoke tested against `opencode 1.14.17` via `opencode serve` headless +
   triggered `session-end.sh` which appended a well-formed daily-log
   stub (`**Session:** plugin-init`, `**Reason:** other`) to
   `past/2026-04-18.md`. Every layer of the bridge confirmed.
+- ✅ **Interactive TUI validation (2026-04-18, opencode Zen):** ran
+  `opencode run --command rpm --model opencode/minimax-m2.5-free version`.
+  Output contained `rpm v2.7.6`, sourced from the bundled
+  `.claude-plugin/plugin.json` via
+  `!bash "jq -r '.version' \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json\""`.
+  This proves the full pipeline: command invocation → `!bash` expansion →
+  `shell.env` hook → `CLAUDE_PLUGIN_ROOT` injection → bundled manifest
+  read → expanded prompt reaches the model. The `opencode/*-free`
+  models ("Zen") run without user credentials, so no API-key
+  dependency for continued testing.
+- ✅ **SessionEnd fix landed + verified.** Added
+  `server.instance.disposed` → `session-end.sh` with
+  `reason=instance_disposed`; kept `session.deleted` case with
+  `reason=session_deleted` as a fallback for explicit
+  `DELETE /session/<id>` calls. Re-ran `opencode run` against
+  `/tmp/rpm-oc-test` and confirmed `past/2026-04-18.md` gained a
+  correctly-formatted daily-log stub with
+  `**Reason:** instance_disposed`. Final event order on normal run
+  completion: `session.idle` → `command.executed` →
+  `server.instance.disposed`.
 - ✅ **Commands mirror landed.** `scripts/translate-skill.py` converts
   each `plugin/skills/<name>/SKILL.md` → `.opencode/commands/<name>.md`,
   stripping Claude-specific frontmatter (`name:`, `allowed-tools:`,

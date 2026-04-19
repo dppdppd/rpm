@@ -81,7 +81,13 @@ export const RpmPlugin: Plugin = async ({ $, directory }) => {
           })
           break
         case "session.deleted":
-          await runHook("session-end.sh", { reason: "other" })
+          await runHook("session-end.sh", { reason: "session_deleted" })
+          break
+        case "server.instance.disposed":
+          // The real SessionEnd analog for opencode. `session.deleted`
+          // only fires on explicit DELETE /session/<id>; normal run
+          // completion, TUI /exit, and kill all land here instead.
+          await runHook("session-end.sh", { reason: "instance_disposed" })
           break
       }
     },

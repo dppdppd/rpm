@@ -77,8 +77,21 @@ test("event hook dispatches session.deleted to session-end.sh", async () => {
   const end = captured.find((c) => c.cmd.includes("session-end.sh"))
   assert.ok(end, "expected session-end.sh to run on session.deleted")
   assert.ok(
-    end!.cmd.includes('"reason":"other"'),
-    `payload should carry reason=other; got: ${end!.cmd}`,
+    end!.cmd.includes('"reason":"session_deleted"'),
+    `payload should tag reason=session_deleted; got: ${end!.cmd}`,
+  )
+})
+
+test("event hook dispatches server.instance.disposed to session-end.sh", async () => {
+  const captured: Captured[] = []
+  const hooks = await RpmPlugin(makeInput(captured))
+  captured.length = 0
+  await hooks.event!({ event: { type: "server.instance.disposed" } as any })
+  const end = captured.find((c) => c.cmd.includes("session-end.sh"))
+  assert.ok(end, "expected session-end.sh to run on server.instance.disposed")
+  assert.ok(
+    end!.cmd.includes('"reason":"instance_disposed"'),
+    `payload should tag reason=instance_disposed; got: ${end!.cmd}`,
   )
 })
 
