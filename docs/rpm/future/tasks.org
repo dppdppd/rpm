@@ -35,19 +35,22 @@
    - No native task UI (no TaskCreate/TaskList/TaskUpdate equivalent)
    - Overall: about half ports; rest blocked on missing lifecycle events
 
-** IN-PROGRESS Port rpm to opencode [[file:2026-04-14-opencode-port.md]]
+** DONE Port rpm to opencode [[file:2026-04-14-opencode-port.md]]
+   CLOSED: [2026-04-18]
    :PROPERTIES:
    :ID: opencode-port
    :END:
    - All seven sub-tasks closed — plugin validated end-to-end in
-     opencode under Zen minimax-m2.5-free; distribution pipeline
-     built and dry-run verified.
-   - Remaining: maintainer runs `./scripts/publish-opencode.sh` to
-     push the `opencode` branch to plugin remote, then smoke-test
-     the one-line install against a clean project.
+     opencode under Zen minimax-m2.5-free; full distribution
+     pipeline built and shipped. v2.7.6 tagged on GitHub as the
+     first unified release covering both the CC plugin and the
+     opencode port. Install: `curl -fsSL
+     https://raw.githubusercontent.com/dppdppd/rpm/opencode/install.sh
+     | bash` from inside a project.
    - Source of truth: `opencode/.opencode/plugins/rpm.ts`,
      `scripts/sync-opencode.sh`, `scripts/translate-agent.py`,
-     `scripts/translate-skill.py`, `scripts/publish-opencode.sh`.
+     `scripts/translate-skill.py`, `scripts/publish-opencode.sh`,
+     `scripts/publish-all.sh`.
 
 *** DONE opencode port: distribution (subtree-split to plugin/opencode)
     CLOSED: [2026-04-18]
