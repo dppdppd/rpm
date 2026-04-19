@@ -4,15 +4,21 @@ import { dirname, resolve } from "node:path"
 import { realpathSync } from "node:fs"
 
 // rpm-opencode — prototype. Bridges opencode's event stream to rpm's
-// existing bash hooks in plugin/hooks. Hook path resolves relative to
-// this file (unfurled through any symlink so dev installs via symlink
-// still work): monorepo layout is
-//   rpm/opencode/.opencode/plugins/rpm.ts → rpm/plugin/hooks/
-// For shipping, hooks will be bundled alongside this file and resolved
-// via `${PLUGIN_FILE_DIR}/hooks` instead.
+// bash hooks. All paths resolve relative to this file so the plugin
+// is self-contained regardless of install shape (monorepo dev,
+// published npm package, or drop-in .opencode/plugins/ copy):
+//
+//   <plugin-file-dir>/               rpm.ts lives here
+//   <plugin-file-dir>/hooks/         bundled bash lifecycle hooks
+//   <plugin-pkg-root>/               one level up — CLAUDE_PLUGIN_ROOT
+//   <plugin-pkg-root>/skills/        bundled skill scripts
+//   <plugin-pkg-root>/.claude-plugin/plugin.json    version source
+//
+// realpathSync unfurls symlinks so dev installs that symlink the
+// plugin into a test project's .opencode/plugins/ still work.
 const PLUGIN_FILE_DIR = dirname(realpathSync(fileURLToPath(import.meta.url)))
-const PLUGIN_PKG_ROOT = resolve(PLUGIN_FILE_DIR, "../../..", "plugin")
-const HOOKS_DIR = resolve(PLUGIN_PKG_ROOT, "hooks")
+const HOOKS_DIR = resolve(PLUGIN_FILE_DIR, "hooks")
+const PLUGIN_PKG_ROOT = resolve(PLUGIN_FILE_DIR, "..")
 
 export const RpmPlugin: Plugin = async ({ $, directory }) => {
   console.log(`[rpm-opencode] plugin loaded; hooks=${HOOKS_DIR}`)

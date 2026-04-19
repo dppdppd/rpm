@@ -7,9 +7,9 @@ import { realpathSync } from "node:fs"
 import { RpmPlugin } from "../.opencode/plugins/rpm.ts"
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url))
-const REPO_ROOT = resolve(TEST_DIR, "..", "..")
-const EXPECTED_PLUGIN_ROOT = resolve(REPO_ROOT, "plugin")
-const EXPECTED_HOOKS = resolve(EXPECTED_PLUGIN_ROOT, "hooks")
+const OPENCODE_ROOT = resolve(TEST_DIR, "..")
+const EXPECTED_PLUGIN_ROOT = resolve(OPENCODE_ROOT, ".opencode")
+const EXPECTED_HOOKS = resolve(EXPECTED_PLUGIN_ROOT, "plugins", "hooks")
 
 type Captured = {
   cmd: string
