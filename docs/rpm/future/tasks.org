@@ -48,13 +48,47 @@
 *** TODO opencode port: distribution (npm vs subtree-split)
     :PROPERTIES:
     :ID: opencode-port-distribution
+    :BLOCKED_BY: opencode-port-first-session-tui opencode-port-session-deleted-exits
     :END:
-    - Decide whether `rpm-opencode` ships as an npm package or a
-      `git subtree split --prefix=opencode` branch (mirroring how
-      `plugin/` publishes to GitHub).
-    - npm matches opencode's documented install path
-      (`opencode plugin install rpm-opencode`); subtree-split keeps the
-      git-native workflow we already use for the CC plugin.
+    - **Do not land before TUI validation closes** — shipping a
+      package whose command invocation path has only been proven via
+      mocks and `opencode serve` + POST would be premature.
+    - Recommendation: npm (matches opencode's documented install
+      path `opencode plugin install rpm-opencode`; plugins guide says
+      "npm plugins are installed automatically using Bun at startup").
+      Subtree-split remains an option as a consistency play with the
+      CC plugin's publish flow, but complicates skills/commands/agents
+      delivery — those live in the USER's project dir, not the plugin
+      package.
+    - **Complication:** opencode's plugin-package model ships the
+      plugin MODULE only. Commands, skills, and agents live
+      project-local (`.opencode/commands/`, etc.). An npm package
+      can't drop files into a user's repo automatically. Options:
+      (a) post-install script that copies bundled commands/skills/
+      agents into `.opencode/` — awkward for a CLI plugin;
+      (b) ship a small `rpm-opencode init` CLI that users run once
+      to lay down files; (c) subtree-split with everything prebuilt.
+      Decide during this sub-task.
+    - **Export shape for npm:** opencode's `PluginModule` type is
+      `{ id?, server: Plugin, tui?: never }`. Today rpm.ts exports
+      `export const RpmPlugin: Plugin`; for npm we'd add
+      `export default { server: RpmPlugin }`. Non-breaking for the
+      local `.opencode/plugins/` drop-in case.
+    - **Package layout would be:**
+      ```
+      rpm-opencode/
+        package.json  (main: "plugin/rpm.ts")
+        plugin/rpm.ts
+        plugin/hooks/*.sh
+        .claude-plugin/plugin.json
+        skills/... (bundled, copied out by installer)
+        commands/... (same)
+        agents/... (same)
+      ```
+    - **Version sync:** plugin.json currently drives `rpm <version>`
+      in session headers (2.7.6). rpm-opencode version should track
+      that. Either publish in lock-step (bump both, tag both) or
+      read plugin.json at publish time.
 
 *** DONE opencode port: bundle plugin/hooks into the plugin package
     CLOSED: [2026-04-18]
