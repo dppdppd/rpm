@@ -1,9 +1,39 @@
 # rpm-opencode (prototype)
 
-Port of rpm to [opencode](https://opencode.ai). Prototype status — the
-event→bash-hook bridge is proven end-to-end (see
-`docs/rpm/future/2026-04-14-opencode-port.md`), but distribution and
-agent translation are still open.
+Port of rpm to [opencode](https://opencode.ai). The plugin, hooks,
+skills, commands, and agents are all working under opencode; see
+`docs/rpm/future/2026-04-14-opencode-port.md` for the full validation
+log.
+
+## Install (user-facing)
+
+From inside your project directory:
+
+```
+curl -fsSL https://raw.githubusercontent.com/dppdppd/rpm/opencode/install.sh | bash
+```
+
+Copies the `.opencode/` tree (plugin, hooks, skills, commands, agents,
+plugin manifest) into your project. Then:
+
+```
+/init-rpm    # one-time: create docs/rpm/ scaffolding
+```
+
+## Publish (maintainer-facing)
+
+The `opencode` branch on GitHub is a subtree split of this dir, with
+all derived mirrors materialized. Republish after changes:
+
+```
+./scripts/publish-opencode.sh              # push plugin/opencode
+./scripts/publish-opencode.sh --dry-run    # stage + split, skip push
+./scripts/publish-opencode.sh dev opencode # push dev/opencode instead
+```
+
+Working tree must be clean. The script creates a throwaway staging
+branch, force-adds the otherwise-gitignored mirror dirs, subtree-splits,
+pushes, and cleans up — failure at any step rolls back via trap.
 
 ## Layout
 
