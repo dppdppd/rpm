@@ -50,7 +50,15 @@ echo "publish-opencode: running sync"
 
 echo "publish-opencode: staging mirrors on $STAGING_BRANCH"
 git checkout -q -b "$STAGING_BRANCH"
-git add -f opencode/
+# Force-add ONLY the derived mirror paths (everything else in
+# opencode/ is already tracked). Using `git add -f opencode/` would
+# sweep in node_modules/ and other gitignored cruft.
+git add -f \
+  opencode/.opencode/skills \
+  opencode/.opencode/agents \
+  opencode/.opencode/commands \
+  opencode/.opencode/plugins/hooks \
+  opencode/.opencode/.claude-plugin
 git commit -q -m "chore: materialize opencode mirrors for publish"
 
 echo "publish-opencode: subtree split"
