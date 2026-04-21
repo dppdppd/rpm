@@ -32,6 +32,18 @@
    - Fix: fall back to `$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json`.
    - Ship as v2.7.4; ~10 min including a bats case.
 
+** TODO publish-all.sh — auto-push dev before subtree-split [[file:2026-04-21-publish-all-push-dev.md]]
+   :PROPERTIES:
+   :ID: publish-all-push-dev
+   :END:
+   - Fold `git push dev master` into `publish-all.sh` as a pre-step,
+     so a single invocation handles both the full-tree dev push and
+     the plugin/opencode subtree splits.
+   - Clean-tree check already exists; add the dev push right after
+     it, before step 1 (CC subtree-split).
+   - Keeps `dev` in sync with `plugin` automatically — prevents the
+     footgun where plugin/master ships code that isn't yet on Gitea.
+
 ** DONE Submit latest to anthropics/claude-plugins-official marketplace
    CLOSED: [2026-04-17]
    :PROPERTIES:
