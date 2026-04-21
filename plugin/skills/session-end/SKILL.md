@@ -1,24 +1,29 @@
 ---
 name: session-end
-description: End the current rpm session. Four user-visible phases — Collecting Findings (auto-applied tracker updates + summary) → Housekeeping (commit/record/fix) → Reviewing Tasks → Handing Off. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
+description: End the current rpm session. Fast-path single-message mode for clean sessions; otherwise four phases — Collecting Findings → Housekeeping → Reviewing Tasks → Handing Off. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
 argument-hint: ""
 allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
 ---
 
 # /session-end
 
-End the current work session in four user-visible phases:
+End the current work session. Two modes:
 
-1. **Collecting Findings** — analyze, auto-apply tracker updates, present summary + actions menu
-2. **Housekeeping** — execute chosen actions (commit, record findings, fix drift)
-3. **Reviewing Tasks** — reconcile rpm backlog order, decide What's next
-4. **Handing Off** — write last-session info, output the handoff text
+- **Fast path** (clean sessions) — drift, learnings, mismatch all
+  empty + git clean after auto-apply → emit one `## Session end
+  (rpm <version>)` message and run Phase 4 cleanup inline. No phase
+  headers.
+- **Full path** (anything non-empty) — four phases:
+  1. **Collecting Findings** — analyze, auto-apply trackers, emit summary
+  2. **Housekeeping** — sub-sections fire only when their surface has content
+  3. **Reviewing Tasks** — auto-demote sweep + mismatch check
+  4. **Handing Off** — write last-session info, emit handoff text
 
 **Print a phase header** (`## Phase N (of 4): Title`) at the start of
-each user-visible response. Sub-sections inside a phase use letters
+each user-visible response in the full path. Sub-sections use letters
 (`### 1b. Uncommitted changes`). Append ` (rpm <version>)` to the
-**Phase 1** header only, using the `version=` value from scan.sh's
-`=== plugin ===` section — e.g. `## Phase 1 (of 4): Collecting Findings (rpm 2.7.2)`.
+first header of either mode, using the `version=` value from scan.sh's
+`=== plugin ===` section — e.g. `## Phase 1 (of 4): Collecting Findings (rpm 2.7.8)` or `## Session end (rpm 2.7.8)`.
 
 Core rpm bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`,
 `docs/rpm/present/status.md`, `docs/rpm/future/tasks.org`) is updated
@@ -39,8 +44,9 @@ false positive, and don't ask twice. If the user explicitly typed
 ## Phase 1 (of 4): Collecting Findings
 
 Analyze, auto-apply tracker updates, then emit one user-visible
-response with the findings block + actions menu. The prep steps
-below run silently (no intermediate output).
+response — either the fast-path block (if clean) or the Phase 1
+findings block (then flow into Phase 2). The prep steps below run
+silently (no intermediate output).
 
 ### Prep (not user-visible)
 
@@ -215,8 +221,24 @@ rejection), note it in the findings and continue.
 
 ### User-visible output
 
-Print this block. The Actions menu at the bottom is what waits for
-the user's pick.
+After the auto-apply commit lands, branch on whether any decision
+surface has content.
+
+**Fast-path check.** If ALL of these hold, skip the Phase 1 block
+entirely and emit the **Fast-path block** below:
+
+- `git status --porcelain` empty (tracker commit left nothing behind)
+- `drift_findings` empty
+- `record_findings` empty (no unrecorded learnings worth promoting)
+- No `in_progress`/`pending` natives (Phase 3a would run silent)
+- No Phase 3b mismatch signal (top actionable matches session work;
+  no deferrals, no dep blocker, no user flag)
+
+Otherwise emit the **Phase 1 findings block** and flow into Phase 2.
+
+---
+
+**Phase 1 findings block (full path):**
 
 ```
 ## Phase 1 (of 4): Collecting Findings
@@ -239,48 +261,55 @@ the user's pick.
 
 ### 1e. Doc-drift scan
 - [one-line per finding, or "no drift detected"]
+```
+
+After emitting the block, proceed directly to Phase 2. **No action
+menu** — each Phase 2 sub-section fires only when its surface has
+content and asks its own question.
 
 ---
 
-## Actions (pick any, multiple OK)
-
-List only actions whose precondition holds (e.g. `Commit changes`
-only if something's uncommitted). Number sequentially — numbers are
-session-specific.
-
-Possible actions:
-
-- **Commit changes** — group and commit uncommitted files
-  *(only if scan shows modified/untracked/staged > 0)*
-
-- **Record findings** — promote session learnings to permanent docs
-  *(only if the Discovered learnings section is non-empty)*
-
-- **Fix drift** — apply the doc-drift findings
-  *(only if `drift_findings` is non-empty)*
-
-Which actions? (e.g., `1,2` · `all` · `none`)
-```
-
-If exactly one action remains after filtering, drop the numbered
-list and the `all · none` grammar — ask directly:
+**Fast-path block (replaces Phases 1–4):**
 
 ```
-Run **{action name}**? (yes / no)
+## Session end (rpm <version>)
+
+**Accomplished**
+- [bullet list of what was completed]
+
+**Tracker updates**
+- `docs/rpm/past/YYYY-MM-DD.md` — [what was logged]
+- `docs/rpm/present/status.md` — [what changed]
+- `docs/rpm/future/tasks.org` — [what was marked/added]
+
+**What's next:** [top actionable task, or "unknown — pick from your
+rpm backlog" if the list is empty]
+
+[If mid-task: one line on where it left off]
+
+---
+
+To start a new session:
+1. Run `/clear` to clear this context
+2. Start a new conversation — rpm context auto-loads
 ```
 
-If no actions remain after filtering, skip the menu entirely and
-proceed directly to Phase 3 (Reviewing Tasks).
-
-Otherwise wait for the user's choice.
+Run the Phase 4 cleanup (`~rpm-last-session` write, marker `rm`) in
+the same response as the fast-path block — see Phase 4 for the exact
+commands. Do not continue the conversation after.
 
 ---
 
 ## Phase 2 (of 4): Housekeeping
 
-Start this response with `## Phase 2 (of 4): Housekeeping`. Only run the
-actions the user picked; for each, ask any followup questions before
-acting.
+Start this response with `## Phase 2 (of 4): Housekeeping`. Fire each
+sub-section below ONLY if its surface has content (2a only if
+uncommitted files exist; 2b only if unrecorded learnings remain;
+2c only if `drift_findings` is non-empty). For each fired sub-section,
+ask its followup question before acting. If all three surfaces are
+empty, skip Phase 2 entirely and proceed to Phase 3 — this can only
+happen when the fast-path check failed solely on a Phase 3 signal
+(mismatch or uncleared natives).
 
 ### 2a. Commit changes
 - If multiple logical groups exist, ask whether to commit them as

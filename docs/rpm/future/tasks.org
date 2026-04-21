@@ -2,6 +2,19 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
+** TODO Trim session-end — kill action menu, add fast path [[file:2026-04-21-trim-session-end.md]]
+   :PROPERTIES:
+   :ID: trim-session-end
+   :END:
+   - Remove Phase 1 "Actions (pick any, multiple OK)" menu — redundant
+     with Phase 2 sub-prompts. Each 2a/2b/2c fires automatically only
+     if its surface has content.
+   - Add fast-path single-response mode: when drift/learnings/mismatch
+     all empty + git clean after auto-apply, emit one combined
+     Session-end block (no phase headers) and skip Phases 2–3.
+   - Preserve full 4-phase flow as fallback whenever any decision
+     surface is non-empty.
+
 ** TODO Pivot-capture rule: marker + tasks.org top on mid-session redirects [[file:2026-04-21-pivot-capture-rule.md]]
    :PROPERTIES:
    :ID: pivot-capture-rule
