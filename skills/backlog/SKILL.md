@@ -21,7 +21,11 @@ Within each `* Parent` group, keep this band order top-to-bottom:
 2. **Blocked** — `** BLOCKED`, or `** TODO` with unresolved
    `:BLOCKED_BY:`
 3. **Postponed** — `** TODO` with a `:POSTPONED:` stamp
-4. **Historical** — `** DONE` / `** CANCELLED`
+
+Closed entries (`** DONE` / `** CANCELLED`) are archived to
+`docs/rpm/future/done.org` by `/session-end` and do not live in
+tasks.org long-term. `/backlog done` toggles `TODO → DONE` in place;
+the archive sweep runs at the next session-end.
 
 Blocked and postponed items drift to the bottom of their band
 automatically whenever this file is written (during `add`,
@@ -91,22 +95,20 @@ without a mirrored native task is the correct, intended behavior.
 ## List
 
 1. Read `docs/rpm/future/tasks.org`.
-2. Print a summary line and the full task list:
+2. Print a summary line and the active task list:
 
    ```
-   ## Tasks — N done · N in-progress · N todo · N blocked
+   ## Tasks — N in-progress · N todo · N blocked
 
    <Parent Heading>
       1. [TODO] <description>
-      2. [DONE 2026-04-10] <description>
-
-   <Parent Heading>
-      3. [IN-PROGRESS] <description>
+      2. [IN-PROGRESS] <description>
          blocked-by: <id>
    ```
 
-   Show ALL tasks including DONE, grouped by parent heading.
-   Number them sequentially for reference.
+   Grouped by parent heading. Number sequentially for reference.
+   Closed entries live in `docs/rpm/future/done.org` — read that
+   file directly if the user asks for history.
 
 ---
 
@@ -142,8 +144,7 @@ auditable.
 2. Match the argument to a task — by number (from most recent
    `/backlog list`), by text match, or by asking if ambiguous.
 3. Identify the task's `* Parent` heading. Find the last `**` task
-   under that parent (regardless of status — DONE/CANCELLED count
-   for positioning).
+   under that parent (any status — active, blocked, or postponed).
 4. Edit the file to move the matched task's heading + its property
    drawer to just below that last sibling. **Do not change status**;
    keep `** TODO`.

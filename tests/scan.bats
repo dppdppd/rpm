@@ -188,6 +188,31 @@ EOF
   section task_deps | grep -Fq 'second'
 }
 
+@test "task_deps: DONE entry archived to done.org still satisfies BLOCKED_BY" {
+  cat > "$PM_DIR/future/tasks.org" <<'EOF'
+* Active
+** TODO Second
+   :PROPERTIES:
+   :ID: second
+   :BLOCKED_BY: first
+   :END:
+EOF
+  cat > "$PM_DIR/future/done.org" <<'EOF'
+* Active
+** DONE First
+   CLOSED: [2026-04-21]
+   :PROPERTIES:
+   :ID: first
+   :END:
+EOF
+  run run_scan
+  section task_deps | grep -qE '^ids=2$'
+  section task_deps | grep -Fq 'ready='
+  section task_deps | grep -Fq 'second'
+  # No dangling reference — first resolves via done.org
+  ! section task_deps | grep -qE '^dangling='
+}
+
 # ----------------------------------------------------------------
 # migration
 # ----------------------------------------------------------------
