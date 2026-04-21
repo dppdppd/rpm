@@ -2,31 +2,6 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
-** TODO Trim session-end — kill action menu, add fast path [[file:2026-04-21-trim-session-end.md]]
-   :PROPERTIES:
-   :ID: trim-session-end
-   :END:
-   - Remove Phase 1 "Actions (pick any, multiple OK)" menu — redundant
-     with Phase 2 sub-prompts. Each 2a/2b/2c fires automatically only
-     if its surface has content.
-   - Add fast-path single-response mode: when drift/learnings/mismatch
-     all empty + git clean after auto-apply, emit one combined
-     Session-end block (no phase headers) and skip Phases 2–3.
-   - Preserve full 4-phase flow as fallback whenever any decision
-     surface is non-empty.
-
-** TODO Pivot-capture rule: marker + tasks.org top on mid-session redirects [[file:2026-04-21-pivot-capture-rule.md]]
-   :PROPERTIES:
-   :ID: pivot-capture-rule
-   :END:
-   - When the user redirects mid-session to new multi-step work
-     (meets TaskCreate bar), LLM must: (1) update
-     `docs/rpm/~rpm-session-start` task: field, (2) insert
-     `** TODO` at top of actionable band in tasks.org.
-   - Add to `plugin/hooks/_directives.sh` (shared SessionStart +
-     post-compact directive) and `plugin/skills/backlog/SKILL.md`
-     preamble. Capture as feedback memory too.
-
 ** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
    :PROPERTIES:
    :ID: codex-port
@@ -72,7 +47,6 @@
 ** TODO Pivot-capture hook: mirror marker → tasks.org top automatically [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook
-   :BLOCKED_BY: pivot-capture-rule
    :END:
    - Follow-up to the LLM-side pivot-capture rule. Hook-enforce the
      mirror via PostToolUse matcher on Edits to
@@ -82,6 +56,32 @@
      instead of duplicating.
    - Defer until LLM-side drift is observed — rule in _directives.sh
      should suffice in practice.
+
+** DONE Trim session-end — kill action menu, add fast path [[file:2026-04-21-trim-session-end.md]]
+   CLOSED: [2026-04-21]
+   :PROPERTIES:
+   :ID: trim-session-end
+   :END:
+   - Removed Phase 1 "Actions (pick any, multiple OK)" outer menu —
+     redundant with Phase 2 sub-prompts (2a/2b/2c fire per surface).
+   - Added fast-path single-response mode for clean sessions
+     (drift/learnings/mismatch empty + git clean after auto-apply →
+     one `## Session end (rpm <version>)` block, Phase 4 cleanup
+     inlined). Full 4-phase flow preserved as fallback.
+   - Shipped as v2.7.9.
+
+** DONE Pivot-capture rule: marker + tasks.org top on mid-session redirects [[file:2026-04-21-pivot-capture-rule.md]]
+   CLOSED: [2026-04-21]
+   :PROPERTIES:
+   :ID: pivot-capture-rule
+   :END:
+   - New directive in `plugin/hooks/_directives.sh`: on mid-session
+     pivot to TaskCreate-worthy work, LLM auto-updates
+     `~rpm-session-start` `task:` + inserts `** TODO` at top of
+     actionable band. No user question.
+   - Captured in `plugin/skills/backlog/SKILL.md` preamble and
+     `feedback_pivot_capture.md` memory.
+   - Shipped as v2.7.8.
 
 ** DONE Submit latest to anthropics/claude-plugins-official marketplace
    CLOSED: [2026-04-17]
