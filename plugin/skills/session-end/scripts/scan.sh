@@ -243,7 +243,7 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
     [ ! -f "$f" ] && continue
     base=$(basename "$f")
     case "$base" in
-      log.md|context.md|status.md|tasks.org) continue ;;
+      log.md|context.md|status.md|tasks.org|done.org) continue ;;
     esac
     MTIME=$(git log -1 --format='%cI' -- "$f" 2>/dev/null)
     [ -z "$MTIME" ] && continue
@@ -267,7 +267,12 @@ echo "=== task_deps ==="
 # Validate tasks.org dependency graph: extract :ID: and :BLOCKED_BY:
 # from property drawers, check for dangling refs and cycles, and
 # report tasks that are ready (TODO with all blockers DONE).
+#
+# Also reads done.org (archived DONE/CANCELLED entries swept by
+# session-end) so cross-file deps still resolve — an archived parent
+# marked DONE must still satisfy a live child's :BLOCKED_BY:.
 FUTURE="docs/rpm/future/tasks.org"
+ARCHIVE="docs/rpm/future/done.org"
 if [ -f "$FUTURE" ]; then
   # Build maps: id→status, id→blocked_by list
   # Parse sequentially: track current heading's status and ID
@@ -298,7 +303,10 @@ if [ -f "$FUTURE" ]; then
       CUR_BLOCKED=$(echo "$line" | sed -E 's/^\s+:BLOCKED_BY:\s+//')
       eval "DEPS_$(san "$CUR_ID")=\"$CUR_BLOCKED\""
     fi
-  done < "$FUTURE"
+  done < <(
+    cat "$FUTURE"
+    [ -f "$ARCHIVE" ] && cat "$ARCHIVE"
+  )
 
   # Second pass: validate refs and find ready tasks
   DEP_COUNT=0

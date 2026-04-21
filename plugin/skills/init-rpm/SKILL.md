@@ -224,6 +224,16 @@ Create `docs/rpm/future/tasks.org`:
 Each task entry is one short sentence + a link to a detail file
 (`future/<date>-<slug>.md`). Never inline task details in your rpm backlog.
 
+Also create `docs/rpm/future/done.org` (archive for closed entries
+swept out of tasks.org by `/session-end`):
+
+```org
+#+TITLE: {Project Name} Archive
+#+TODO: TODO IN-PROGRESS BLOCKED | DONE CANCELLED
+
+Closed entries swept from tasks.org by session-end. Newest first.
+```
+
 ## Phase 5: Adapt for Team Size
 
 **Say to user:** "Tuning the scaffolding for your team size."

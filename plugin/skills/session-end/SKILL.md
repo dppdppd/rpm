@@ -167,6 +167,32 @@ updates section.
    `future/<date>-<slug>.md`. Write the detail file for each new
    task. Reconcile with native tasks per the rules below.
 
+##### Archive sweep (same edit pass)
+
+After marking DONE / CANCELLED, cut every such heading (with its
+`CLOSED:` line and property drawer) out of `tasks.org` and move it
+to `docs/rpm/future/done.org`. This runs every session — both
+fast-path and full-path — so closed entries never accumulate in
+the active backlog. Rules:
+
+- Create `done.org` with the header below if it doesn't exist:
+  ```org
+  #+TITLE: rpm Archive
+  #+TODO: TODO IN-PROGRESS BLOCKED | DONE CANCELLED
+
+  Closed entries swept from tasks.org by session-end. Newest first.
+  ```
+- Mirror the parent-heading structure: if an archived entry lived
+  under `* Active` in tasks.org, it goes under `* Active` in done.org
+  (create the parent if missing).
+- Insert each archived entry at the **top** of its parent section in
+  done.org (newest-first within a parent).
+- Preserve `[[file:...]]` links, `CLOSED: [YYYY-MM-DD]`, and
+  property drawers verbatim.
+- The archive sweep covers BOTH entries you just marked DONE AND
+  any pre-existing DONE/CANCELLED entries that slipped through
+  (e.g. mid-session `/backlog done`).
+
 ##### Native task reconciliation (within the `future/tasks.org` edit)
 
 - Completed native with a high-confidence candidate match (≥80 via
@@ -211,7 +237,7 @@ findings response into a **single message** — commit as a tool call,
 findings as text alongside.
 
 ```bash
-git add docs/rpm/past/$(date +%Y-%m-%d).md docs/rpm/present/status.md docs/rpm/future/tasks.org 2>/dev/null
+git add docs/rpm/past/$(date +%Y-%m-%d).md docs/rpm/present/status.md docs/rpm/future/tasks.org docs/rpm/future/done.org 2>/dev/null
 git diff --cached --quiet || git commit -m "rpm: session end — update past/present/future"
 ```
 
@@ -258,6 +284,7 @@ Otherwise emit the **Phase 1 findings block** and flow into Phase 2.
 - `docs/rpm/past/YYYY-MM-DD.md` — [what was logged, or "no changes"]
 - `docs/rpm/present/status.md` — [what changed, or "no changes"]
 - `docs/rpm/future/tasks.org` — [what was marked/added, or "no changes"]
+- `docs/rpm/future/done.org` — [N entries archived, or "no changes"]
 
 ### 1e. Doc-drift scan
 - [one-line per finding, or "no drift detected"]
@@ -281,6 +308,7 @@ content and asks its own question.
 - `docs/rpm/past/YYYY-MM-DD.md` — [what was logged]
 - `docs/rpm/present/status.md` — [what changed]
 - `docs/rpm/future/tasks.org` — [what was marked/added]
+- `docs/rpm/future/done.org` — [N entries archived, or "no changes"]
 
 **What's next:** [top actionable task, or "unknown — pick from your
 rpm backlog" if the list is empty]
@@ -424,9 +452,10 @@ Re-read the file (post-auto-apply, post-3a-promotions). Then:
 2. Blocked — `** BLOCKED`, or `** TODO` with unresolved
    `:BLOCKED_BY:`
 3. Postponed — `** TODO` with a `:POSTPONED:` stamp
-4. Historical — `** DONE` / `** CANCELLED`
 
-Preserve relative order within each band. Apply silently.
+Preserve relative order within each band. Apply silently. (DONE /
+CANCELLED entries no longer live in tasks.org — Phase 1's archive
+sweep moves them to `docs/rpm/future/done.org`.)
 
 **Then check for a mismatch signal:**
 
