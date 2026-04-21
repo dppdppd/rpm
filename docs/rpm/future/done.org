@@ -1,0 +1,182 @@
+#+TITLE: rpm Archive
+#+TODO: TODO IN-PROGRESS BLOCKED | DONE CANCELLED
+
+Closed entries swept from tasks.org by session-end. Newest first.
+Parent-heading structure mirrors tasks.org so archived entries stay
+grouped with their original category.
+
+* Active
+** DONE Trim session-end — kill action menu, add fast path [[file:2026-04-21-trim-session-end.md]]
+   CLOSED: [2026-04-21]
+   :PROPERTIES:
+   :ID: trim-session-end
+   :END:
+   - Removed Phase 1 "Actions (pick any, multiple OK)" outer menu —
+     redundant with Phase 2 sub-prompts (2a/2b/2c fire per surface).
+   - Added fast-path single-response mode for clean sessions
+     (drift/learnings/mismatch empty + git clean after auto-apply →
+     one `## Session end (rpm <version>)` block, Phase 4 cleanup
+     inlined). Full 4-phase flow preserved as fallback.
+   - Shipped as v2.7.9.
+
+** DONE Pivot-capture rule: marker + tasks.org top on mid-session redirects [[file:2026-04-21-pivot-capture-rule.md]]
+   CLOSED: [2026-04-21]
+   :PROPERTIES:
+   :ID: pivot-capture-rule
+   :END:
+   - New directive in `plugin/hooks/_directives.sh`: on mid-session
+     pivot to TaskCreate-worthy work, LLM auto-updates
+     `~rpm-session-start` `task:` + inserts `** TODO` at top of
+     actionable band. No user question.
+   - Captured in `plugin/skills/backlog/SKILL.md` preamble and
+     `feedback_pivot_capture.md` memory.
+   - Shipped as v2.7.8.
+
+** DONE Submit latest to anthropics/claude-plugins-official marketplace
+   CLOSED: [2026-04-17]
+   :PROPERTIES:
+   :ID: marketplace-submit
+   :END:
+   - Submit via claude.ai/settings/plugins/submit
+   - Latest: SHA 59a47b5 (tag v2.5.4) — supersedes v2.5.3
+   - Prefer unpinned source if the form allows, so future version
+     bumps auto-propagate to users; otherwise expect to re-submit
+     on each release
+
+** DONE Tighten session-end native-task reconciliation
+   CLOSED: [2026-04-14]
+   :PROPERTIES:
+   :ID: tighten-native-reconciliation
+   :END:
+   - Session-end Phase 1 prep auto-append removed; in-progress/pending
+     natives now surface in Phase 3a for user-confirmed promotion,
+     then get mass-`TaskUpdate`'d to `completed` to clear the live
+     list. Completed-but-unmatched natives let die as ephemeral.
+
+** DONE Port rpm to opencode [[file:2026-04-14-opencode-port.md]]
+   CLOSED: [2026-04-18]
+   :PROPERTIES:
+   :ID: opencode-port
+   :END:
+   - All seven sub-tasks closed — plugin validated end-to-end in
+     opencode under Zen minimax-m2.5-free; full distribution
+     pipeline built and shipped. v2.7.6 tagged on GitHub as the
+     first unified release covering both the CC plugin and the
+     opencode port. Install: `curl -fsSL
+     https://raw.githubusercontent.com/dppdppd/rpm/opencode/install.sh
+     | bash` from inside a project.
+   - Source of truth: `opencode/.opencode/plugins/rpm.ts`,
+     `scripts/sync-opencode.sh`, `scripts/translate-agent.py`,
+     `scripts/translate-skill.py`, `scripts/publish-opencode.sh`,
+     `scripts/publish-all.sh`.
+
+*** DONE opencode port: distribution (subtree-split to plugin/opencode)
+    CLOSED: [2026-04-18]
+    :PROPERTIES:
+    :ID: opencode-port-distribution
+    :END:
+    - Chose subtree-split over npm: the npm route ships only the
+      plugin module, while rpm's commands/skills/agents must land
+      in the user's project .opencode/ dir. A single `opencode`
+      branch with everything pre-baked avoids a post-install dance.
+    - `scripts/publish-opencode.sh` stages gitignored mirrors on a
+      throwaway branch, subtree-splits, pushes to
+      plugin/opencode (force). Supports --dry-run for verification
+      and alternate remotes (dev/opencode for testing).
+    - `opencode/install.sh` lives at the root of the split; users
+      curl+bash it from
+      https://raw.githubusercontent.com/dppdppd/rpm/opencode/install.sh
+      to copy .opencode/ into their project.
+    - Dry-run verified: 38 files in split, install.sh + README.md +
+      package.json at root, full .opencode/ tree underneath.
+    - Publish not yet run (awaiting maintainer go-ahead).
+
+*** DONE opencode port: bundle plugin/hooks into the plugin package
+    CLOSED: [2026-04-18]
+    :PROPERTIES:
+    :ID: opencode-port-bundle-hooks
+    :END:
+    - sync-opencode.sh now copies plugin/hooks → opencode/.opencode/plugins/hooks/
+      and plugin/.claude-plugin → opencode/.opencode/.claude-plugin/
+      so the plugin bundle is self-contained.
+    - rpm.ts resolves HOOKS_DIR = ${plugin-file-dir}/hooks and
+      PLUGIN_PKG_ROOT = ${plugin-file-dir}/.. . Works identically in
+      monorepo dev and in any future published layout.
+    - Tests updated to match; 5/5 still passing.
+
+*** DONE opencode port: mirror rpm surface to opencode COMMANDS
+    CLOSED: [2026-04-18]
+    :PROPERTIES:
+    :ID: opencode-port-commands-mirror
+    :END:
+    - `scripts/translate-skill.py` + sync integration. All six rpm
+      commands discovered by `opencode debug config` as slash
+      commands. Skills mirror retained in parallel. Interactive TUI
+      verification still pending.
+
+*** DONE opencode port: resolve ${CLAUDE_SKILL_DIR}/${CLAUDE_PLUGIN_ROOT}
+    CLOSED: [2026-04-18]
+    :PROPERTIES:
+    :ID: opencode-port-skill-paths
+    :END:
+    - translate-skill.py rewrites `${CLAUDE_SKILL_DIR}` →
+      `${CLAUDE_PLUGIN_ROOT}/skills/<name>`. TS plugin `shell.env`
+      hook injects `CLAUDE_PLUGIN_ROOT` (absolute via `realpathSync`)
+      on every shell invocation. Scripts execute cleanly with the
+      env var set; full command-invocation path blocked on TUI test
+      (needs a model).
+
+*** DONE opencode port: SessionEnd on real exits
+    CLOSED: [2026-04-18]
+    :PROPERTIES:
+    :ID: opencode-port-session-deleted-exits
+    :END:
+    - Found `session.deleted` does NOT fire on normal run completion;
+      the correct SessionEnd analog is `server.instance.disposed`.
+      Plugin now dispatches both — instance_disposed as primary,
+      session_deleted as fallback. Verified via opencode run against
+      /tmp/rpm-oc-test; daily-log stub appears with
+      reason=instance_disposed. TUI `/exit` and SIGKILL paths not
+      individually tested but presumed to also fire
+      server.instance.disposed (instance always tears down).
+
+*** DONE opencode port: first-session in real session
+    CLOSED: [2026-04-18]
+    :PROPERTIES:
+    :ID: opencode-port-first-session-tui
+    :END:
+    - Validated via `opencode run --command rpm version` against the
+      opencode Zen minimax-m2.5-free model (no user credentials).
+      Output contained `rpm v2.7.6` drawn from bundled
+      `.claude-plugin/plugin.json` via the !bash block and shell.env
+      CLAUDE_PLUGIN_ROOT injection — proves plugin init,
+      session-start-auto.sh, command expansion, bash execution, and
+      env var injection all fire correctly on the first session.
+
+*** DONE opencode port: test suite for the TS plugin
+    CLOSED: [2026-04-18]
+    :PROPERTIES:
+    :ID: opencode-port-tests
+    :END:
+    - `opencode/tests/rpm.test.ts` (5 tests, all passing) exercises
+      plugin init, event dispatch (session.deleted, session.compacted,
+      no-op events), and the shell.env hook. Uses node:test via tsx —
+      no bun runtime required. Run with `npm test` from opencode/.
+
+** DONE Extend bats coverage to remaining hooks
+   CLOSED: [2026-04-13]
+   :PROPERTIES:
+   :ID: bats-extend
+   :END:
+   - 6 new bats files: context-monitor, pre-compact, post-compact,
+     session-end-hook, stop-learn-capture, task-capture.
+   - Suite: 26 → 69 passing tests.
+
+** DONE Soften session-end nudges (v2.5.4)
+   CLOSED: [2026-04-13]
+   :PROPERTIES:
+   :ID: soften-session-end-254
+   :END:
+   - Hooks: context-monitor, session-start-auto, session-end,
+     handoff-validator. Skill: session-end SKILL.md.
+   - Plugin v2.5.4 published — origin/master at 59a47b5, tag v2.5.4.
