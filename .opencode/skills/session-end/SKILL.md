@@ -1,0 +1,517 @@
+---
+name: session-end
+description: End the current rpm session. Fast-path single-message mode for clean sessions; otherwise four phases — Collecting Findings → Housekeeping → Reviewing Tasks → Handing Off. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
+argument-hint: ""
+allowed-tools: Read Write Edit Bash(bash:*) Bash(git:*) Bash(rm:*) Glob Grep
+---
+
+# /session-end
+
+End the current work session. Two modes:
+
+- **Fast path** (clean sessions) — drift, learnings, mismatch all
+  empty + git clean after auto-apply → emit one `## Session end
+  (rpm <version>)` message and run Phase 4 cleanup inline. No phase
+  headers.
+- **Full path** (anything non-empty) — four phases:
+  1. **Collecting Findings** — analyze, auto-apply trackers, emit summary
+  2. **Housekeeping** — sub-sections fire only when their surface has content
+  3. **Reviewing Tasks** — auto-demote sweep + mismatch check
+  4. **Handing Off** — write last-session info, emit handoff text
+
+**Print a phase header** (`## Phase N (of 4): Title`) at the start of
+each user-visible response in the full path. Sub-sections use letters
+(`### 1b. Uncommitted changes`). Append ` (rpm <version>)` to the
+first header of either mode, using the `version=` value from scan.sh's
+`=== plugin ===` section — e.g. `## Phase 1 (of 4): Collecting Findings (rpm 2.7.8)` or `## Session end (rpm 2.7.8)`.
+
+Core rpm bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`,
+`docs/rpm/present/status.md`, `docs/rpm/future/tasks.org`) is updated
+automatically during Phase 1's prep — no prompts, no diff approval.
+Ask only about commits, promoting findings, drift fixes, and
+rpm backlog order.
+
+## Pre-flight
+
+If this skill auto-loaded (you judged the user is wrapping up), ask
+first — "You seem ready to wrap up. Want me to run `/session-end`?"
+— and wait. Phase 1 commits tracker updates; don't trigger on a
+false positive, and don't ask twice. If the user explicitly typed
+`/session-end`, skip this and go to Phase 1.
+
+---
+
+## Phase 1 (of 4): Collecting Findings
+
+Analyze, auto-apply tracker updates, then emit one user-visible
+response — either the fast-path block (if clean) or the Phase 1
+findings block (then flow into Phase 2). The prep steps below run
+silently (no intermediate output).
+
+### Prep (not user-visible)
+
+#### Mechanical scan (auto-injected, no tool call needed)
+
+The `scan.sh` output below was produced by a shell script that ran
+**before** this skill body reached you. Its results are already in
+this message — do NOT re-run these checks as tool calls.
+
+!`bash "${CLAUDE_SKILL_DIR}/scripts/scan.sh"`
+
+**Interpreting the sections:**
+
+- `plugin` — `version=<X.Y.Z>` from `plugin.json`. Append to the Phase 1
+  header as `(rpm <version>)`.
+- `git` — modified / untracked / staged file counts + stash count.
+  Your Phase 1 uncommitted-state summary.
+- `claude_md` — line count + status (`ok` / `warn` >120 / `critical`
+  >150). Only raise as a finding if `warn` or `critical`.
+- `not_implemented` — count and up to 20 matches. Meta-references
+  inside audit/session-end skill bodies (matches on files under
+  `skills/audit/`, `skills/session-end/`, `command-version/`,
+  `agents/auditor.md`) are expected and should be **suppressed**.
+  Only flag real stubs in source.
+- `broken_refs` — backticked path references in `CLAUDE.md`,
+  `README.md`, `docs/rpm/context.md` that don't resolve on disk.
+  `count > 0` is always actionable. (`present/status.md`, `past/log.md`,
+  and `past/*.md` are deliberately excluded as historical.)
+- `daily_log` — today's date, most recent log date, days since,
+  commits since. If `today_exists=false` and `commits_since > 0`,
+  the auto-apply writes need to create today's log.
+- `session_marker` — whether `docs/rpm/~rpm-session-start` exists.
+  Phase 4 removes it only if it exists.
+- `specs_inventory` — if a spec dir exists, `total` / `listed` /
+  `unlisted` counts against `present/status.md`. `unlisted > 0` is a
+  drift signal — status.md isn't enumerating all specs. Up to
+  10 `unlisted_sample=` lines identify which. `status=no_spec_dir`
+  means the project has no spec directory (no action).
+- `pm_docs_staleness` — `file=<path> days=<N>` pairs for loose
+  log/tracker/inventory files under `docs/` and `docs/rpm/`. Flag
+  as possible drift if `days > 3` AND the session touched related
+  work. `days=0` means freshly updated. `count=0` means nothing to
+  check.
+- `task_deps` — `future/tasks.org` dependency graph validation.
+  `dangling=` lines are broken references. `ready=` lines are tasks
+  newly unblocked by this session's work. Surface both in findings.
+- `migration` — if `count > 0`, auto-migrate before continuing:
+  `mkdir -p` target dirs, `mv` each `move=old→new` pair, `git add`
+  both old and new paths. Print what was moved, then proceed.
+- `learnings_capture` — auto-captured learning excerpts from the
+  Stop hook. `entries > 0` means the hook found learning signals
+  during this session. Use these as pre-populated input for the
+  conversation synth below — they supplement (not replace)
+  conversation review.
+
+#### Fire remaining reads in parallel
+
+In a SINGLE message, issue all of these concurrently — do NOT
+sequence them:
+
+- Read `docs/rpm/future/tasks.org` — tasks to mark DONE, IN-PROGRESS
+  updates, new TODOs surfaced this session
+- Read `docs/rpm/present/status.md` — which fields still reflect reality
+- Read `docs/rpm/past/YYYY-MM-DD.md` (today's date) — **only if
+  `today_exists=true` in the scan**. The auto-apply step appends to
+  this file; reading it now lets those writes fire in parallel.
+- Call `TaskList` — native task state for reconciliation
+
+#### Synthesize the conversation (concurrent with the reads)
+
+While the reads are in flight, look back through this session's
+conversation for:
+
+- **Accomplishments**: features built, bugs fixed, tests passing
+- **Decisions**: architectural choices, tradeoffs made
+- **Discoveries**: things you learned about the code/system
+- **Learnings**: corrections from the user, new patterns, debugging
+  approaches that worked or didn't
+- **Mid-task state**: anything left unfinished
+
+If the scan shows `learnings_capture entries > 0`, use those
+excerpts as a head start. Deduplicate against conversation review.
+
+#### Assemble `drift_findings`
+
+From the scan output and the tracker reads, collect any drift items
+that warrant user action into a `drift_findings` list for the
+user-visible findings section. Suppress trivial meta-matches.
+
+#### Backfill an unassigned task title
+
+If `docs/rpm/~rpm-session-start` has `task: (unassigned)` — the
+user started the session without picking from the menu — derive a
+concise title (5–8 words, imperative form) from the synthesis, git
+log, and modified files. Do NOT ask the user; auto-assign.
+
+Edit the marker to replace `task: (unassigned)` with the derived
+title. Downstream (daily log header, `~rpm-last-session`, handoff)
+will see the real title instead of "(unassigned)".
+
+#### Auto-apply tracker updates (parallel writes)
+
+Apply these updates immediately without asking. No previews, no
+diff approval. If a particular file genuinely has nothing to
+update, skip it and note "no changes" in the user-visible Tracker
+updates section.
+
+**In a SINGLE message, issue all three writes concurrently:**
+
+1. **Write** `docs/rpm/past/YYYY-MM-DD.md` — append if exists,
+   create if not. Sections: Accomplished, Key Discoveries, What
+   Didn't Work, Next.
+2. **Edit** `docs/rpm/present/status.md` — update only the fields
+   that actually changed this session.
+3. **Edit** `docs/rpm/future/tasks.org` — mark completed tasks DONE
+   with today's date, update IN-PROGRESS items, append discovered
+   TODOs. New TODOs: one short sentence + link to
+   `future/<date>-<slug>.md`. Write the detail file for each new
+   task. Reconcile with native tasks per the rules below.
+
+##### Archive sweep (same edit pass)
+
+After marking DONE / CANCELLED, cut every such heading (with its
+`CLOSED:` line and property drawer) out of `tasks.org` and move it
+to `docs/rpm/future/done.org`. This runs every session — both
+fast-path and full-path — so closed entries never accumulate in
+the active backlog. Rules:
+
+- Create `done.org` with the header below if it doesn't exist:
+  ```org
+  #+TITLE: rpm Archive
+  #+TODO: TODO IN-PROGRESS BLOCKED | DONE CANCELLED
+
+  Closed entries swept from tasks.org by session-end. Newest first.
+  ```
+- Mirror the parent-heading structure: if an archived entry lived
+  under `* Active` in tasks.org, it goes under `* Active` in done.org
+  (create the parent if missing).
+- Insert each archived entry at the **top** of its parent section in
+  done.org (newest-first within a parent).
+- Preserve `[[file:...]]` links, `CLOSED: [YYYY-MM-DD]`, and
+  property drawers verbatim.
+- The archive sweep covers BOTH entries you just marked DONE AND
+  any pre-existing DONE/CANCELLED entries that slipped through
+  (e.g. mid-session `/backlog done`).
+
+##### Native task reconciliation (within the `future/tasks.org` edit)
+
+- Completed native with a high-confidence candidate match (≥80 via
+  `~rpm-task-candidates.jsonl`, see "Task candidates" below) → mark
+  that backlog entry DONE.
+- Completed native with no backlog counterpart → let it die. It was
+  ephemeral session sub-work, not backlog material.
+- **In-progress or pending natives → do NOT append here.**
+  **Phase 3 (Reviewing Tasks → 3a)** auto-promotes them to the
+  backlog and clears the live list via `TaskUpdate`. No user
+  question — creation-time was the vetting step.
+
+##### Task candidates (from TaskCompleted hook)
+
+If `docs/rpm/~rpm-task-candidates.jsonl` exists, each line is a
+completed native task scored against an rpm backlog heading by the
+`task-capture.sh` hook. Schema:
+
+```jsonl
+{"ts":"...","session":"...","event":"complete","native_id":"t7","native_subject":"...","match":{"heading":"...","id":"...","confidence":85}}
+{"ts":"...","session":"...","event":"complete","native_id":"t9","native_subject":"...","match":null}
+```
+
+Consume as follows:
+
+- **`match.confidence >= 80`**: auto-mark your rpm backlog entry DONE
+  with today's date. No question. Note it in the Tracker updates
+  section.
+- **`match.confidence` 40–79**: surface as one consolidated finding
+  — list `native_subject → heading (confidence N)` and ask yes/no
+  per row (or `all`/`none`). Apply DONE edits on the user's picks.
+- **`match:null`** or missing: ignore mechanically; conversation
+  synthesis may still catch it.
+
+Prefer `match.id` (via the `:ID:` property) over heading-text edits
+when the entry has one — ID-targeted edits survive heading rewrites.
+
+#### Commit tracker updates (same response as user-visible output)
+
+After all three writes land, combine the commit and the user-visible
+findings response into a **single message** — commit as a tool call,
+findings as text alongside.
+
+```bash
+git add docs/rpm/past/$(date +%Y-%m-%d).md docs/rpm/present/status.md docs/rpm/future/tasks.org docs/rpm/future/done.org 2>/dev/null
+git diff --cached --quiet || git commit -m "rpm: session end — update past/present/future"
+```
+
+If nothing was staged (all three were "no changes"), skip the
+commit silently. If the commit fails (e.g., pre-commit hook
+rejection), note it in the findings and continue.
+
+### User-visible output
+
+After the auto-apply commit lands, branch on whether any decision
+surface has content.
+
+**Fast-path check.** If ALL of these hold, skip the Phase 1 block
+entirely and emit the **Fast-path block** below:
+
+- `git status --porcelain` empty (tracker commit left nothing behind)
+- `drift_findings` empty
+- `record_findings` empty (no unrecorded learnings worth promoting)
+- No `in_progress`/`pending` natives (Phase 3a would run silent)
+- No Phase 3b mismatch signal (top actionable matches session work;
+  no deferrals, no dep blocker, no user flag)
+
+Otherwise emit the **Phase 1 findings block** and flow into Phase 2.
+
+---
+
+**Phase 1 findings block (full path):**
+
+```
+## Phase 1 (of 4): Collecting Findings
+
+### 1a. Accomplishments
+- [Bullet list of what was completed]
+
+### 1b. Uncommitted changes
+- N modified files: [brief categories]
+- N untracked files: [brief categories]
+- N staged files
+
+### 1c. Discovered learnings
+- [Bullet list of learnings, corrections, patterns]
+
+### 1d. Tracker updates
+- `docs/rpm/past/YYYY-MM-DD.md` — [what was logged, or "no changes"]
+- `docs/rpm/present/status.md` — [what changed, or "no changes"]
+- `docs/rpm/future/tasks.org` — [what was marked/added, or "no changes"]
+- `docs/rpm/future/done.org` — [N entries archived, or "no changes"]
+
+### 1e. Doc-drift scan
+- [one-line per finding, or "no drift detected"]
+```
+
+After emitting the block, proceed directly to Phase 2. **No action
+menu** — each Phase 2 sub-section fires only when its surface has
+content and asks its own question.
+
+---
+
+**Fast-path block (replaces Phases 1–4):**
+
+```
+## Session end (rpm <version>)
+
+**Accomplished**
+- [bullet list of what was completed]
+
+**Tracker updates**
+- `docs/rpm/past/YYYY-MM-DD.md` — [what was logged]
+- `docs/rpm/present/status.md` — [what changed]
+- `docs/rpm/future/tasks.org` — [what was marked/added]
+- `docs/rpm/future/done.org` — [N entries archived, or "no changes"]
+
+**What's next:** [top actionable task, or "unknown — pick from your
+rpm backlog" if the list is empty]
+
+[If mid-task: one line on where it left off]
+
+---
+
+To start a new session:
+1. Run `/clear` to clear this context
+2. Start a new conversation — rpm context auto-loads
+```
+
+Run the Phase 4 cleanup (`~rpm-last-session` write, marker `rm`) in
+the same response as the fast-path block — see Phase 4 for the exact
+commands. Do not continue the conversation after.
+
+---
+
+## Phase 2 (of 4): Housekeeping
+
+Start this response with `## Phase 2 (of 4): Housekeeping`. Fire each
+sub-section below ONLY if its surface has content (2a only if
+uncommitted files exist; 2b only if unrecorded learnings remain;
+2c only if `drift_findings` is non-empty). For each fired sub-section,
+ask its followup question before acting. If all three surfaces are
+empty, skip Phase 2 entirely and proceed to Phase 3 — this can only
+happen when the fast-path check failed solely on a Phase 3 signal
+(mismatch or uncleared natives).
+
+### 2a. Commit changes
+- If multiple logical groups exist, ask whether to commit them as
+  one commit or split into several
+- Confirm files to include (avoid `git add .` — list files explicitly)
+- Draft a commit message and show it before committing
+- For commit message format, follow the project's existing style
+  (check `git log --oneline -10`)
+
+### 2b. Record findings
+- Filter out learnings already captured (in code comments, specs,
+  existing memory files, etc.) — do NOT show them.
+- Present only unrecorded learnings as a single numbered menu with
+  a proposed destination for each:
+  ```
+  1. [learning summary] → memory file
+  2. [learning summary] → CLAUDE.md
+  ```
+  Then ask: "Which to promote? (e.g., `1,2` · `all` · `none`)"
+- If only one learning remains, skip the numbered list and ask
+  directly: `Promote **[summary]** → {destination}? (yes / no)`
+- One list, one question. Do not pre-filter, recommend, or renumber.
+- Only promote the ones the user picks
+- Show the addition before writing
+
+### 2c. Fix drift
+- For each `drift_findings` entry the user accepted, apply the
+  obvious fix (repair the broken ref, update the contradictory
+  tracker, etc.). For ambiguous drift (e.g. a NOT_IMPLEMENTED stub
+  whose implementation path isn't clear), surface it back to the
+  user instead of guessing.
+- After fixes land, note them in today's past log under a
+  "Doc-drift fixes" subsection.
+
+After ALL chosen actions complete, proceed to Phase 3.
+
+---
+
+## Phase 3 (of 4): Reviewing Tasks
+
+Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Two
+sub-steps before handoff: dispose of remaining native tasks, then
+reconcile rpm backlog order.
+
+### 3a. Clear native tasks (dedup, promote, clear)
+
+Native tasks are session-scoped and need clearing before handoff.
+A native task's creation *is* the vetting step — if Claude put it
+on the list, it was worth tracking — so every uncleared native gets
+captured in your rpm backlog before the live list is wiped. No user
+question.
+
+**Order matters.** Phase 1 prep already handled every *completed*
+native with a high-confidence candidate match (it DONE'd the matching
+backlog entry). So 3a only deals with in_progress/pending natives.
+For each, dedup against the live backlog *before* appending — a
+native picked from the backlog at session-start will already have
+an entry, and we must not duplicate it.
+
+1. Call `TaskList`. Filter to `in_progress` or `pending`
+   (completed natives are already handled by Phase 1 prep). Emit
+   one JSONL line per surfaced task — `{"id":"...","subject":"...","status":"..."}`
+   — and pipe the batch to the scoring script:
+
+   ```bash
+   printf '%s\n' \
+     '{"id":"t1","subject":"...","status":"in_progress"}' \
+     '{"id":"t2","subject":"...","status":"pending"}' \
+     | bash "${CLAUDE_PLUGIN_ROOT}/skills/session-end/scripts/score-natives.sh"
+   ```
+
+   Output: one JSONL line per input with
+   `{"native_id":"...","native_subject":"...","match":{"heading","id","confidence"}|null}`.
+   Same 100/80/60/40 buckets as `task-capture.sh` — both scripts
+   share `hooks/_scoring.sh`.
+
+2. Apply per output line:
+   - **`match.confidence >= 80`**: a backlog entry already exists
+     for this work. If its heading is `** TODO`, update to
+     `** IN-PROGRESS` (work was started but not finished). If
+     already `IN-PROGRESS` or `BLOCKED`, leave alone. Do NOT
+     append — that's the duplicate.
+   - **`match: null` or `match.confidence < 80`**: append
+     `** TODO <subject>` under a sensible `* Parent` group (match
+     the native's scope; create a group if no fit). Append to the
+     bottom of the actionable band — order is the user's call at
+     the next 3b reconciliation.
+
+3. Call `TaskUpdate` on every surfaced task (step 1's batch) to set
+   status=`completed`. This clears the live native list.
+
+4. Report what happened in one line at the start of this response
+   (e.g., `Promoted 2 natives; 1 deduped into existing IN-PROGRESS.`),
+   then proceed to 3b.
+
+If there were zero in-progress/pending natives, skip 3a silently.
+
+### 3b. Reconcile rpm backlog order
+
+Your rpm backlog is sorted in **execution order** (top-to-bottom =
+the order in which tasks need to get done). The top actionable
+task (topmost `** TODO` or `** IN-PROGRESS` with all `:BLOCKED_BY:`
+deps DONE) is the default `What's next`.
+
+Re-read the file (post-auto-apply, post-3a-promotions). Then:
+
+**Auto-demote sweep (mechanical, no user question).** Within each
+`* Parent` group, re-order so the bands fall top-to-bottom:
+
+1. Actionable — `** IN-PROGRESS` or `** TODO` with all
+   `:BLOCKED_BY:` deps DONE
+2. Blocked — `** BLOCKED`, or `** TODO` with unresolved
+   `:BLOCKED_BY:`
+3. Postponed — `** TODO` with a `:POSTPONED:` stamp
+
+Preserve relative order within each band. Apply silently. (DONE /
+CANCELLED entries no longer live in tasks.org — Phase 1's archive
+sweep moves them to `docs/rpm/future/done.org`.)
+
+**Then check for a mismatch signal:**
+
+- User worked below the top → top-of-queue probably isn't the right
+  next thing.
+- Top is blocked by an incomplete dep → blocker moves up, or the
+  auto-demote already handled it.
+- User flagged the list during the session.
+- **User deferred a task** during the session ("let's do X later",
+  "postpone Y", "that can wait") → apply `/backlog postpone <task>`
+  to move it to the bottom of its `* Parent` group and stamp
+  `:POSTPONED: YYYY-MM-DD` (the auto-demote sweep will then keep it
+  in the Postponed band).
+
+If any holds, end this response with ONE question (e.g. "You worked
+on X today, but Y is at the top of your rpm backlog. Should X move
+to the top?" or "You said Y can wait — postpone it to the bottom
+of its group?") and wait. Apply the agreed change by editing your
+rpm backlog (use the Postpone procedure in the `/backlog` skill for
+deferrals; otherwise just reorder), commit as
+`rpm: session end — reorder backlog`. Otherwise briefly state the
+top as `What's next` and proceed to Phase 4.
+
+---
+
+## Phase 4 (of 4): Handing Off
+
+Only after Phase 3 is resolved. **Single response** — the rm tool
+call and the handoff text go in the same message:
+
+- Save last session info before cleanup:
+  ```bash
+  TASK=$(grep -oP 'task: \K.*' docs/rpm/~rpm-session-start 2>/dev/null | head -1)
+  SID=$(grep -oP 'session_id: \K.*' docs/rpm/~rpm-session-start 2>/dev/null | head -1)
+  printf 'task: %s\nended: %s\nnext: %s\n' "${TASK:-unknown}" "$(date -Iseconds)" "{reconciled What's next from Phase 3}" > docs/rpm/~rpm-last-session
+  # Handoff marker — session-start consumes this to silently clear any
+  # orphan ~rpm-session-start left behind by /clear in this same process.
+  printf 'session_id: %s\n' "${SID:-unknown}" > docs/rpm/~rpm-session-end
+  ```
+- Clear session files: `rm -rf docs/rpm/~rpm-session-start docs/rpm/~rpm-compact-state docs/rpm/~rpm-learnings.jsonl docs/rpm/~rpm-native-tasks.jsonl docs/rpm/~rpm-task-candidates.jsonl`
+- Output the handoff text below as the **very last lines**:
+
+```
+## Phase 4 (of 4): Handing Off
+
+**What's next:** [reconciled top task from Phase 3, or
+"unknown — pick from your rpm backlog" if the list is empty]
+
+[If mid-task: note exactly where it left off so the next session
+can resume without re-investigation]
+
+---
+
+To start a new session:
+1. Run `/clear` to clear this context
+2. Start a new conversation — rpm context auto-loads
+```
+
+Do not continue the conversation after this.
