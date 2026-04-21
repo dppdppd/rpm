@@ -2,6 +2,18 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
+** TODO Pivot-capture rule: marker + tasks.org top on mid-session redirects [[file:2026-04-21-pivot-capture-rule.md]]
+   :PROPERTIES:
+   :ID: pivot-capture-rule
+   :END:
+   - When the user redirects mid-session to new multi-step work
+     (meets TaskCreate bar), LLM must: (1) update
+     `docs/rpm/~rpm-session-start` task: field, (2) insert
+     `** TODO` at top of actionable band in tasks.org.
+   - Add to `plugin/hooks/_directives.sh` (shared SessionStart +
+     post-compact directive) and `plugin/skills/backlog/SKILL.md`
+     preamble. Capture as feedback memory too.
+
 ** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
    :PROPERTIES:
    :ID: codex-port
@@ -43,6 +55,20 @@
      it, before step 1 (CC subtree-split).
    - Keeps `dev` in sync with `plugin` automatically — prevents the
      footgun where plugin/master ships code that isn't yet on Gitea.
+
+** TODO Pivot-capture hook: mirror marker → tasks.org top automatically [[file:2026-04-21-pivot-capture-hook.md]]
+   :PROPERTIES:
+   :ID: pivot-capture-hook
+   :BLOCKED_BY: pivot-capture-rule
+   :END:
+   - Follow-up to the LLM-side pivot-capture rule. Hook-enforce the
+     mirror via PostToolUse matcher on Edits to
+     `docs/rpm/~rpm-session-start`, auto-inserting the corresponding
+     `** TODO` at the top of the actionable band.
+   - Idempotent: if a matching entry already exists, promote to top
+     instead of duplicating.
+   - Defer until LLM-side drift is observed — rule in _directives.sh
+     should suffice in practice.
 
 ** DONE Submit latest to anthropics/claude-plugins-official marketplace
    CLOSED: [2026-04-17]
