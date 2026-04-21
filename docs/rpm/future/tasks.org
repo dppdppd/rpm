@@ -2,6 +2,36 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
+** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
+   :PROPERTIES:
+   :ID: codex-port
+   :END:
+   - Skills port 1:1 (same SKILL.md + YAML frontmatter format)
+   - Plugin manifest similar (.codex-plugin/plugin.json)
+   - Hooks are experimental — only SessionStart, Stop, PostToolUse (Bash only);
+     no SessionEnd, PreCompact, PostCompact, TaskCreated/TaskCompleted
+   - Agents need translation: TOML not markdown
+   - No native task UI (no TaskCreate/TaskList/TaskUpdate equivalent)
+   - Overall: about half ports; rest blocked on missing lifecycle events
+
+** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
+   :PROPERTIES:
+   :ID: sessionstart-clear-flake
+   :END:
+   - User hit a case where /clear on Opus 4.7 did not fire the hook;
+     quit+restart recovered it.
+   - Harness-level (CC) bug, not rpm code. Watch for repro and file
+     upstream at anthropics/claude-code if it persists.
+
+** TODO scan.sh version=unknown fallback [[file:2026-04-18-scan-version-fallback.md]]
+   :PROPERTIES:
+   :ID: scan-version-fallback
+   :END:
+   - `session-end` scan.sh emits `version=unknown` because
+     `$CLAUDE_PLUGIN_ROOT` isn't set in skill-body bash context.
+   - Fix: fall back to `$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json`.
+   - Ship as v2.7.4; ~10 min including a bats case.
+
 ** DONE Submit latest to anthropics/claude-plugins-official marketplace
    CLOSED: [2026-04-17]
    :PROPERTIES:
@@ -22,18 +52,6 @@
      natives now surface in Phase 3a for user-confirmed promotion,
      then get mass-`TaskUpdate`'d to `completed` to clear the live
      list. Completed-but-unmatched natives let die as ephemeral.
-
-** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
-   :PROPERTIES:
-   :ID: codex-port
-   :END:
-   - Skills port 1:1 (same SKILL.md + YAML frontmatter format)
-   - Plugin manifest similar (.codex-plugin/plugin.json)
-   - Hooks are experimental — only SessionStart, Stop, PostToolUse (Bash only);
-     no SessionEnd, PreCompact, PostCompact, TaskCreated/TaskCompleted
-   - Agents need translation: TOML not markdown
-   - No native task UI (no TaskCreate/TaskList/TaskUpdate equivalent)
-   - Overall: about half ports; rest blocked on missing lifecycle events
 
 ** DONE Port rpm to opencode [[file:2026-04-14-opencode-port.md]]
    CLOSED: [2026-04-18]
@@ -144,24 +162,6 @@
       plugin init, event dispatch (session.deleted, session.compacted,
       no-op events), and the shell.env hook. Uses node:test via tsx —
       no bun runtime required. Run with `npm test` from opencode/.
-
-** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
-   :PROPERTIES:
-   :ID: sessionstart-clear-flake
-   :END:
-   - User hit a case where /clear on Opus 4.7 did not fire the hook;
-     quit+restart recovered it.
-   - Harness-level (CC) bug, not rpm code. Watch for repro and file
-     upstream at anthropics/claude-code if it persists.
-
-** TODO scan.sh version=unknown fallback [[file:2026-04-18-scan-version-fallback.md]]
-   :PROPERTIES:
-   :ID: scan-version-fallback
-   :END:
-   - `session-end` scan.sh emits `version=unknown` because
-     `$CLAUDE_PLUGIN_ROOT` isn't set in skill-body bash context.
-   - Fix: fall back to `$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json`.
-   - Ship as v2.7.4; ~10 min including a bats case.
 
 ** DONE Extend bats coverage to remaining hooks
    CLOSED: [2026-04-13]

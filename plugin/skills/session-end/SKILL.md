@@ -11,7 +11,7 @@ End the current work session in four user-visible phases:
 
 1. **Collecting Findings** — analyze, auto-apply tracker updates, present summary + actions menu
 2. **Housekeeping** — execute chosen actions (commit, record findings, fix drift)
-3. **Reviewing Tasks** — reconcile rpm backlog priority, decide What's next
+3. **Reviewing Tasks** — reconcile rpm backlog order, decide What's next
 4. **Handing Off** — write last-session info, output the handoff text
 
 **Print a phase header** (`## Phase N (of 4): Title`) at the start of
@@ -24,7 +24,7 @@ Core rpm bookkeeping (`docs/rpm/past/YYYY-MM-DD.md`,
 `docs/rpm/present/status.md`, `docs/rpm/future/tasks.org`) is updated
 automatically during Phase 1's prep — no prompts, no diff approval.
 Ask only about commits, promoting findings, drift fixes, and
-rpm backlog reordering.
+rpm backlog order.
 
 ## Pre-flight
 
@@ -323,7 +323,7 @@ After ALL chosen actions complete, proceed to Phase 3.
 
 Start this response with `## Phase 3 (of 4): Reviewing Tasks`. Two
 sub-steps before handoff: dispose of remaining native tasks, then
-reconcile rpm backlog priority.
+reconcile rpm backlog order.
 
 ### 3a. Clear native tasks (dedup, promote, clear)
 
@@ -366,8 +366,8 @@ an entry, and we must not duplicate it.
    - **`match: null` or `match.confidence < 80`**: append
      `** TODO <subject>` under a sensible `* Parent` group (match
      the native's scope; create a group if no fit). Append to the
-     bottom of the group — priority is the user's call at the next
-     3b reconciliation.
+     bottom of the actionable band — order is the user's call at
+     the next 3b reconciliation.
 
 3. Call `TaskUpdate` on every surfaced task (step 1's batch) to set
    status=`completed`. This clears the live native list.
@@ -378,20 +378,39 @@ an entry, and we must not duplicate it.
 
 If there were zero in-progress/pending natives, skip 3a silently.
 
-### 3b. Reconcile rpm backlog priority
+### 3b. Reconcile rpm backlog order
 
-Your rpm backlog is priority-ordered; the top actionable task (topmost
-`** TODO` or `** IN-PROGRESS` with all `:BLOCKED_BY:` deps DONE) is
-the default `What's next`. Re-read the file (post-auto-apply,
-post-3a-promotions) and check for a mismatch:
+Your rpm backlog is sorted in **execution order** (top-to-bottom =
+the order in which tasks need to get done). The top actionable
+task (topmost `** TODO` or `** IN-PROGRESS` with all `:BLOCKED_BY:`
+deps DONE) is the default `What's next`.
 
-- User worked below the top → order probably doesn't reflect priority.
-- Top is blocked by an incomplete dep → blocker moves up, or blocked moves down.
+Re-read the file (post-auto-apply, post-3a-promotions). Then:
+
+**Auto-demote sweep (mechanical, no user question).** Within each
+`* Parent` group, re-order so the bands fall top-to-bottom:
+
+1. Actionable — `** IN-PROGRESS` or `** TODO` with all
+   `:BLOCKED_BY:` deps DONE
+2. Blocked — `** BLOCKED`, or `** TODO` with unresolved
+   `:BLOCKED_BY:`
+3. Postponed — `** TODO` with a `:POSTPONED:` stamp
+4. Historical — `** DONE` / `** CANCELLED`
+
+Preserve relative order within each band. Apply silently.
+
+**Then check for a mismatch signal:**
+
+- User worked below the top → top-of-queue probably isn't the right
+  next thing.
+- Top is blocked by an incomplete dep → blocker moves up, or the
+  auto-demote already handled it.
 - User flagged the list during the session.
 - **User deferred a task** during the session ("let's do X later",
   "postpone Y", "that can wait") → apply `/backlog postpone <task>`
   to move it to the bottom of its `* Parent` group and stamp
-  `:POSTPONED: YYYY-MM-DD`.
+  `:POSTPONED: YYYY-MM-DD` (the auto-demote sweep will then keep it
+  in the Postponed band).
 
 If any holds, end this response with ONE question (e.g. "You worked
 on X today, but Y is at the top of your rpm backlog. Should X move
@@ -399,8 +418,8 @@ to the top?" or "You said Y can wait — postpone it to the bottom
 of its group?") and wait. Apply the agreed change by editing your
 rpm backlog (use the Postpone procedure in the `/backlog` skill for
 deferrals; otherwise just reorder), commit as
-`rpm: session end — reorder backlog priority`. Otherwise briefly
-state the top as `What's next` and proceed to Phase 4.
+`rpm: session end — reorder backlog`. Otherwise briefly state the
+top as `What's next` and proceed to Phase 4.
 
 ---
 

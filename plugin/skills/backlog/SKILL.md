@@ -1,6 +1,6 @@
 ---
 name: backlog
-description: Manage the rpm backlog (long-term project tasks in docs/rpm/future/tasks.org — distinct from Claude's native TaskCreate list, which is session-scoped). Add, list, review, postpone, or complete entries. Use when the user wants to add a backlog item, see what's on the rpm backlog, reorganize or reprioritize, defer to the bottom of a group, mark something done, or evaluate backlog health.
+description: Manage the rpm backlog (long-term project tasks in docs/rpm/future/tasks.org — distinct from Claude's native TaskCreate list, which is session-scoped). Add, list, review, postpone, or complete entries. Use when the user wants to add a backlog item, see what's on the rpm backlog, reorder the execution sequence, defer to the bottom of a group, mark something done, or evaluate backlog health.
 argument-hint: "[add <description> | list | review | postpone <#> | done <#>]"
 allowed-tools: Read Write Edit Glob Grep
 ---
@@ -9,6 +9,27 @@ allowed-tools: Read Write Edit Glob Grep
 
 Manage the **rpm backlog** — persisted at `docs/rpm/future/tasks.org`.
 All operations read and write this file using org-mode format.
+
+The backlog is sorted in **execution order** (top-to-bottom = the
+order in which tasks need to get done). "Take from the top" is the
+expected read pattern.
+
+Within each `* Parent` group, keep this band order top-to-bottom:
+
+1. **Actionable** — `** IN-PROGRESS` or `** TODO` with all
+   `:BLOCKED_BY:` deps DONE
+2. **Blocked** — `** BLOCKED`, or `** TODO` with unresolved
+   `:BLOCKED_BY:`
+3. **Postponed** — `** TODO` with a `:POSTPONED:` stamp
+4. **Historical** — `** DONE` / `** CANCELLED`
+
+Blocked and postponed items drift to the bottom of their band
+automatically whenever this file is written (during `add`,
+`postpone`, `review`, or session-end Phase 3b). Moves are mechanical
+— no user question. Preserve relative order within each band.
+New `add` entries land at the bottom of the **actionable band**
+(not the absolute bottom); user promotes upward explicitly if
+something needs to happen sooner.
 
 ## Routing
 
@@ -44,7 +65,8 @@ without a mirrored native task is the correct, intended behavior.
 2. Ask which parent heading the task belongs under (suggest one if
    obvious). If no headings exist, create one.
 3. Add as `** TODO <one-sentence description> [[file:YYYY-MM-DD-slug.md]]`
-   under the chosen heading.
+   at the bottom of the **actionable band** in the chosen heading
+   (above any blocked / postponed / DONE entries).
 4. Create the detail file at `docs/rpm/future/YYYY-MM-DD-slug.md`
    with a brief description — at minimum a `# Title` and
    `## Description` section. Ask the user for details if the task
@@ -88,7 +110,9 @@ without a mirrored native task is the correct, intended behavior.
    - **Scope:** any tasks too large for one session (~35 min)?
      Suggest decomposition.
    - **Duplicates:** overlapping tasks?
-   - **Priority:** highest-value work at the top?
+   - **Order:** work is sorted top-to-bottom by execution order
+     (when it needs to get done)? Anything that should happen sooner
+     than what's currently above it?
    - **Deferrals:** anything the user has set aside or signaled they
      want to come back to later? Surface as candidates for **Postpone**.
 3. Present findings and proposed changes. Wait for confirmation
@@ -100,8 +124,9 @@ without a mirrored native task is the correct, intended behavior.
 ## Postpone
 
 Defer a task to the bottom of its `* Parent` group. Status stays
-`TODO` (the task isn't dropped, just deprioritized). Adds a
-`:POSTPONED: YYYY-MM-DD` property so the deferral is auditable.
+`TODO` (the task isn't dropped, just moved later in the execution
+order). Adds a `:POSTPONED: YYYY-MM-DD` property so the deferral is
+auditable.
 
 1. Read `docs/rpm/future/tasks.org`.
 2. Match the argument to a task — by number (from most recent
