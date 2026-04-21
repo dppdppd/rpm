@@ -31,6 +31,16 @@ New `add` entries land at the bottom of the **actionable band**
 (not the absolute bottom); user promotes upward explicitly if
 something needs to happen sooner.
 
+**Pivot capture (automatic, no user question).** When the user
+redirects mid-session to new multi-step work that meets the
+`TaskCreate` bar, the LLM must insert a `** TODO` at the **top** of
+the actionable band AND update `docs/rpm/~rpm-session-start` to set
+the `task:` field to the new work. The ask IS the confirmation —
+don't prompt. Skip for tactical single-step follow-ups. Rationale:
+the backlog should always represent current state, so a dropped
+session (without `/session-end`) still hands off accurately. Full
+rule lives in `plugin/hooks/_directives.sh`.
+
 ## Routing
 
 Parse `$ARGUMENTS`:
