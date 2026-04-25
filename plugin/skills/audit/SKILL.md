@@ -150,16 +150,30 @@ format, reply grammar, and execute flow.
 Below the menu, note any low-confidence findings that were
 suppressed: `(N low-confidence findings logged but not shown)`.
 
-### Phase 3: Post-execute — hookify repeat offenders
+### Phase 3: Post-execute — codify repeat findings
 
-After the menu's Execute step completes, for each ✓ fix that addresses
-a CLAUDE.md rule violation flagged **2+ times across audits**, offer
-to codify it:
+After the menu's Execute step completes, for each ✓ fix, scan
+`docs/rpm/past/log.md` Audit History for thematically-similar prior
+findings. If this drift has appeared **2+ times across audits**, the
+mechanical fix isn't enough — propose a structural follow-up so it
+stops recurring.
 
-> "This rule has been violated before. Want me to create a hook to
-> enforce it? I'll write a `.claude/hookify.{name}.local.md` rule."
+Pick the intervention by finding type — not always a hook. Often
+the right answer is just guidance:
 
-If the user agrees, create the hookify rule file:
+| Finding type | Intervention |
+|---|---|
+| Hard rule, tool-enforceable (editing wrong file, skipping a flow) | PreToolUse hook → `.claude/hookify.{name}.local.md` |
+| Detection-side gap (scan.sh missed a category, recurring scan blind spot) | Edit `plugin/skills/session-end/scripts/scan.sh` |
+| LLM behavior pattern (wrong command name, missed convention, repeated word choice) | New `feedback_*.md` memory rule or one-line CLAUDE.md addition |
+| Skill output drift (session-end / audit / etc. keeps producing wrong format) | Edit the relevant skill body |
+| Doc/tracker rot (status.md keeps going stale, log gaps) | Add a check to scan.sh, or codify the update in the originating skill |
+
+Propose **one** concrete intervention per repeat finding — name the
+exact file you'd create or edit and what the change is. Wait for
+confirmation before applying.
+
+**Hookify rule format** (only for the PreToolUse-hook case):
 
 ```markdown
 ---
@@ -169,7 +183,7 @@ hook_type: PreToolUse
 matcher: "{tool pattern}"
 ---
 
-{Description of what this rule enforces and why}
+{What this rule enforces and why}
 
 ## Conditions
 - {condition}: {pattern}
@@ -177,6 +191,9 @@ matcher: "{tool pattern}"
 ## Action
 deny with message: "{explanation}"
 ```
+
+For non-hook interventions, edit the target file directly — no
+hookify file is created.
 
 ### Phase 4: Log results
 

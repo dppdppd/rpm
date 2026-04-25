@@ -72,7 +72,10 @@ Scan the project and report findings.
    For unreviewed sessions (most recent first, max 5):
    - Extract user messages and file-modifying tool calls.
    - Classify drift as `JUSTIFIED` or `UNJUSTIFIED`.
-   For unjustified drift, recommend `hook > CLAUDE.md > wording`.
+   For unjustified drift, recommend an intervention by type:
+   `hook > scan.sh check > skill-body edit > CLAUDE.md line >
+   memory feedback rule`. Pick the lightest-touch option that
+   would have prevented the drift — guidance often suffices.
 
 ## Report format
 

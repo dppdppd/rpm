@@ -2,6 +2,23 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
+** TODO Broaden audit hookify to non-CLAUDE.md repeat findings
+   :PROPERTIES:
+   :ID: broaden-hookify
+   :END:
+   - /audit documents Phase 3 currently only hookifies CLAUDE.md
+     rule violations seen 2+ times. Other recurring drift (stale
+     status.md, broken refs, daily-log gaps, memory-file rot) gets
+     re-fixed each audit with no structural follow-up.
+   - Broaden Phase 3 to detect any repeat finding (by category /
+     signature) and propose the fitting intervention — could be
+     a hook, but often just guidance: skill-body edit, memory
+     rule, CLAUDE.md line, scan.sh check. Pick by finding type,
+     not always a hook.
+   - Keeps the loop closed: drift fixed once mechanically, then
+     prevented from recurring (sometimes by code, sometimes by
+     telling the LLM to stop doing it).
+
 ** TODO Archive DONE entries out of tasks.org
    :PROPERTIES:
    :ID: archive-done-entries
