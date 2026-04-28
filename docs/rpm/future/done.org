@@ -6,6 +6,25 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE A/B test W&D parallel-tool-calling vs 4-subagent design
+   CLOSED: [2026-04-28]
+   :PROPERTIES:
+   :ID: wd-vs-multiagent
+   :END:
+   - Recommendation 6 from research/llm-deep-research-best-practices/findings/report.md
+   - W&D (arxiv:2602.07359) claims parallel tool calling within one
+     reasoning step can match or beat 4-subagent orchestration at
+     lower cost. Validate on a fresh narrow topic.
+   - Method: same task, two variants —
+     (A) current N-subagent design with reflection-driven termination,
+     (B) single subagent with ~12 parallel WebSearches in one turn + 1 refinement round.
+   - Result: Variant B 56.6% fewer tokens, 27% less wall-clock, 47% fewer
+     tool calls; comparable findings count; uniquely surfaced cross-entity
+     patterns architecturally invisible to Variant A. Wired SURVEY vs
+     DEEP-DIVE task-shape classifier into deep-research SKILL + standalone
+     command (v2.9.0). Comparison report at
+     research/wd-vs-multiagent-citation-grounding/findings/comparison.md.
+
 ** DONE Trim session-end — kill action menu, add fast path [[file:2026-04-21-trim-session-end.md]]
    CLOSED: [2026-04-21]
    :PROPERTIES:
