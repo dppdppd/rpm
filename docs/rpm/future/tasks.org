@@ -2,19 +2,6 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
-** TODO Inline self-verification in Phase 5b (VeriFact-CoT pattern)
-   :PROPERTIES:
-   :ID: inline-self-verify
-   :END:
-   - Recommendation 7 from research/llm-deep-research-best-practices/findings/report.md
-   - VeriFact-CoT (arxiv:2509.05741): factual accuracy 72→83%,
-     hallucination 25→12% when verification is inline-during-write
-     instead of post-hoc.
-   - Wire into Phase 5b: for each load-bearing claim, re-Read the
-     relevant fetched/ artifact window before writing the paragraph;
-     drop or revise claims that don't match.
-   - Catches "Frankenstein citations" (real fragments stitched into
-     fake claims) that semantic audit misses.
 
 ** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
    :PROPERTIES:
