@@ -6,6 +6,41 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Wire 3 DRB2-derived improvements + Managed Agents scoping + Gap 1 doc
+   CLOSED: [2026-04-28]
+   :PROPERTIES:
+   :ID: drb2-derived-improvements
+   :END:
+   - Three DRB2-derived skill improvements shipped in v2.11.0:
+     1. Phase 2 agent template anchors on user's categorization
+        (don't reorganize into popular literature convention).
+     2. Phase 4 explicit domain-coverage check (region-specific +
+        specialty + niche sources, not just globally popular).
+     3. Phase 5b URL canonicalization (canonical landing page, not
+        any-2xx — won't 404 in six months).
+   - Managed Agents migration scoping doc at
+     research/managed-agents-scoping/decision.md — decision: NO
+     migration. Wrong runtime target; no durability gap; conflicts
+     with local-first artifact model; breaks SKILL.md portability.
+   - Gap 1 query-count ablation deferred — Grader check obsoletes
+     the fixed-budget question. Methodology stub at
+     research/query-count-ablation/methodology.md if anyone wants
+     to actually run it later.
+
+** DONE Inline self-verification in Phase 5b (VeriFact-CoT pattern)
+   CLOSED: [2026-04-28]
+   :PROPERTIES:
+   :ID: inline-self-verify
+   :END:
+   - Recommendation 7 from research/llm-deep-research-best-practices/findings/report.md
+   - VeriFact-CoT (arxiv:2509.05741): factual accuracy 72→83%,
+     hallucination 25→12% when verification is inline-during-write
+     instead of post-hoc.
+   - Shipped in v2.10.0 (commit c98ee1f). For each load-bearing
+     claim, orchestrator re-Reads the relevant fetched/ artifact
+     window before writing the paragraph; revises or drops claims
+     the source doesn't support.
+
 ** DONE Broaden audit hookify to non-CLAUDE.md repeat findings
    CLOSED: [2026-04-24]
    :PROPERTIES:
