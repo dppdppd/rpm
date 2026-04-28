@@ -145,11 +145,13 @@ Must produce: `$TOPIC/gaps/` file + `$TOPIC/validation/adversarial.md`.
 Write `$TOPIC/findings/report.md`.
 
 **Confidence tagging — source-grounded:**
-- Cited claims: `**Confidence: HIGH** (source: URL)` — the source URL is mandatory.
+- Cited claims: `**Confidence: HIGH** (source: URL)` — source URL mandatory.
 - Unsourced claims: replace H/M/L with `**Model knowledge — not verified**`.
 - Rationale: GPT-4 AUROC on its own stated confidence ≈ 62.7%; bare H/M/L from RLHF models is barely better than random (arXiv:2306.13063).
 
-**Layered citation defenses (run in order):**
+**Inline verification — verify-as-you-write.** For every load-bearing claim (number, quote, specific fact, named result) before writing it down: identify the supporting `fetched/` artifact, Read a small ~500–1000 char window of it, confirm verbatim or paraphrase-faithfulness, then write. Revise or drop claims the source doesn't support — do not write from memory when the source disagrees. Catches "Frankenstein citations" that post-hoc audit misses (VeriFact-CoT, arXiv:2509.05741: 72→83% factual accuracy when verification is inline rather than post-hoc).
+
+**Post-hoc citation defenses (run in order):**
 1. Deterministic URL liveness check (Phase 3 above) — drops fabricated URLs.
 2. Citation-audit sub-agent (foreground sonnet) — checks semantic claim-vs-source match (CiteAudit pattern, arXiv:2602.23452).
 3. Fix MISMATCHED claims; for UNSOURCED claims add a citation from artifacts or label "model knowledge — not verified". Never fabricate URLs.
