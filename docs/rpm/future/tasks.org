@@ -57,3 +57,17 @@
      instead of duplicating.
    - Defer until LLM-side drift is observed — rule in _directives.sh
      should suffice in practice.
+
+** TODO deep-research Phase 3 retry/fallback hardening [[file:2026-04-28-phase3-retry-hardening.md]]
+   :PROPERTIES:
+   :ID: phase3-retry-hardening
+   :END:
+   - Filed from research/managed-agents-scoping/decision.md.
+   - Borrow patterns from Anthropic Managed Agents WITHOUT migrating
+     runtime: exponential backoff for HTTP 429, per-domain failure
+     threshold, batch-wide timeout detection.
+   - Triggers (any one): observed rate-limit cascade, Cloudflare /
+     bot-blocking on a domain, or batch-wide timeout in a parallel
+     curl fetch. None observed as of 2026-04-28.
+   - Defer until observed — current single-retry + priority-list
+     replacement is good enough for ~12 URL fetches per run.
