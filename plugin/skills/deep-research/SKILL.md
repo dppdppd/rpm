@@ -86,6 +86,11 @@ Return your complete report as plain text.
 
 QUESTION: {specific sub-question}
 
+ANCHOR ON USER'S CATEGORIZATION: if the user's prompt enumerates a
+  taxonomy (e.g. "X, Y, Z" or "three types: A, B, C"), use THAT exact
+  taxonomy as your output structure. Do NOT silently reorganize into
+  the most-popular literature convention.
+
 ROUND 1: 5-6 broad queries with varied terminology
 PAUSE — GRADER CHECK: Are all sub-questions covered with primary-source
   evidence? If yes, halt early and skip Round 2. If no, list the
@@ -130,12 +135,19 @@ request: `curl -sIL -m 15 -o /dev/null -w "%{http_code}" "URL"`.
 Drop or flag non-resolving URLs (urlhealth-style; reduces non-resolving
 citations 6–79× per arXiv:2604.03173).
 
+**URL canonicalization:** prefer the canonical landing page over a
+deep-link to a rotating subpage. Use the project root for databases
+(`materialsproject.org`), the canonical arxiv abs URL
+(`arxiv.org/abs/X`) over the HTML version, the docs root over a
+versioned slug. The form that won't 404 in six months.
+
 Replace failures from priority list. Post-fetch: scan for better URLs.
 
 ## Phase 4: Gap Analysis & Validation
 
 Must produce: `$TOPIC/gaps/` file + `$TOPIC/validation/adversarial.md`.
 - Gap analysis: LOW-confidence findings, contradictions, thin dims
+- **Domain coverage check**: when surveying "the most-used X", explicitly verify region-specific + specialty + niche sources are represented (generic web search systematically over-weights globally popular ones).
 - Adversarial: 3+ searches seeking counter-evidence
 - Recency check: findings >18mo still current?
 - Citation pre-audit: source URLs exist and match?
