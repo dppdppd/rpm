@@ -6,6 +6,35 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Broaden audit hookify to non-CLAUDE.md repeat findings
+   CLOSED: [2026-04-24]
+   :PROPERTIES:
+   :ID: broaden-hookify
+   :END:
+   - /audit documents Phase 3 currently only hookifies CLAUDE.md
+     rule violations seen 2+ times. Other recurring drift (stale
+     status.md, broken refs, daily-log gaps, memory-file rot) gets
+     re-fixed each audit with no structural follow-up.
+   - Broaden Phase 3 to detect any repeat finding (by category /
+     signature) and propose the fitting intervention — could be
+     a hook, but often just guidance: skill-body edit, memory
+     rule, CLAUDE.md line, scan.sh check. Pick by finding type,
+     not always a hook.
+   - Closed by commits 3ede449 + b6dbb03 (v2.7.11).
+
+** DONE Archive DONE entries out of tasks.org
+   CLOSED: [2026-04-21]
+   :PROPERTIES:
+   :ID: archive-done-entries
+   :END:
+   - Active backlog was cluttered by 13 DONE entries.
+   - Moved closed tasks to docs/rpm/future/done.org so tasks.org
+     only carries actionable work (TODO/IN-PROGRESS/BLOCKED).
+   - Downstream wiring: backlog skill (mark-done flow, review
+     listing), session-end skill (auto-archive sweep), scan.sh
+     (walks DONE for :BLOCKED_BY: dep resolution).
+   - Closed by commits 47e4a8a + eaa7006 + 57cf4e6 (v2.7.10).
+
 ** DONE A/B test W&D parallel-tool-calling vs 4-subagent design
    CLOSED: [2026-04-28]
    :PROPERTIES:

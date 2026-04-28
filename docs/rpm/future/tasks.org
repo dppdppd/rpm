@@ -2,34 +2,6 @@
 #+TODO: TODO IN-PROGRESS BLOCKED | DONE
 
 * Active
-** TODO Broaden audit hookify to non-CLAUDE.md repeat findings
-   :PROPERTIES:
-   :ID: broaden-hookify
-   :END:
-   - /audit documents Phase 3 currently only hookifies CLAUDE.md
-     rule violations seen 2+ times. Other recurring drift (stale
-     status.md, broken refs, daily-log gaps, memory-file rot) gets
-     re-fixed each audit with no structural follow-up.
-   - Broaden Phase 3 to detect any repeat finding (by category /
-     signature) and propose the fitting intervention — could be
-     a hook, but often just guidance: skill-body edit, memory
-     rule, CLAUDE.md line, scan.sh check. Pick by finding type,
-     not always a hook.
-   - Keeps the loop closed: drift fixed once mechanically, then
-     prevented from recurring (sometimes by code, sometimes by
-     telling the LLM to stop doing it).
-
-** TODO Archive DONE entries out of tasks.org
-   :PROPERTIES:
-   :ID: archive-done-entries
-   :END:
-   - Active backlog is cluttered by 13 DONE entries (lines 60–234).
-   - Move closed tasks to a separate done file so tasks.org only
-     carries actionable work (TODO/IN-PROGRESS/BLOCKED).
-   - Downstream touch-points: backlog skill (mark-done flow,
-     review listing), session-end skill (auto-DONE on match),
-     scan.sh (walks DONE for :BLOCKED_BY: dep resolution).
-
 ** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
    :PROPERTIES:
    :ID: codex-port
