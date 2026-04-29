@@ -340,6 +340,19 @@ happen when the fast-path check failed solely on a Phase 3 signal
 (mismatch or uncleared natives).
 
 ### 2a. Commit changes
+- **Untracked files first.** If `git status` reports any untracked
+  files, list them and ask the user to decide per file (or per
+  logical group) before drafting any commit:
+  - **keep** → stage and include in this commit
+  - **gitignore** → add the path/pattern to `.gitignore` (and stage
+    that change)
+  - **delete** → `rm` the file
+  Never silently drop untracked files; never `git add .` past them.
+  The point is to make sure work doesn't get lost — surface every
+  untracked path and get an explicit decision.
+- After untracked files are resolved, apply the same lens to
+  modified-but-unstaged files: confirm each is intended for the
+  commit, not stray scratch work.
 - If multiple logical groups exist, ask whether to commit them as
   one commit or split into several
 - Confirm files to include (avoid `git add .` — list files explicitly)
