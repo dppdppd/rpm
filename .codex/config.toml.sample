@@ -1,0 +1,14 @@
+# rpm-on-Codex sample config fragment.
+#
+# Codex hooks are behind an experimental feature flag. Merge the block
+# below into your `~/.codex/config.toml` (or the project's `.codex/
+# config.toml`) so the hooks declared in `.codex/hooks.json` actually
+# fire.
+#
+# Without `codex_hooks = true`, Codex will load `hooks.json` but skip
+# dispatch silently — the rpm SessionStart context-injection won't
+# happen, drift won't be checked, and the Stop-time learnings/handoff
+# pipeline won't run.
+
+[features]
+codex_hooks = true
