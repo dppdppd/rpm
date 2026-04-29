@@ -73,7 +73,13 @@ docs/research/<topic-slug>/
 - SIMPLE (1-3 dims): searches in main session, no sub-agents
 - COMPLEX (4+ dims for DEEP-DIVE; 3+ entities for SURVEY): sub-agents per Step 1
 
-Present strategy + dimensions, wait for confirmation.
+**Scope confirmation gate (mandatory).** Present the chosen strategy
+and the full dimension/entity list to the user, then STOP and wait
+for explicit confirmation before any agent dispatch. List dimensions
+as a numbered set so the user can edit by reference (e.g. "drop 3,
+add a fourth on X"). Do not launch sub-agents on assumed scope, even
+if the original prompt seemed unambiguous — the user's mental model
+of the decomposition is what should drive the run.
 
 ## Phase 2: Parallel Discovery
 
@@ -167,7 +173,15 @@ Write `$TOPIC/findings/report.md`.
 2. Citation-audit sub-agent (foreground) — checks semantic claim-vs-source match (CiteAudit pattern, arXiv:2602.23452).
 3. Fix MISMATCHED claims; for UNSOURCED claims add a citation from artifacts or label "model knowledge — not verified". Never fabricate URLs.
 
-Present summary with confidence levels, audit score, and link to report.
+**Final summary (mandatory).** End the run with a Key Findings
+summary in the chat — the user should not have to open the report
+file to know what came back. Include:
+- 3–7 bullets covering the most important findings, each with its
+  confidence tag (HIGH / MEDIUM / LOW or "model knowledge — not
+  verified") and the source URL
+- Any contradictions or unresolved gaps surfaced by Phase 4
+- Citation-audit score from Phase 5's post-hoc defenses
+- Path to the full `findings/report.md`
 
 ## Scaling Rules
 
