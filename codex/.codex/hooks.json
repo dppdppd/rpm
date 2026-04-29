@@ -1,0 +1,40 @@
+{
+  "description": "rpm hooks for Codex CLI. Subset of plugin/hooks/hooks.json — only events Codex actually fires.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codex/hooks/session-start-auto.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codex/hooks/context-monitor.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codex/hooks/stop-learn-capture.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .codex/hooks/handoff-validator.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
