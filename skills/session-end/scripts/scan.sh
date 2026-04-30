@@ -17,6 +17,9 @@ cd "$ROOT" 2>/dev/null || { echo "error=cannot_cd_to_root"; exit 0; }
 # ----------------------------------------------------------------
 echo "=== plugin ==="
 PLUGIN_MANIFEST="${CLAUDE_PLUGIN_ROOT:-}/.claude-plugin/plugin.json"
+if [ ! -f "$PLUGIN_MANIFEST" ] && [ -n "${CLAUDE_SKILL_DIR:-}" ]; then
+  PLUGIN_MANIFEST="${CLAUDE_SKILL_DIR}/../../.claude-plugin/plugin.json"
+fi
 RPM_VERSION=""
 if [ -f "$PLUGIN_MANIFEST" ]; then
   RPM_VERSION=$(jq -r '.version // empty' "$PLUGIN_MANIFEST" 2>/dev/null)
