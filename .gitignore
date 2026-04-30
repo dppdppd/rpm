@@ -1,3 +1,6 @@
+# Claude Code harness runtime state (lock files, local settings)
+.claude/
+
 # Session state — ephemeral, recreated each session
 docs/rpm/~rpm-session-start
 docs/rpm/~rpm-session-end
