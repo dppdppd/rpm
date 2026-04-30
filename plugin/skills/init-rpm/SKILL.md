@@ -219,10 +219,23 @@ Create `docs/rpm/future/tasks.org`:
 
 * {Current Phase}
 ** TODO {first task} [[file:YYYY-MM-DD-slug.md]]
+   :PROPERTIES:
+   :ID: {slug}
+   :END:
 ```
 
-Each task entry is one short sentence + a link to a detail file
-(`future/<date>-<slug>.md`). Never inline task details in your rpm backlog.
+**Format rule (enforce from day one):** each entry is the
+heading line (with `[[file:...]]` link) plus the standard
+`:PROPERTIES: / :ID: / :END:` drawer. Body content (anything
+outside the drawer) caps at 3 lines and is usually empty —
+all task details live in the detail file at
+`future/<date>-<slug>.md`. The drawer doesn't count toward
+the 3-line body budget; add `:BLOCKED_BY: <other-slug>` inside
+it when there's a dependency on another task.
+
+Never inline bullet lists, prose, or implementation notes in
+your rpm backlog. The full rule lives in
+`plugin/skills/backlog/SKILL.md`.
 
 Also create `docs/rpm/future/done.org` (archive for closed entries
 swept out of tasks.org by `/session-end`):
