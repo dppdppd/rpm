@@ -74,31 +74,56 @@ is long-term; native tasks (`TaskCreate`/`TaskList`) are reserved for
 work actually happening *this session*. Adding to your rpm backlog
 without a mirrored native task is the correct, intended behavior.
 
-**One line per entry.** A `tasks.org` entry is exactly one TODO
-heading line plus its `:PROPERTIES:` drawer. The `[[file:...]]` link
-in the heading is how you express "more context lives elsewhere" —
-do NOT inline body bullets, prose, or implementation notes under the
-heading. All of that goes in the detail file. Multi-line entries
-turn the backlog into prose-reading and break the SessionStart menu
-+ `/next` priority scan, both of which need "topmost unblocked" to
-fit a glance.
+**3 body lines max per entry, plus the org `:PROPERTIES:` drawer.**
+The drawer is its own thing — it doesn't count toward the body
+budget. Body content (heading + any inline notes) caps at 3 lines;
+default is just the heading.
+
+Standard shape:
+
+```
+** TODO <description> [[file:YYYY-MM-DD-slug.md]]
+   :PROPERTIES:
+   :ID: <slug>
+   :END:
+```
+
+Add `:BLOCKED_BY: <other-slug>` inside the drawer when there's a
+dependency. Add up to 2 inline body lines (under the drawer) only
+when something can't reasonably live in the detail file — most of
+the time the detail file is the right home for everything beyond
+the heading.
+
+What does **not** belong inline in tasks.org:
+- Bullet lists describing the task
+- Prose explaining "why", "how", or "defer until"
+- Implementation notes, links to related files, status commentary
+
+All of that goes in the detail file at
+`docs/rpm/future/YYYY-MM-DD-slug.md` — never as 5+ lines of body
+under the heading. Subagents dispatched by `/next` actionable-
+backlog read the detail file, so information isn't lost — it's
+just not in the line-scannable index. Multi-line entries turn
+the backlog into prose-reading and break the SessionStart menu
++ `/next` priority scan, both of which need "topmost unblocked"
+to fit a glance.
 
 1. Read `docs/rpm/future/tasks.org` to see existing parent headings
    and task structure.
 2. Ask which parent heading the task belongs under (suggest one if
    obvious). If no headings exist, create one.
-3. Add as a single line — `** TODO <one-sentence description>
-   [[file:YYYY-MM-DD-slug.md]]` — at the bottom of the **actionable
-   band** in the chosen heading (above any blocked / postponed /
-   DONE entries). Follow with the org-mode `:PROPERTIES: / :ID: /
-   :END:` drawer (3 lines of metadata, not body content).
+3. Add as `** TODO <one-sentence description>
+   [[file:YYYY-MM-DD-slug.md]]` followed by the standard
+   `:PROPERTIES: / :ID: <slug> / :END:` drawer, at the bottom of
+   the **actionable band** in the chosen heading (above any
+   blocked / postponed / DONE entries).
 4. Create the detail file at `docs/rpm/future/YYYY-MM-DD-slug.md`
    with everything that would otherwise be inline: title,
    description, action steps, scope, estimate, related links. Ask
    the user for details if the task is complex.
-5. If the task has obvious dependencies on existing tasks, add a
-   `:BLOCKED_BY:` line inside the properties drawer (still
-   metadata, not body).
+5. If the task has obvious dependencies on existing tasks, add
+   `:BLOCKED_BY: <other-slug>` inside the drawer (still
+   structured metadata, not body).
 6. Confirm: print the new entry and its location.
 
 ---
