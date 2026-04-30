@@ -6,6 +6,23 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Multi-agentic upgrades — port from volta [[file:2026-04-30-multi-agentic-upgrades.md]]
+   CLOSED: [2026-04-30]
+   :PROPERTIES:
+   :ID: multi-agentic-upgrades
+   :END:
+   - HIGH-value items shipped: /next orchestrator (1), /audit
+     documents → background (2), loop-exhausted terminal (4),
+     orchestrator activity log + log-decision.sh helper (7),
+     /next status formatter (7b), codex-sync-reminder
+     PostToolUse hook (3, plus 2 deferred sub-candidates).
+   - MEDIUM items deferred-with-rationale: RESULT_SCHEMA for
+     auditor (5) — current prose findings work well; tag-prefix
+     state on backlog items (6) — rpm backlog is creative work,
+     not a mechanical pipeline.
+   - Side fix during this work: sync-codex.sh now mirrors per-
+     skill scripts/ subdirectories (closed sync-codex-scripts).
+
 ** DONE sync-codex.sh — sync skill scripts/ subdirectories [[file:2026-04-30-sync-codex-scripts.md]]
    CLOSED: [2026-04-30]
    :PROPERTIES:

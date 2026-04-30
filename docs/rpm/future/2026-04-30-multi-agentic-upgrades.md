@@ -108,7 +108,11 @@ expected fleet size is ≤4 short jobs, so the JSONL is enough).
 This is now part of the **HIGH value** band — visibility into the
 orchestrator is core to trusting `/loop /next`, not optional.
 
-## Medium — adapt before porting
+## Medium — deferred (no observed forcing function)
+
+The following two items are scoped but not shipped — they're real
+patterns from volta but rpm hasn't hit recurring pain that demands
+them yet. Revisit when concrete drift surfaces.
 
 ### 5. Worker-brief + RESULT_SCHEMA for dispatched subagents
 
@@ -128,6 +132,11 @@ LLM-rendered. Define a JSON schema for findings:
 Have the auditor emit JSON; let the audit skill parse + sort + render.
 Mechanical instead of LLM-rendered.
 
+**Deferred reason:** today's audit returned thorough, well-evidenced
+prose findings — JSON structure could compress them in unhelpful
+ways. Revisit if Phase 2 LLM-rendering ever produces inconsistent
+scoring or drops findings.
+
 ### 6. Tag-prefix state on backlog items
 
 Volta uses `[task:][analyzed:][fix-attempted:]` prefixes on a single
@@ -136,6 +145,13 @@ text field as a race-safe state machine. rpm analog: mark
 deep on a backlog item, `[planned:DATE]` when a plan file exists.
 Richer than the current TODO/IN-PROGRESS/BLOCKED set; lives in a
 single text field; idempotent; no schema change.
+
+**Deferred reason:** rpm backlog items are creative work the user
+owns end-to-end — once an item is investigated/planned, the user
+typically goes straight to implementation. Tag prefixes serve
+mechanical pipelines (volta's bug-fix loop) better than creative
+ones. Revisit when `/next`'s actionable-backlog dispatches start
+producing artifacts that need pipeline tracking.
 
 ### 7. Append-only orchestrator activity log
 
