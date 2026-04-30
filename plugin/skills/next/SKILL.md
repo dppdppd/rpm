@@ -1,7 +1,7 @@
 ---
 name: next
 description: One-step rpm orchestrator. Picks ONE action per invocation from a priority list (blocked-on-user → drift-fix → actionable-backlog → idle), dispatches a subagent if needed, logs the decision, and returns. Designed to be wrapped by `/loop /next` — never loops internally. Terminates the loop after 3 consecutive idle ticks. Use when the user wants the session to autonomously work the rpm backlog.
-argument-hint: ""
+argument-hint: "[status]"
 allowed-tools: Read Write Edit Glob Grep Bash Agent
 ---
 
@@ -11,6 +11,26 @@ Single-step orchestrator that picks ONE action per turn from a strict
 priority list, dispatches the work (often as a background subagent),
 and returns. **Never loops internally.** Wrap with `/loop /next` for
 self-paced execution.
+
+## Routing
+
+If `$ARGUMENTS` is `status`, run the status formatter and stop:
+
+!`bash ${CLAUDE_SKILL_DIR}/scripts/status.sh`
+
+Render the script's output verbatim. Do not interpret, summarize, or
+add commentary — the user wants the raw view.
+
+If `$ARGUMENTS` is empty, continue with the orchestrator below.
+
+If `$ARGUMENTS` is anything else, print:
+
+```
+/next        — one orchestrator step (use `/loop /next` for autonomous mode)
+/next status — show in-flight subagents, recent decisions, idle streak, daily counters
+```
+
+and stop.
 
 ## Action priority
 

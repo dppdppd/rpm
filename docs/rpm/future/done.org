@@ -6,6 +6,19 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE sync-codex.sh — sync skill scripts/ subdirectories [[file:2026-04-30-sync-codex-scripts.md]]
+   CLOSED: [2026-04-30]
+   :PROPERTIES:
+   :ID: sync-codex-scripts
+   :END:
+   - Shipped as a prereq for /next status (which lives at
+     plugin/skills/next/scripts/status.sh and needs to propagate
+     to the codex port). Per-skill scripts/ subdirectory now copies
+     verbatim alongside the translated SKILL.md.
+   - Confirmed: codex/.codex/skills/{next,session-end}/scripts/
+     populate correctly on sync. audit/scripts/ correctly stays
+     absent (no source).
+
 ** DONE Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
    CLOSED: [2026-04-30]
    :PROPERTIES:

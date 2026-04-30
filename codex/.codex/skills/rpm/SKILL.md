@@ -24,6 +24,7 @@ Print this exact list and stop:
 /audit project   — full review with competitive research and plan
 /backlog         — manage rpm backlog (add, list, review, postpone, done)
 /next            — one-step orchestrator (loop-friendly: /loop /next)
+/next status     — view in-flight subagents, recent decisions, idle streak
 /rpm             — what is rpm, how it works, governing principles
 /rpm ?           — this list
 ```

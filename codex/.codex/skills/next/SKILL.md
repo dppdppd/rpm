@@ -10,6 +10,26 @@ priority list, dispatches the work (often as a background subagent),
 and returns. **Never loops internally.** Wrap with `/loop /next` for
 self-paced execution.
 
+## Routing
+
+If `$ARGUMENTS` is `status`, run the status formatter and stop:
+
+!`bash ${CLAUDE_SKILL_DIR}/scripts/status.sh`
+
+Render the script's output verbatim. Do not interpret, summarize, or
+add commentary — the user wants the raw view.
+
+If `$ARGUMENTS` is empty, continue with the orchestrator below.
+
+If `$ARGUMENTS` is anything else, print:
+
+```
+/next        — one orchestrator step (use `/loop /next` for autonomous mode)
+/next status — show in-flight subagents, recent decisions, idle streak, daily counters
+```
+
+and stop.
+
 ## Action priority
 
 Evaluate top-to-bottom; first match wins:

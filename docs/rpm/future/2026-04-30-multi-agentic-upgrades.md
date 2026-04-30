@@ -58,6 +58,46 @@ consecutive idle ticks, output `action: loop-exhausted / next: USER
 ATTENTION …` and explicitly do NOT call `ScheduleWakeup` on that
 terminal turn. Prevents runaway dynamic-mode loops.
 
+### 7b. `/next status` CLI surface (folded in from item 7)
+
+Volta's dashboard (REST API + web UI at `/api/orchestrator/...`)
+violates rpm's "pure markdown + bash, no daemon" constraint. The
+underlying *need* — visibility into "what's running, what just
+happened, what's queued" — generalizes as a CLI status command:
+
+- `/next status` (sub-command on `/next`, or `/orchestrator-status`
+  if `/next` should stay single-purpose) emits a formatted view of
+  the activity log:
+
+  ```
+  == In-flight ==
+    <agent-id>  actionable-backlog: sync-codex-scripts  (3 min ago)
+  == Last 10 decisions ==
+    12:08  actionable-backlog  phase3-retry-hardening   dispatched
+    12:07  drift-fix           context.md broken-ref    fixed
+    ...
+  == Idle streak ==
+    0  (loop-exhausted in 3 more idle ticks)
+  == Today ==
+    drift fixes: 2   dispatches: 4   completions: 2   blocked: 0
+  ```
+
+- Implementation: bash + `jq` over `~rpm-orchestrator-log.jsonl`.
+  ~30 lines. No server, no HTML, no JS.
+
+- Document the raw log format so `tail -f
+  docs/rpm/~rpm-orchestrator-log.jsonl | jq .` is a first-class
+  observability path. Power users skip the formatter entirely.
+
+Skip from volta's dashboard: the web UI (renders nothing the log
+doesn't; adds a dev dependency), the REST API server (wrong
+factoring for solo-dev rpm), and per-agent transcript tailing
+(volta needs it because parallel workers run for 30+ min; rpm's
+expected fleet size is ≤4 short jobs, so the JSONL is enough).
+
+This is now part of the **HIGH value** band — visibility into the
+orchestrator is core to trusting `/loop /next`, not optional.
+
 ## Medium — adapt before porting
 
 ### 5. Worker-brief + RESULT_SCHEMA for dispatched subagents

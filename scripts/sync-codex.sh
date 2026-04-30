@@ -63,6 +63,16 @@ for skill_dir in "$SRC"/skills/*/; do
   mkdir -p "$DST/skills/$name"
   python3 "$REPO_ROOT/scripts/translate-skill-codex.py" "$src_md" "$dst_md"
   synced_skills+=("$name")
+
+  # Mirror per-skill scripts/ subdirectory (e.g. session-end/scripts/scan.sh,
+  # next/scripts/status.sh). Codex skill bodies reference these by relative
+  # path; without the copy the codex side can't run them.
+  src_scripts="$skill_dir/scripts"
+  dst_scripts="$DST/skills/$name/scripts"
+  if [ -d "$src_scripts" ]; then
+    rm -rf "$dst_scripts"
+    cp -a "$src_scripts" "$dst_scripts"
+  fi
 done
 
 # Drop stale skill dirs whose source is gone, except manual ones.
