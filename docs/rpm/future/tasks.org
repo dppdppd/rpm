@@ -3,6 +3,20 @@
 
 * Active
 
+** IN-PROGRESS Multi-agentic upgrades — port from volta [[file:2026-04-30-multi-agentic-upgrades.md]]
+   :PROPERTIES:
+   :ID: multi-agentic-upgrades
+   :END:
+   - 7 items inventoried from volta's .claude/ + orchestrator
+     infrastructure. First slice (items 1+2) is /next orchestrator
+     + /audit documents → background. Items 3-7 follow incrementally.
+   - HIGH value: /next orchestrator (1), /audit background (2),
+     PostToolUse REMINDER hooks (3), loop-exhausted terminal (4).
+   - MEDIUM: worker-brief + RESULT_SCHEMA (5), tag-prefix state
+     on backlog items (6), orchestrator activity log (7).
+   - SKIP: atomic-claim REST, lease reaper, triage→analyze→fix
+     pipeline, worktree-domain workers, lock-aware appender.
+
 ** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
    :PROPERTIES:
    :ID: sessionstart-clear-flake

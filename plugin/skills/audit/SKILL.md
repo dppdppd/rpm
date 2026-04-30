@@ -119,15 +119,22 @@ Scan docs, CLAUDE.md, memory files, trackers, and recent session
 jsonl logs for drift. Runs via the `rpm:auditor` subagent. Scored,
 confidence-gated, hookifies repeat offenders.
 
-### Phase 1: Scan (background agent)
+### Phase 1: Dispatch (background subagent)
 
-Launch the `rpm:auditor` subagent in background
-(`subagent_type: "rpm:auditor"`). It returns a structured audit report
-containing a scan summary, findings (each scored 0–100), and a session
-drift table. The scan spec lives in `agents/auditor.md` — do not
-duplicate it here.
+Launch the `rpm:auditor` subagent with `run_in_background: true` and
+return immediately — do NOT block-wait. The audit takes ~3 minutes;
+the main session stays interactive while it runs. The scan spec
+lives in `agents/auditor.md` — do not duplicate it here.
 
-Wait for the subagent to complete, then proceed to Phase 2.
+In the same response, surface a one-line dispatch confirmation to
+the user (`audit: dispatched rpm:auditor in background — results
+will appear when ready`) and stop. Do NOT invent findings or guess
+at outcomes.
+
+When the agent's `<task-notification>` arrives, re-enter the skill
+at Phase 2 with the report content. The notification carries the
+agent ID; read its output via the file referenced in the
+notification's `<output-file>` tag.
 
 ### Phase 2: Score findings, present menu
 

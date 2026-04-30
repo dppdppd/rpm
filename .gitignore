@@ -10,6 +10,7 @@ docs/rpm/~rpm-native-tasks.jsonl
 docs/rpm/~rpm-last-session
 docs/rpm/~rpm-last-validated-commit
 docs/rpm/~rpm-task-candidates.jsonl
+docs/rpm/~rpm-orchestrator-log.jsonl
 
 # opencode sibling package — derived mirrors populated by
 # scripts/sync-opencode.sh; source of truth lives in plugin/
