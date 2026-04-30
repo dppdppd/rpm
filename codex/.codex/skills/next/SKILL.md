@@ -81,21 +81,34 @@ action produced (e.g. drift-fix details, dispatch confirmation).
 
 ## Logging
 
-Append one JSONL line to `docs/rpm/~rpm-orchestrator-log.jsonl` per
-invocation:
+Use the helper script — never hand-format JSONL:
 
-```json
-{"ts":"2026-04-30T10:34:00-07:00","kind":"actionable-backlog","target":"sync-codex-scripts","rationale":"top unblocked TODO; dispatched general-purpose subagent <agent-id>"}
+```bash
+bash ${CLAUDE_SKILL_DIR}/scripts/log-decision.sh <kind> [target] [rationale] [agent-id] [status]
 ```
 
-For `actionable-backlog` dispatches, also append a `backlog-result`
-entry when the `<task-notification>` arrives:
+After each priority branch's action, call the script with the
+appropriate kind:
 
-```json
-{"ts":"…","kind":"backlog-result","target":"sync-codex-scripts","agent_id":"…","status":"plan-written|blocked|no-op"}
-```
+- `blocked-on-user` — pass the open question text as `<rationale>`
+- `drift-fix` — pass the drift category as `<target>` (e.g.
+  `context.md broken-ref`) and the fix summary as `<rationale>`
+- `actionable-backlog` — pass the task ID as `<target>`, the
+  one-line rationale, and the dispatched subagent's ID as
+  `<agent-id>`. Match volta's idiom: the agent ID is what the
+  Agent tool returned (look for `agentId:` in the dispatch result).
+- `idle` — empty `<target>`, short `<rationale>`
+- `loop-exhausted` — empty `<target>`, fixed `<rationale>` like
+  `3 idle ticks`
+- `backlog-result` — when a `<task-notification>` arrives for a
+  prior `actionable-backlog` dispatch, log it: pass the same
+  `<target>` and `<agent-id>` plus a `<status>` of
+  `plan-written | blocked | no-op`. This pairing is what powers
+  the `in-flight: <N>` count.
 
-This pairing is what powers the `in-flight: <N>` count.
+The script writes to `docs/rpm/~rpm-orchestrator-log.jsonl`
+(gitignored, ephemeral). Failures print a stderr warning and
+exit 0 — never block the orchestrator.
 
 ## Idle terminal
 
