@@ -7,55 +7,18 @@
    :PROPERTIES:
    :ID: sessionstart-clear-flake
    :END:
-   - User hit a case where /clear on Opus 4.7 did not fire the hook;
-     quit+restart recovered it.
-   - Harness-level (CC) bug, not rpm code. Watch for repro and file
-     upstream at anthropics/claude-code if it persists.
 
-** TODO scan.sh version=unknown fallback [[file:2026-04-18-scan-version-fallback.md]]
-   :PROPERTIES:
-   :ID: scan-version-fallback
-   :END:
-   - `session-end` scan.sh emits `version=unknown` because
-     `$CLAUDE_PLUGIN_ROOT` isn't set in skill-body bash context.
-   - Fix: fall back to `$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json`.
-   - Ship as v2.7.4; ~10 min including a bats case.
-
-** TODO publish-all.sh — auto-push dev before subtree-split [[file:2026-04-21-publish-all-push-dev.md]]
-   :PROPERTIES:
-   :ID: publish-all-push-dev
-   :END:
-   - Fold `git push dev master` into `publish-all.sh` as a pre-step,
-     so a single invocation handles both the full-tree dev push and
-     the plugin/opencode subtree splits.
-   - Clean-tree check already exists; add the dev push right after
-     it, before step 1 (CC subtree-split).
-   - Keeps `dev` in sync with `plugin` automatically — prevents the
-     footgun where plugin/master ships code that isn't yet on Gitea.
-
-** TODO Pivot-capture hook: mirror marker → tasks.org top automatically [[file:2026-04-21-pivot-capture-hook.md]]
+** TODO Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook
    :END:
-   - Follow-up to the LLM-side pivot-capture rule. Hook-enforce the
-     mirror via PostToolUse matcher on Edits to
-     `docs/rpm/~rpm-session-start`, auto-inserting the corresponding
-     `** TODO` at the top of the actionable band.
-   - Idempotent: if a matching entry already exists, promote to top
-     instead of duplicating.
-   - Defer until LLM-side drift is observed — rule in _directives.sh
-     should suffice in practice.
 
 ** TODO deep-research Phase 3 retry/fallback hardening [[file:2026-04-28-phase3-retry-hardening.md]]
    :PROPERTIES:
    :ID: phase3-retry-hardening
    :END:
-   - Filed from research/managed-agents-scoping/decision.md.
-   - Borrow patterns from Anthropic Managed Agents WITHOUT migrating
-     runtime: exponential backoff for HTTP 429, per-domain failure
-     threshold, batch-wide timeout detection.
-   - Triggers (any one): observed rate-limit cascade, Cloudflare /
-     bot-blocking on a domain, or batch-wide timeout in a parallel
-     curl fetch. None observed as of 2026-04-28.
-   - Defer until observed — current single-retry + priority-list
-     replacement is good enough for ~12 URL fetches per run.
+
+** TODO /next refinements from end-to-end validation [[file:2026-04-30-next-refinements.md]]
+   :PROPERTIES:
+   :ID: next-refinements
+   :END:

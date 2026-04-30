@@ -22,3 +22,11 @@ This is a watch-and-file item, not an rpm code change.
 - In the session where the task was logged, `SessionStart:clear` *did*
   fire cleanly — so the flake is intermittent, not a total break.
 - Not blocking any rpm work; park as a bug-watch.
+
+## Investigation note
+2026-04-28 (orchestrator dispatch): no fresh repro evidence has surfaced
+since this was filed on 2026-04-17. The SessionStart hook's `source`
+handling (`session-start-auto.sh:18-20`) accepts `clear` correctly and
+remains model-agnostic at the script level — symptom must originate in
+the Claude Code harness's hook dispatch, which we can't fix from here.
+Leaving as watch-only; nothing actionable until a repro lands.
