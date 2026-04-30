@@ -50,6 +50,15 @@
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/context-monitor.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/codex-sync-reminder.sh\""
+          }
+        ]
       }
     ],
     "Stop": [

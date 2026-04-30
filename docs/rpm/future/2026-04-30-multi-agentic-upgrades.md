@@ -41,15 +41,25 @@ stdout (model-visible next turn) when a commit/write touches a path
 with a known invariant. Document the audit history reference in the
 hook comment so the rationale is clear.
 
-rpm candidates:
+**Shipped (v1):**
+
+- `plugin/hooks/codex-sync-reminder.sh` — fires on Edit|Write under
+  `plugin/{skills,hooks,agents}/` when the project has
+  `scripts/sync-codex.sh` (i.e. the rpm monorepo). Stdout reminder
+  to run sync-codex.sh before committing, so the codex port stays
+  in sync. Plugin-side only — sync goes plugin → codex, so codex
+  doesn't carry this hook.
+
+**Deferred:**
 
 - Edit to `docs/rpm/future/tasks.org` without subsequent ordering
-  check (`/backlog list` not invoked or no reorder happened)
+  check — too noisy in practice (most edits don't need a review;
+  ordering is a `/backlog review` concern).
 - Commit touching `plugin/skills/**` or `plugin/hooks/**` without
-  a corresponding `plugin/.claude-plugin/plugin.json` version bump
-  (user-facing changes shipping unversioned)
-- Edit to a `plugin/skills/<name>/SKILL.md` without a subsequent
-  `sync-codex.sh` run (codex copy stale)
+  a corresponding plugin.json version bump — better as a
+  pre-commit / pre-release check, not PostToolUse. The
+  `verify_version_before_tag` memory already covers this in
+  guidance form. Revisit if forgotten bumps recur.
 
 ### 4. Loop-exhausted terminal pattern
 
