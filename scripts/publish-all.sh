@@ -37,6 +37,18 @@ fi
 
 echo "publish-all: version=$VERSION tag=$TAG"
 
+# --- Step 0: push dev (full monorepo) so plugin/opencode aren't ahead ---
+# If this fails (network, auth), we exit before any force-push to plugin —
+# safer failure mode than today, where a dev outage can still leave plugin
+# updated with commits that aren't on dev.
+
+echo "publish-all: step 0/3 — push dev"
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "publish-all: would push dev master (dry-run, skipping)"
+else
+  git push dev master
+fi
+
 # --- Step 1: CC plugin (subtree split from plugin/ → plugin/master) ---
 
 echo "publish-all: step 1/3 — CC plugin"

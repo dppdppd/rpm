@@ -3,18 +3,6 @@
 
 * Active
 
-** TODO Port rpm to Codex CLI [[file:2026-04-14-codex-port.md]]
-   :PROPERTIES:
-   :ID: codex-port
-   :END:
-   - Skills port 1:1 (same SKILL.md + YAML frontmatter format)
-   - Plugin manifest similar (.codex-plugin/plugin.json)
-   - Hooks are experimental — only SessionStart, Stop, PostToolUse (Bash only);
-     no SessionEnd, PreCompact, PostCompact, TaskCreated/TaskCompleted
-   - Agents need translation: TOML not markdown
-   - No native task UI (no TaskCreate/TaskList/TaskUpdate equivalent)
-   - Overall: about half ports; rest blocked on missing lifecycle events
-
 ** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
    :PROPERTIES:
    :ID: sessionstart-clear-flake
@@ -44,6 +32,20 @@
      it, before step 1 (CC subtree-split).
    - Keeps `dev` in sync with `plugin` automatically — prevents the
      footgun where plugin/master ships code that isn't yet on Gitea.
+
+** TODO sync-codex.sh — sync skill scripts/ subdirectories [[file:2026-04-30-sync-codex-scripts.md]]
+   :PROPERTIES:
+   :ID: sync-codex-scripts
+   :END:
+   - sync-codex.sh mirrors SKILL.md + a hook-script whitelist, but
+     skips per-skill `scripts/` subdirectories. So
+     codex/.codex/skills/{audit,session-end}/scripts/ are missing,
+     and the codex SKILL.md bodies reference scripts that don't
+     exist on the codex side.
+   - Surfaced by 2026-04-30 documents audit while fixing F4
+     (scan.sh CLAUDE_SKILL_DIR fallback had no codex counterpart).
+   - Fix: add a per-skill scripts/ copy loop to sync-codex.sh
+     mirroring the existing skill-mirror loop. ~10 lines, ~15 min.
 
 ** TODO Pivot-capture hook: mirror marker → tasks.org top automatically [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:

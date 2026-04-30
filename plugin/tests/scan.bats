@@ -25,6 +25,25 @@ section() {
 }
 
 # ----------------------------------------------------------------
+# plugin (version resolution)
+# ----------------------------------------------------------------
+
+@test "plugin: version resolves via CLAUDE_SKILL_DIR fallback when CLAUDE_PLUGIN_ROOT is unset" {
+  # Reproduces the skill-body-bash invocation context where
+  # $CLAUDE_PLUGIN_ROOT isn't propagated but $CLAUDE_SKILL_DIR is
+  # (see docs/rpm/future/2026-04-18-scan-version-fallback.md).
+  ROOT="$CLAUDE_PLUGIN_ROOT"
+  SKILL_DIR="$ROOT/skills/session-end"
+  run env -u CLAUDE_PLUGIN_ROOT \
+    CLAUDE_PROJECT_DIR="$TEST_DIR" \
+    CLAUDE_SKILL_DIR="$SKILL_DIR" \
+    bash "$SKILL_DIR/scripts/scan.sh"
+  [ "$status" -eq 0 ]
+  section plugin | grep -qE '^version=[0-9]+\.[0-9]+\.[0-9]+$'
+  ! ( section plugin | grep -qE '^version=unknown$' )
+}
+
+# ----------------------------------------------------------------
 # git
 # ----------------------------------------------------------------
 

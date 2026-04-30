@@ -21,4 +21,7 @@ and drift across LLM sessions. Solo dev; published via git subtree split.
 - CLAUDE.md staying under 150 lines
 
 ## Prior Findings
-See `docs/rpm/past/log.md` Audit History.
+See `docs/rpm/past/log.md` Audit History. Most recent: 2026-04-30
+documents audit, 4 findings all fixed (codex-port reconciliation,
+CLAUDE.md skill-name drift, publish-all dev-push gap, scan.sh
+$CLAUDE_SKILL_DIR fallback).

@@ -48,8 +48,17 @@ Referenced from `docs/rpm/context.md` when needed.
   - T7: past/log.md Sessions Reviewed stops at 2026-04-12 (68, Low)
   - T8: feedback_consolidate_parallel_bash not codified (63, Low)
   - T9: Phase 3a native-scoring duplicates task-capture.sh logic (60, Low)
+- 2026-04-30 — audit documents — 4 findings, 4 fixed, 0 skipped
+  - F1: tasks.org `codex-port` still TODO despite work shipping at 9a78ac7 + v2.12.0 (85)
+  - F2: CLAUDE.md line 17 names sixth skill `tasks` — actual is `backlog` (75)
+  - F3: publish-all.sh missing `git push dev master` step — plugin can ship ahead of dev (72)
+  - F4: scan.sh `version=unknown` — needs `$CLAUDE_SKILL_DIR` fallback for skill-body bash (60)
+  - (1 low-confidence finding suppressed: context.md hooks.json filename ambiguity, score 55)
 
 ## Sessions Reviewed
+- 2026-04-30 — 2 sessions reviewed by audit documents
+  - `3a408a57` (Apr 30, current) — codex port v1, deep-research scope+summary gates, two new directives (delegation, "next?"-query), v2.12.0+v2.13.0 — JUSTIFIED
+  - `409e79d8` (Apr 28) — DRB2-derived deep-research improvements, Managed Agents scoping, v2.8.0–v2.11.0 (5 releases) — JUSTIFIED
 - 2026-04-17 — 2 sessions reviewed by audit project
   - `f81e37d4` (Apr 17) — /audit project (this run) — N/A
   - `a4ee0e19` (Apr 13–16) — v2.5.5–v2.7.2 (context-monitor rewrite, task overhaul, Phase 3a, deferred-work capture) — JUSTIFIED; 2 unclean exits; past/ retrospective gap tracked as T4
