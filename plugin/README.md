@@ -96,9 +96,13 @@ backlog), and creates a CLAUDE.md if one doesn't exist.
 ### `/session-end`
 
 Wrap up the current session. Auto-updates past/present/future
-trackers, surfaces uncommitted work and learnings, presents an action
-menu, then writes handoff notes. Run when you're done working or when
-context is getting long.
+trackers, then scales the wrap-up to fit: clean sessions get a
+single-message Express handoff; sessions with one or two surfaces
+(commit, learnings, drift) get an Inline mode with one combined
+message and one follow-up; only genuinely complex sessions
+(multi-commit splits, untracked triage, mismatch) escalate to the
+four-phase ceremony. Encourages short focused sessions by keeping
+the wrap-up cost proportional to what's there.
 
 ### `/backlog`
 
