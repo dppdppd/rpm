@@ -8,7 +8,7 @@
       "name": "rpm",
       "source": {
         "source": "local",
-        "path": "./"
+        "path": "./.codex"
       },
       "policy": {
         "installation": "AVAILABLE",
