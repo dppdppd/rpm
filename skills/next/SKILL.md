@@ -114,10 +114,12 @@ exit 0 — never block the orchestrator.
 
 ## Idle terminal
 
-Read `tail -3 docs/rpm/~rpm-orchestrator-log.jsonl` (filter to
-`kind` ∈ {`blocked-on-user`, `drift-fix`, `actionable-backlog`,
-`idle`, `loop-exhausted`} — ignore `backlog-result`). If all three
-are `idle`, this turn becomes `loop-exhausted` instead of `idle`.
+Read `docs/rpm/~rpm-orchestrator-log.jsonl` only if it exists. Filter
+to `kind` ∈ {`blocked-on-user`, `drift-fix`, `actionable-backlog`,
+`idle`, `loop-exhausted`} and ignore `backlog-result`. If the file
+does not exist, the idle streak is `0`. If the last three filtered
+entries are `idle`, this turn becomes `loop-exhausted` instead of
+`idle`.
 
 The 3-idle threshold prevents runaway dynamic-mode loops. The user
 can resume by running `/next` directly; the next invocation reads
