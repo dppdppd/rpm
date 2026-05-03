@@ -35,15 +35,29 @@ publish flow.
 
 ## Getting started — Codex
 
-Install from inside Codex:
+Install from a shell:
+
+```bash
+codex plugin marketplace add dppdppd/rpm@codex --enable codex_hooks
+```
+
+Then enable the plugin in `~/.codex/config.toml`:
+
+```toml
+[plugins."rpm@dppdppd-rpm"]
+enabled = true
+```
+
+Or install from inside the Codex TUI:
 
 ```
 /plugins marketplace add dppdppd/rpm@codex
 /plugins install rpm@dppdppd-rpm
 ```
 
-Then enable hooks in your Codex config if they are not already enabled
-(`~/.codex/config.toml` or the project's `.codex/config.toml`):
+Codex hooks also require this feature flag in your Codex config if it
+is not already enabled (`~/.codex/config.toml` or the project's
+`.codex/config.toml`):
 
 ```toml
 [features]

@@ -32,7 +32,23 @@ This port supports two layouts:
   Codex's `/plugins` commands.
 - Project layout: copy the generated `.codex/` directory into a project.
 
-For plugin install, run inside Codex:
+For plugin install from a shell:
+
+```bash
+codex plugin marketplace add dppdppd/rpm@codex --enable codex_hooks
+```
+
+Then enable the plugin in `~/.codex/config.toml`:
+
+```toml
+[plugins."rpm@dppdppd-rpm"]
+enabled = true
+```
+
+The `codex plugin` CLI currently manages marketplaces only; it does
+not provide a `codex plugin install` subcommand. If you are already
+inside the Codex TUI, you can use the interactive plugin commands
+instead:
 
 ```
 /plugins marketplace add dppdppd/rpm@codex
