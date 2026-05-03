@@ -65,6 +65,13 @@ Using another agent runtime? See the
 [opencode branch](https://github.com/dppdppd/rpm/tree/opencode) or
 [Codex branch](https://github.com/dppdppd/rpm/tree/codex).
 
+Codex quick install:
+
+```
+/plugin marketplace add dppdppd/rpm@codex
+/plugin install rpm@dppdppd-rpm
+```
+
 ## The workflow
 
 **First time:** Run `/init-rpm`. It scans your project, asks a few

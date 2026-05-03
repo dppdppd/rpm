@@ -35,15 +35,15 @@ publish flow.
 
 ## Getting started — Codex
 
-Install from the published `codex` branch:
+Install from inside Codex:
 
-```bash
-git clone --branch codex --depth 1 https://github.com/dppdppd/rpm.git /tmp/rpm-codex
-cp -R /tmp/rpm-codex/.codex .
+```
+/plugin marketplace add dppdppd/rpm@codex
+/plugin install rpm@dppdppd-rpm
 ```
 
-Then enable hooks in your Codex config (`~/.codex/config.toml` or the
-project's `.codex/config.toml`):
+Then enable hooks in your Codex config if they are not already enabled
+(`~/.codex/config.toml` or the project's `.codex/config.toml`):
 
 ```toml
 [features]

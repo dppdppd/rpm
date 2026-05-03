@@ -28,17 +28,25 @@ Codex CLI port of the rpm plugin. Generated from `plugin/` via
 
 This port supports two layouts:
 
-- Plugin layout: install this `codex/` directory as an rpm Codex plugin.
+- Plugin layout: install from the published `codex` branch via
+  Codex's `/plugin` commands.
 - Project layout: copy the generated `.codex/` directory into a project.
 
-For project-level install from GitHub, from your project root:
+For plugin install, run inside Codex:
+
+```
+/plugin marketplace add dppdppd/rpm@codex
+/plugin install rpm@dppdppd-rpm
+```
+
+For project-level copy install from GitHub, from your project root:
 
 ```bash
 git clone --branch codex --depth 1 https://github.com/dppdppd/rpm.git /tmp/rpm-codex
 cp -R /tmp/rpm-codex/.codex .
 ```
 
-For project-level install from a local checkout, from your project root:
+For project-level copy install from a local checkout, from your project root:
 
 ```bash
 cp -R /path/to/rpm/codex/.codex .
