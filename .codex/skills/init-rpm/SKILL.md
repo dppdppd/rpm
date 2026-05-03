@@ -5,9 +5,21 @@ description: First-run rpm plugin setup for a project. Detects project state, sc
 
 # /init-rpm — Full Instructions
 
-First-run setup. Creates rpm context for a project. Run once per project.
+First-run setup. Creates or updates rpm context for a project. Run once per project,
+or run once after installing rpm in a new agent runtime such as Codex.
 If `docs/rpm/context.md` already exists, read it and **augment** — do not
 overwrite. Merge in missing sections only.
+
+If any `docs/rpm/` content already exists, treat this as an rpm migration/update,
+not a brand-new install. Preserve existing rpm files, create only missing
+canonical files (`context.md`, `past/log.md`, `present/status.md`,
+`future/tasks.org`, `future/done.org`, `reviews/`), and migrate legacy names
+when present:
+
+- `docs/rpm/FUTURE.org` or `docs/rpm/future/FUTURE.org` -> `docs/rpm/future/tasks.org`
+- `docs/rpm/PRESENT.md` or `docs/rpm/present/PRESENT.md` -> `docs/rpm/present/status.md`
+- `docs/rpm/RPM-LOG.md` or `docs/rpm/past/RPM-LOG.md` -> `docs/rpm/past/log.md`
+- `docs/rpm/RPM.md` -> `docs/rpm/context.md`
 
 Narrate as you go. At each phase, tell the user what's about to happen
 in one short sentence before doing it — users should never be surprised
@@ -41,7 +53,7 @@ Proceed immediately to Phase 1.
 
 **Say to user:** "Scanning the project…"
 
-!bash ".codex/skills/init-rpm/scripts/detect.sh"
+!bash "${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/init-rpm/scripts/detect.sh"
 
 Classify silently (do NOT ask the user):
 - **GREENFIELD**: Empty or near-empty directory

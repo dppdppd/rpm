@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .codex/hooks/session-start-auto.sh"
+            "command": "bash ./hooks/session-start-auto.sh"
           }
         ]
       }
@@ -17,11 +17,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .codex/hooks/context-monitor.sh"
+            "command": "bash ./hooks/context-monitor.sh"
           },
           {
             "type": "command",
-            "command": "bash .codex/hooks/codex-sync-reminder.sh"
+            "command": "bash ./hooks/codex-sync-reminder.sh"
           }
         ]
       }
@@ -31,11 +31,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .codex/hooks/stop-learn-capture.sh"
+            "command": "bash ./hooks/stop-learn-capture.sh"
           },
           {
             "type": "command",
-            "command": "bash .codex/hooks/handoff-validator.sh"
+            "command": "bash ./hooks/handoff-validator.sh"
           }
         ]
       }
