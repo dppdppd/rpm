@@ -7,13 +7,16 @@
 #   log-decision.sh <kind> [target] [rationale] [agent-id] [status]
 #
 #   <kind>      one of: blocked-on-user, drift-fix, actionable-backlog,
-#                       idle, loop-exhausted, backlog-result
+#                       idle, loop-exhausted, backlog-result, review-result
 #   [target]    short identifier (task ID, drift category, etc.); ""
 #               for idle/loop-exhausted
 #   [rationale] one-line free text explaining the choice
 #   [agent-id]  for actionable-backlog and backlog-result kinds: the
 #               subagent ID returned by the Agent tool
-#   [status]    for backlog-result only: plan-written | blocked | no-op
+#   [status]    for backlog-result:
+#               needs-review | plan-written | blocked | no-op
+#               for review-result:
+#               approved | changes-requested
 #
 # Always exits 0; failures (jq missing, log unwritable) print a stderr
 # warning and skip — never block the orchestrator.

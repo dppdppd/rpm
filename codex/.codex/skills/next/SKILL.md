@@ -45,14 +45,25 @@ Evaluate top-to-bottom; first match wins:
    `days > 3`, or `migration.count > 0`. Action: apply the obvious
    fix inline (it's mechanical) and log.
 
-3. **actionable-backlog** — `tasks.org` has at least one TODO or
+3. **needs-review** — run:
+   `bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/review-ready.sh`. If it reports
+   a worker result with `status=needs-review` and no matching
+   `review-result`, pick the first row. Action: review the detail
+   file, git diff, and any verification noted by the worker. If the
+   work is acceptable, mark the backlog entry DONE or leave a clear
+   session-end reconciliation note, then log `review-result` with
+   status `approved`. If more work is needed, append reviewer notes to
+   the detail file and log `review-result` with status
+   `changes-requested`.
+
+4. **actionable-backlog** — `tasks.org` has at least one TODO or
    IN-PROGRESS entry whose `:BLOCKED_BY:` deps all resolve to DONE
    or CANCELLED. Action: pick the topmost across all `* Parent`
    groups, dispatch a worker using the contract below, and log the
    dispatch. Workers must persist their own result; do not rely on a
    background notification as the only return path.
 
-4. **idle** — none of the above matched. Action: emit summary, log
+5. **idle** — none of the above matched. Action: emit summary, log
    `idle`. After 3 consecutive `idle` entries in the log, output
    `action: loop-exhausted` and do NOT call `ScheduleWakeup` —
    hand back to user.
@@ -67,8 +78,8 @@ in-flight: <N>
 next: <hint or USER ATTENTION>
 ```
 
-- `<kind>`: one of `blocked-on-user`, `drift-fix`, `actionable-backlog`,
-  `idle`, `loop-exhausted`.
+- `<kind>`: one of `blocked-on-user`, `drift-fix`, `needs-review`,
+  `actionable-backlog`, `idle`, `loop-exhausted`.
 - `<N>`: count of background subagents currently running (read from
   the log; entries with `kind: actionable-backlog` and no
   corresponding `kind: backlog-result` are still in-flight).
@@ -96,15 +107,22 @@ appropriate kind:
   one-line rationale, and the dispatched subagent's ID as
   `<agent-id>`. Match volta's idiom: the agent ID is what the
   Agent tool returned (look for `agentId:` in the dispatch result).
+- `needs-review` — pass the task ID as `<target>`, the reviewer
+  action as `<rationale>`, the worker ID as `<agent-id>`, and a
+  status of `approved | changes-requested`
 - `idle` — empty `<target>`, short `<rationale>`
 - `loop-exhausted` — empty `<target>`, fixed `<rationale>` like
   `3 idle ticks`
 - `backlog-result` — when a `<task-notification>` arrives for a
   prior `actionable-backlog` dispatch, log it: pass the same
   `<target>` and `<agent-id>` plus a `<status>` of
-  `plan-written | blocked | no-op`. This pairing is what powers
-  the `in-flight: <N>` count.
+  `needs-review | plan-written | blocked | no-op`. This pairing is
+  what powers the `in-flight: <N>` count.
   If the worker already wrote this line itself, do not duplicate it.
+- `review-result` — after reviewing a `needs-review` result, log the
+  same `<target>` and `<agent-id>` with status
+  `approved | changes-requested`. This clears the review queue for
+  that worker result.
 
 The script writes to `docs/rpm/~rpm-orchestrator-log.jsonl`
 (gitignored, ephemeral). Failures print a stderr warning and
@@ -128,22 +146,25 @@ Task:
 
 Rules:
 1. Read docs/rpm/future/tasks.org and the detail file before writing.
-2. Do not implement production code unless the task explicitly asks for
-   implementation. Default job: investigate and draft a plan.
-3. Append a `## Plan` section to the detail file. Include:
+2. Do real work when the task is scoped enough to execute safely.
+   Keep changes limited to the task. If the task is ambiguous or too
+   broad, do not guess; write a plan instead.
+3. Append a `## Worker Result` section to the detail file when you
+   changed files or otherwise completed the task. Include:
    - Summary
-   - Proposed steps
-   - Files likely to change
-   - Verification
-   - Blockers or assumptions
-4. If you cannot write a useful plan, append `## Blocked` instead with
-   the missing information.
+   - Files changed
+   - Verification run
+   - Remaining risks or follow-ups
+4. Append `## Plan` if you only planned the work. Append `## Blocked`
+   if you could not proceed, with the missing information.
 5. Before finishing, log your result:
 
    bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/log-decision.sh backlog-result \
-     "<task-id>" "<one-line result>" "<agent-id>" "plan-written"
+     "<task-id>" "<one-line result>" "<agent-id>" "needs-review"
 
-   Use status `blocked` if you appended `## Blocked`; use `no-op` only
+   Use status `needs-review` when you did work and want the
+   orchestrator to review it. Use `plan-written` if you only appended
+   `## Plan`, `blocked` if you appended `## Blocked`, and `no-op` only
    when the task is already fully handled.
 6. In your final response, state the detail file changed and the status
    you logged. The file + JSONL log are the source of truth.
