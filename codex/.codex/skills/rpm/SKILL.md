@@ -9,7 +9,7 @@ description: Explain the rpm plugin and list its commands. Use when the user ask
 
 If `$ARGUMENTS` is `version` (or `--version` or `-v`):
 
-!bash "jq -r '.version' \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json\""
+!bash "jq -r '.version' \"${RPM_PLUGIN_ROOT:-.codex}/.codex-plugin/plugin.json\""
 
 Print `rpm v{version}` and stop. Do not continue to the overview below.
 

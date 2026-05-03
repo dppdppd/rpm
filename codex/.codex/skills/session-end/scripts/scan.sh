@@ -16,9 +16,25 @@ cd "$ROOT" 2>/dev/null || { echo "error=cannot_cd_to_root"; exit 0; }
 
 # ----------------------------------------------------------------
 echo "=== plugin ==="
-PLUGIN_MANIFEST="${CLAUDE_PLUGIN_ROOT:-}/.claude-plugin/plugin.json"
-if [ ! -f "$PLUGIN_MANIFEST" ] && [ -n "${CLAUDE_SKILL_DIR:-}" ]; then
-  PLUGIN_MANIFEST="${CLAUDE_SKILL_DIR}/../../.claude-plugin/plugin.json"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_ROOT="${RPM_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}"
+PLUGIN_MANIFEST=""
+for candidate in \
+  "$PLUGIN_ROOT/.claude-plugin/plugin.json" \
+  "$PLUGIN_ROOT/.codex-plugin/plugin.json" \
+  "$SCRIPT_DIR/../../../.claude-plugin/plugin.json" \
+  "$SCRIPT_DIR/../../../.codex-plugin/plugin.json" \
+  "$SCRIPT_DIR/../../../../.codex-plugin/plugin.json"
+do
+  [ -n "$candidate" ] && [ -f "$candidate" ] && { PLUGIN_MANIFEST="$candidate"; break; }
+done
+if [ -z "$PLUGIN_MANIFEST" ] && [ -n "${CLAUDE_SKILL_DIR:-}" ]; then
+  for candidate in \
+    "$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json" \
+    "$CLAUDE_SKILL_DIR/../../.codex-plugin/plugin.json"
+  do
+    [ -f "$candidate" ] && { PLUGIN_MANIFEST="$candidate"; break; }
+  done
 fi
 RPM_VERSION=""
 if [ -f "$PLUGIN_MANIFEST" ]; then

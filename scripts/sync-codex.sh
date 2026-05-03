@@ -26,6 +26,7 @@ SENTINEL='codex-sync: manual'
 CODEX_HOOK_SCRIPTS=(
   session-start-auto.sh
   context-monitor.sh
+  codex-sync-reminder.sh
   stop-learn-capture.sh
   handoff-validator.sh
   _directives.sh
@@ -40,6 +41,7 @@ AGENT_TO_SKILL=(
 )
 
 mkdir -p "$DST/skills" "$DST/hooks"
+mkdir -p "$REPO_ROOT/codex/.codex-plugin" "$DST/.codex-plugin"
 
 is_manual() {
   [ -f "$1" ] && head -n 20 "$1" | grep -qF "$SENTINEL"
@@ -73,7 +75,52 @@ for skill_dir in "$SRC"/skills/*/; do
     rm -rf "$dst_scripts"
     cp -a "$src_scripts" "$dst_scripts"
   fi
+
+  # Mirror same-directory skill support docs/resources (for example
+  # audit/findings-menu.md and audit/project-mode.md). SKILL.md itself
+  # is translated above; scripts/ is handled separately.
+  find "$skill_dir" -maxdepth 1 -type f ! -name 'SKILL.md' -print0 \
+    | while IFS= read -r -d '' support_file; do
+        cp "$support_file" "$DST/skills/$name/$(basename "$support_file")"
+      done
 done
+
+# --- Plugin manifest --------------------------------------------------------
+python3 - "$SRC/.claude-plugin/plugin.json" \
+  "$REPO_ROOT/codex/.codex-plugin/plugin.json" \
+  "$DST/.codex-plugin/plugin.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+src, *dests = map(Path, sys.argv[1:])
+manifest = json.loads(src.read_text())
+manifest["skills"] = "./skills/"
+manifest["hooks"] = "./hooks.json"
+manifest["interface"] = {
+    "displayName": "rpm",
+    "shortDescription": "Session lifecycle, backlog, audit, and research support for Codex.",
+    "longDescription": (
+        "rpm is a local-first project manager for LLM-assisted development. "
+        "It keeps hot context, backlog state, session handoffs, audit findings, "
+        "and research artifacts in the repository."
+    ),
+    "developerName": manifest.get("author", {}).get("name", "dppdppd"),
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": manifest.get("homepage", ""),
+    "defaultPrompt": [
+        "Set up rpm for this project.",
+        "Show my rpm backlog.",
+        "Run an rpm project audit.",
+    ],
+    "brandColor": "#2563EB",
+}
+text = json.dumps(manifest, indent=2) + "\n"
+for dest in dests:
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(text)
+PY
 
 # Drop stale skill dirs whose source is gone, except manual ones.
 for existing in "$DST/skills"/*/; do
@@ -127,6 +174,7 @@ done
 
 # --- Report -----------------------------------------------------------------
 echo "sync-codex: $DST"
+echo "  manifest synced: codex/.codex-plugin/plugin.json codex/.codex/.codex-plugin/plugin.json"
 [ ${#synced_skills[@]} -gt 0 ] && printf '  skills synced:   %s\n' "${synced_skills[*]}"
 [ ${#skipped_skills[@]} -gt 0 ] && printf '  skills skipped:  %s\n' "${skipped_skills[*]}"
 [ ${#synced_hooks[@]} -gt 0 ]  && printf '  hooks synced:    %s\n' "${synced_hooks[*]}"

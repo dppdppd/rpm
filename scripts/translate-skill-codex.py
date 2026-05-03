@@ -49,6 +49,7 @@ def translate(src: str) -> str:
     fm, body = m.group(1), m.group(2)
     lines = fm.split("\n")
     out: list[str] = []
+    skill_name = ""
     i = 0
     while i < len(lines):
         line = lines[i]
@@ -62,8 +63,18 @@ def translate(src: str) -> str:
             ):
                 i += 1
             continue
+        if key_match and key_match.group(1) == "name":
+            skill_name = line.split(":", 1)[1].strip().strip('"').strip("'")
         out.append(line)
         i += 1
+
+    if skill_name:
+        body = body.replace(
+            "${CLAUDE_SKILL_DIR}/scripts/",
+            f".codex/skills/{skill_name}/scripts/",
+        )
+    body = body.replace("${CLAUDE_PLUGIN_ROOT}", "${RPM_PLUGIN_ROOT:-.codex}")
+    body = body.replace("/.claude-plugin/plugin.json", "/.codex-plugin/plugin.json")
 
     return "---\n" + "\n".join(out).strip() + "\n---\n" + body
 

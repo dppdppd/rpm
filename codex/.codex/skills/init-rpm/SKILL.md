@@ -41,7 +41,7 @@ Proceed immediately to Phase 1.
 
 **Say to user:** "Scanning the project…"
 
-!bash "${CLAUDE_SKILL_DIR}/scripts/detect.sh"
+!bash ".codex/skills/init-rpm/scripts/detect.sh"
 
 Classify silently (do NOT ask the user):
 - **GREENFIELD**: Empty or near-empty directory

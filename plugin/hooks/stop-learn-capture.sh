@@ -1,7 +1,14 @@
 #!/bin/bash
 # Stop hook: capture learnings to docs/rpm/~rpm-learnings.jsonl.
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+# Read payload from stdin
+PAYLOAD=$(cat)
+MSG=$(echo "$PAYLOAD" | jq -r '.last_assistant_message // empty' 2>/dev/null)
+SESSION=$(echo "$PAYLOAD" | jq -r '.session_id // "unknown"' 2>/dev/null)
+
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-}"
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR=$(echo "$PAYLOAD" | jq -r '.cwd // empty' 2>/dev/null)
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR="."
 PM_DIR="$PROJECT_DIR/docs/rpm"
 LEARNINGS="$PM_DIR/~rpm-learnings.jsonl"
 MARKER="$PM_DIR/~rpm-session-start"
@@ -9,11 +16,6 @@ MARKER="$PM_DIR/~rpm-session-start"
 # Only capture during active rpm sessions
 [ -d "$PM_DIR" ] || exit 0
 [ -f "$MARKER" ] || exit 0
-
-# Read payload from stdin
-PAYLOAD=$(cat)
-MSG=$(echo "$PAYLOAD" | jq -r '.last_assistant_message // empty' 2>/dev/null)
-SESSION=$(echo "$PAYLOAD" | jq -r '.session_id // "unknown"' 2>/dev/null)
 
 # Skip empty or short responses (< 200 chars unlikely to contain learnings)
 [ ${#MSG} -lt 200 ] && exit 0
