@@ -1,15 +1,16 @@
 #!/bin/bash
-# Publish a full rpm release: both the Claude Code plugin and the
-# opencode port, tagged at the current plugin.json version.
+# Publish a full rpm release: the Claude Code plugin, opencode port,
+# and Codex port, tagged at the current plugin.json version.
 #
 # Usage:
-#   publish-all.sh             # publish both + push version tag
+#   publish-all.sh             # publish all ports + push version tag
 #   publish-all.sh --dry-run   # stage + split both, skip pushes
 #
 # Assumes the `plugin` remote points at the public GitHub repo
 # (https://github.com/<owner>/rpm.git). Both releases land there —
 #   master  = CC subtree split (from plugin/)
 #   opencode = opencode subtree split (from opencode/)
+#   codex    = codex subtree split (from codex/)
 
 set -euo pipefail
 
@@ -72,9 +73,19 @@ else
   "$REPO/scripts/publish-opencode.sh"
 fi
 
-# --- Step 3: version tag ---
+# --- Step 3: Codex port (delegates to publish-codex.sh) ---
 
-echo "publish-all: step 3/3 — tag $TAG"
+echo "publish-all: step 3/4 — Codex port"
+if [ "$DRY_RUN" -eq 1 ]; then
+  "$REPO/scripts/publish-codex.sh" --dry-run >/dev/null
+  echo "publish-all: codex split verified (dry-run, skipping push)"
+else
+  "$REPO/scripts/publish-codex.sh"
+fi
+
+# --- Step 4: version tag ---
+
+echo "publish-all: step 4/4 — tag $TAG"
 
 if git rev-parse --verify --quiet "$TAG" >/dev/null; then
   echo "publish-all: tag $TAG already exists locally — skipping create"
