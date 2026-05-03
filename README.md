@@ -67,6 +67,19 @@ Using another agent runtime? See the
 
 Codex quick install:
 
+```bash
+codex plugin marketplace add dppdppd/rpm@codex --enable codex_hooks
+```
+
+Then add this to `~/.codex/config.toml`:
+
+```toml
+[plugins."rpm@dppdppd-rpm"]
+enabled = true
+```
+
+Inside the Codex TUI, the equivalent interactive commands are:
+
 ```
 /plugins marketplace add dppdppd/rpm@codex
 /plugins install rpm@dppdppd-rpm
