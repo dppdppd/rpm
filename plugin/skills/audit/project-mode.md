@@ -11,11 +11,13 @@ best-in-class.
 
 ## Phase 1: Investigate (gather evidence, don't opine yet)
 
-**At the start of Phase 1, launch `rpm:auditor` in the background**
-(`subagent_type: "rpm:auditor"`) so its structured scan runs in
-parallel with the reads below. Without this, a Project audit can
-silently miss broken file refs and tracker drift that a Documents
-audit would catch.
+**At the start of Phase 1, launch `rpm:auditor` using the current
+runtime's agent mechanism** so its structured scan runs in parallel
+with the reads below when background agents are available. In Claude
+Code, use `subagent_type: "rpm:auditor"`. In runtimes without
+compatible background agents, run the auditor protocol synchronously.
+Without this scan, a Project audit can silently miss broken file refs
+and tracker drift that a Documents audit would catch.
 
 **Hard gate:** Do NOT start Phase 4, present findings, or write
 deliverables until the `rpm:auditor` scan has completed and its
@@ -28,7 +30,8 @@ later defeats the purpose of a single consolidated review.
 Read project state in parallel:
 
 - `git log --oneline -30` and `git diff --stat`
-- CLAUDE.md, `present/status.md`, recent `past/` daily logs, debugging/parity logs
+- Active agent instructions (`AGENTS.md`, `CLAUDE.md`, or equivalent),
+  `present/status.md`, recent `past/` daily logs, debugging/parity logs
 - Memory files (feedback type especially)
 - `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
 - `docs/rpm/context.md` (project-specific rpm context)
@@ -111,8 +114,9 @@ Discipline). Trivial hygiene drops out.
 
 1. **Process Health** — workflow followed? measure→change→measure?
 2. **Architecture & Code Health** — boundaries clean? complexity proportional?
-3. **LLM Workflow** — hooks/skills/memory effective? CLAUDE.md right
-   size? **Any deterministic work (grep, wc, file-existence checks,
+3. **LLM Workflow** — hooks/skills/memory effective? Agent
+   instructions right size? **Any deterministic work (grep, wc,
+   file-existence checks,
    simple diffs, status summaries) done repeatedly by LLM workflows
    that should be bundled as bash scripts?** Each bundled script
    saves tokens on every invocation and is more reliable than

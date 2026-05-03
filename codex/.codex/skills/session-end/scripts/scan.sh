@@ -66,6 +66,30 @@ fi
 
 # ----------------------------------------------------------------
 echo
+echo "=== agent_instructions ==="
+INSTRUCTIONS_FILE=""
+for candidate in AGENTS.md CLAUDE.md GEMINI.md .cursorrules; do
+  [ -f "$candidate" ] && { INSTRUCTIONS_FILE="$candidate"; break; }
+done
+if [ -n "$INSTRUCTIONS_FILE" ]; then
+  LINES=$(wc -l < "$INSTRUCTIONS_FILE" | tr -d ' ')
+  echo "file=$INSTRUCTIONS_FILE"
+  echo "lines=$LINES"
+  if [ "$LINES" -gt 150 ]; then
+    echo "status=critical"
+  elif [ "$LINES" -gt 120 ]; then
+    echo "status=warn"
+  else
+    echo "status=ok"
+  fi
+else
+  echo "file=none"
+  echo "lines=0"
+  echo "status=missing"
+fi
+
+# Legacy section for older skill instructions and logs.
+echo
 echo "=== claude_md ==="
 if [ -f CLAUDE.md ]; then
   LINES=$(wc -l < CLAUDE.md | tr -d ' ')
@@ -108,7 +132,8 @@ echo "=== broken_refs ==="
 # Scan live current-state docs for backticked path references and
 # verify they resolve on disk.
 #
-# Scope: CLAUDE.md, README.md, docs/rpm/context.md (three "what IS" docs).
+# Scope: agent instructions, README.md, docs/rpm/context.md
+# ("what IS" docs).
 #
 # Excluded: docs/rpm/past/log.md, docs/rpm/past/*.md, docs/rpm/present/status.md
 # — all append-only/historical. References to renamed or deleted
@@ -123,7 +148,7 @@ echo "=== broken_refs ==="
 #   5. no shell metacharacters or `~`
 #   6. not a known shell command prefix
 BROKEN_COUNT=0
-for src in CLAUDE.md README.md docs/rpm/context.md; do
+for src in AGENTS.md CLAUDE.md GEMINI.md .cursorrules README.md docs/rpm/context.md; do
   [ -f "$src" ] || continue
   TOKENS=$(grep -oE '`[^`]+`' "$src" 2>/dev/null | sed 's/^`//;s/`$//' || true)
   while IFS= read -r token; do
