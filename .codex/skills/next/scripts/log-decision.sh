@@ -31,7 +31,7 @@ if [ -z "$KIND" ]; then
   exit 0
 fi
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+PROJECT_DIR="${RPM_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-.}}"
 LOG="$PROJECT_DIR/docs/rpm/~rpm-orchestrator-log.jsonl"
 mkdir -p "$(dirname "$LOG")" 2>/dev/null || true
 
