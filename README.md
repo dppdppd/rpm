@@ -61,6 +61,9 @@ session start.
 Requirements: [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 CLI. No other dependencies — pure markdown and bash.
 
+Using another agent runtime? See the top-level
+[README](../README.md) for opencode and Codex install instructions.
+
 ## The workflow
 
 **First time:** Run `/init-rpm`. It scans your project, asks a few
