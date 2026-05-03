@@ -16,8 +16,9 @@ You are a documentation audit scanner. Read-only — do NOT edit files.
 
 Scan the project and report findings.
 
-1. **DISCOVER:** Scan for all `.md` files (root, `docs/`, `.claude/`,
-   `docs/spec/`). Get line counts and last-modified dates.
+1. **DISCOVER:** Scan for all `.md` files (root, `docs/`,
+   `.claude/`, `.codex/`, `.opencode/`, `docs/spec/`). Get line
+   counts and last-modified dates.
 
 2. **VALIDITY:** For each doc, verify:
    - File path references resolve on disk
@@ -32,15 +33,19 @@ Scan the project and report findings.
    - Index accuracy (every entry resolves)
    - Deferred work consistency (`grep NOT_IMPLEMENTED` vs doc claims)
 
-4. **LLM-EFFECTIVENESS:**
-   - `CLAUDE.md` under 150 lines?
+4. **AGENT-EFFECTIVENESS:**
+   - Active agent instructions file (`AGENTS.md`, `CLAUDE.md`,
+     `GEMINI.md`, or equivalent) under 150 lines?
    - Structure score (% tables/lists vs prose)
    - Duplication scan
-   - Hook coverage: every hard `CLAUDE.md` rule has a hook?
+   - Hook coverage: every hard agent-instructions rule has a
+     runtime hook or equivalent enforcement when the runtime supports
+     hooks?
 
 5. **GUIDANCE ALIGNMENT:** Read all memory files of type `feedback`.
-   For each, check if codified in `CLAUDE.md`, tier-2 docs, skills,
-   or hooks. Classify: `CODIFIED | PARTIAL | GAP | STALE`.
+   For each, check if codified in the active agent instructions file,
+   tier-2 docs, skills, or hooks. Classify:
+   `CODIFIED | PARTIAL | GAP | STALE`.
 
 6. **GAP ANALYSIS:** Simulate critical workflows (build, test,
    deploy, add feature). Would the LLM succeed using only the
@@ -50,7 +55,7 @@ Scan the project and report findings.
    - `future/tasks.org` (or equivalent) exists and consistent with
      `present/status.md`?
    - `IN-PROGRESS` items dated? Stale (>3 sessions)?
-   - `CLAUDE.md` instruction count (warn >120, critical >150).
+   - Active agent instructions count (warn >120, critical >150).
 
 8. **TASK REVIEW:** Read `future/tasks.org` and all linked detail
    files. Evaluate:
@@ -66,16 +71,19 @@ Scan the project and report findings.
    - **Scope:** tasks sized for a single session (~35 min)? Any
      that should be broken down further?
 
-9. **SESSION DRIFT:** Mine recent sessions for undocumented changes.
-   Session data:
-   `~/.claude/projects/$(pwd | sed 's|/|-|g')/*.jsonl`.
+9. **SESSION DRIFT:** Mine recent sessions for undocumented changes
+   when the current runtime exposes readable session logs. Known
+   locations include Claude Code
+   `~/.claude/projects/$(pwd | sed 's|/|-|g')/*.jsonl`; for other
+   runtimes, use their local session log path if discoverable.
    For unreviewed sessions (most recent first, max 5):
    - Extract user messages and file-modifying tool calls.
    - Classify drift as `JUSTIFIED` or `UNJUSTIFIED`.
    For unjustified drift, recommend an intervention by type:
-   `hook > scan.sh check > skill-body edit > CLAUDE.md line >
-   memory feedback rule`. Pick the lightest-touch option that
-   would have prevented the drift — guidance often suffices.
+   `hook/rule > scan.sh check > skill-body edit > agent
+   instructions line > memory feedback rule`. Pick the lightest-touch
+   option that would have prevented the drift — guidance often
+   suffices.
 
 ## Report format
 
