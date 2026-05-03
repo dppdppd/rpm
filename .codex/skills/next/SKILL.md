@@ -14,7 +14,7 @@ self-paced execution.
 
 If `$ARGUMENTS` is `status`, run the status formatter and stop:
 
-!`bash ${CLAUDE_SKILL_DIR}/scripts/status.sh`
+!`bash .codex/skills/next/scripts/status.sh`
 
 Render the script's output verbatim. Do not interpret, summarize, or
 add commentary — the user wants the raw view.
@@ -84,7 +84,7 @@ action produced (e.g. drift-fix details, dispatch confirmation).
 Use the helper script — never hand-format JSONL:
 
 ```bash
-bash ${CLAUDE_SKILL_DIR}/scripts/log-decision.sh <kind> [target] [rationale] [agent-id] [status]
+bash .codex/skills/next/scripts/log-decision.sh <kind> [target] [rationale] [agent-id] [status]
 ```
 
 After each priority branch's action, call the script with the

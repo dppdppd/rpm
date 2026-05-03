@@ -18,6 +18,10 @@
           {
             "type": "command",
             "command": "bash .codex/hooks/context-monitor.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .codex/hooks/codex-sync-reminder.sh"
           }
         ]
       }

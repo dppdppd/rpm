@@ -7,7 +7,10 @@
 # Pattern adapted from shihchengwei-lab/claude-code-session-kit's
 # handoff-check.sh.
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+PAYLOAD=$(cat)
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-}"
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR=$(echo "$PAYLOAD" | jq -r '.cwd // empty' 2>/dev/null)
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR="."
 PM_DIR="$PROJECT_DIR/docs/rpm"
 FLAG="$PM_DIR/~rpm-last-validated-commit"
 

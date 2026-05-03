@@ -12,14 +12,16 @@
 # Runs every 10th tool call (after the first 3) to keep overhead negligible.
 # No-op unless rpm is initialized AND a session is active.
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+PAYLOAD=$(cat)
+
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-}"
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR=$(echo "$PAYLOAD" | jq -r '.cwd // empty' 2>/dev/null)
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR="."
 PM_DIR="$PROJECT_DIR/docs/rpm"
 MARKER="$PM_DIR/~rpm-session-start"
 
 [ -d "$PM_DIR" ] || exit 0
 [ -f "$MARKER" ] || exit 0
-
-PAYLOAD=$(cat)
 
 SESSION_ID=$(echo "$PAYLOAD" | jq -r '.session_id // "unknown"' 2>/dev/null)
 COUNTER_FILE="/tmp/rpm-ctx-counter-${SESSION_ID}"

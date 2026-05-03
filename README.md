@@ -7,9 +7,11 @@ Codex CLI port of the rpm plugin. Generated from `plugin/` via
 
 | Surface | Status | Notes |
 |---|---|---|
+| Plugin manifest | Full | `.codex-plugin/plugin.json` is generated from the Claude plugin manifest and points at the Codex skills/hooks |
 | Skills | Full | All six skills sync 1:1; Codex frontmatter is a strict subset of Claude Code's |
 | `SessionStart` hook | Full | `session-start-auto.sh` — context injection, marker bookkeeping, backlog menu |
 | `PostToolUse` hook | Full | `context-monitor.sh` — fires for all tools (per Codex schema) |
+| Codex sync reminder | Full | `codex-sync-reminder.sh` — reminds rpm contributors to run `sync-codex.sh` after source edits |
 | `Stop` hook | Full | `stop-learn-capture.sh` + `handoff-validator.sh` — Codex's Stop payload includes `last_assistant_message`, no transcript scraping needed |
 | Auditor system prompt | Reference doc | Lives at `.codex/skills/audit/references/auditor.md`; the audit skill should Read it and hand it to a sub-agent (Codex has no separate "subagent definition" file format that fits) |
 
@@ -24,12 +26,19 @@ Codex CLI port of the rpm plugin. Generated from `plugin/` via
 
 ## Install
 
-The contents of `.codex/` install at the **project** level. From your
-project root:
+This port supports two layouts:
+
+- Plugin layout: install this `codex/` directory as an rpm Codex plugin.
+- Project layout: copy the generated `.codex/` directory into a project.
+
+For project-level install, from your project root:
 
 ```bash
 cp -R /path/to/rpm/codex/.codex .
 ```
+
+That copy includes `.codex/.codex-plugin/plugin.json` so `$rpm version`
+can still resolve the rpm version in a project-local install.
 
 Then merge `.codex/config.toml.sample` into `~/.codex/config.toml` (or
 `.codex/config.toml`):
