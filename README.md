@@ -78,12 +78,8 @@ Then add this to `~/.codex/config.toml`:
 enabled = true
 ```
 
-Inside the Codex TUI, the equivalent interactive commands are:
-
-```
-/plugins marketplace add dppdppd/rpm@codex
-/plugins install rpm@dppdppd-rpm
-```
+The current Codex CLI manages marketplaces only; plugin activation is
+the `[plugins."rpm@dppdppd-rpm"]` config entry above.
 
 ## The workflow
 
