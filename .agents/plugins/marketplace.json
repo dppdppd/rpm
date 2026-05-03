@@ -1,0 +1,20 @@
+{
+  "name": "dppdppd-rpm",
+  "interface": {
+    "displayName": "rpm"
+  },
+  "plugins": [
+    {
+      "name": "rpm",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
