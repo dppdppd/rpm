@@ -57,15 +57,20 @@ this message — do NOT re-run these checks as tool calls.
   heading as `(rpm <version>)`.
 - `git` — modified / untracked / staged file counts + stash count.
   Drives mode selection and Inline/Phased commit handling.
-- `claude_md` — line count + status (`ok` / `warn` >120 / `critical`
-  >150). Only raise as a finding if `warn` or `critical`.
+- `agent_instructions` — active instructions file + line count +
+  status (`ok` / `warn` >120 / `critical` >150). Only raise as a
+  finding if `warn` or `critical`.
+- `claude_md` — legacy compatibility section. In Codex, treat
+  `CLAUDE.md` and Claude memory files as input guidance, not as the
+  default destination for new guidance.
 - `not_implemented` — count and up to 20 matches. Meta-references
   inside audit/session-end skill bodies (matches on files under
   `skills/audit/`, `skills/session-end/`, `command-version/`,
   `agents/auditor.md`) are expected and should be **suppressed**.
   Only flag real stubs in source.
-- `broken_refs` — backticked path references in `CLAUDE.md`,
-  `README.md`, `docs/rpm/context.md` that don't resolve on disk.
+- `broken_refs` — backticked path references in active agent
+  instructions, `README.md`, and `docs/rpm/context.md` that don't
+  resolve on disk.
   `count > 0` is always actionable. (`present/status.md`, `past/log.md`,
   and `past/*.md` are deliberately excluded as historical.)
 - `daily_log` — today's date, most recent log date, days since,
@@ -340,8 +345,8 @@ QUESTION: Commit as drafted, edit the message, or skip the commit?
 proposed destinations. Use this format even for a single learning,
 to keep the answer pattern consistent:]
 **Worth keeping**
-1. [learning summary] → memory file
-2. [learning summary] → CLAUDE.md
+1. [learning summary] → rpm feedback memory file
+2. [learning summary] → active agent instructions file
 
 QUESTION: Promote which? (e.g. `1,2` / `all` / `none`)
 
@@ -478,11 +483,13 @@ picked solely on a Phase 3 signal (mismatch, etc.).
 #### 2b. Record findings
 
 - Filter out learnings already captured (in code comments, specs,
-  existing memory files) — do NOT show them.
+  existing memory files, including Claude-era memory files) — do NOT
+  show them. In Codex, read `CLAUDE.md`, `.claude/` guidance,
+  `MEMORY.md`, and `feedback_*.md` before deciding a learning is new.
 - Present unrecorded learnings as a numbered menu with destinations:
   ```
-  1. [learning summary] → memory file
-  2. [learning summary] → CLAUDE.md
+  1. [learning summary] → rpm feedback memory file
+  2. [learning summary] → active agent instructions file
   ```
   Then ask: "Which to promote? (e.g., `1,2` · `all` · `none`)"
 - One list, one question. Do not pre-filter, recommend, or renumber.
