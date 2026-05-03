@@ -39,6 +39,10 @@ DROP_KEYS = {
     "argument-hint",
     "disable-model-invocation",
 }
+CODEX_PLUGIN_ROOT = (
+    "${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/"
+    "marketplaces/dppdppd-rpm/.codex}"
+)
 
 
 def translate(src: str) -> str:
@@ -71,9 +75,9 @@ def translate(src: str) -> str:
     if skill_name:
         body = body.replace(
             "${CLAUDE_SKILL_DIR}/scripts/",
-            f".codex/skills/{skill_name}/scripts/",
+            f"{CODEX_PLUGIN_ROOT}/skills/{skill_name}/scripts/",
         )
-    body = body.replace("${CLAUDE_PLUGIN_ROOT}", "${RPM_PLUGIN_ROOT:-.codex}")
+    body = body.replace("${CLAUDE_PLUGIN_ROOT}", CODEX_PLUGIN_ROOT)
     body = body.replace("/.claude-plugin/plugin.json", "/.codex-plugin/plugin.json")
 
     return "---\n" + "\n".join(out).strip() + "\n---\n" + body

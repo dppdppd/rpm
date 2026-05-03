@@ -43,8 +43,7 @@ The `codex plugin` CLI currently manages marketplaces only; it does
 not provide a `codex plugin install` subcommand. Plugin activation is
 the `[plugins."rpm@dppdppd-rpm"]` config entry above.
 
-Then merge `.codex/config.toml.sample` into `~/.codex/config.toml` (or
-`.codex/config.toml`):
+Then merge `.codex/config.toml.sample` into `~/.codex/config.toml`:
 
 ```toml
 [features]

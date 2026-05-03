@@ -48,9 +48,8 @@ Then enable the plugin in `~/.codex/config.toml`:
 enabled = true
 ```
 
-Codex hooks also require this feature flag in your Codex config if it
-is not already enabled (`~/.codex/config.toml` or the project's
-`.codex/config.toml`):
+Codex hooks also require this feature flag in `~/.codex/config.toml`
+if it is not already enabled:
 
 ```toml
 [features]

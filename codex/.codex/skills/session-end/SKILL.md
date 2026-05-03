@@ -49,7 +49,7 @@ The `scan.sh` output below was produced by a shell script that ran
 **before** this skill body reached you. Its results are already in
 this message — do NOT re-run these checks as tool calls.
 
-!`bash ".codex/skills/session-end/scripts/scan.sh"`
+!`bash "${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/session-end/scripts/scan.sh"`
 
 **Interpreting the sections:**
 
@@ -522,7 +522,7 @@ against the live backlog *before* appending.
    printf '%s\n' \
      '{"id":"t1","subject":"...","status":"in_progress"}' \
      '{"id":"t2","subject":"...","status":"pending"}' \
-     | bash "${RPM_PLUGIN_ROOT:-.codex}/skills/session-end/scripts/score-natives.sh"
+     | bash "${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/session-end/scripts/score-natives.sh"
    ```
 
    Output: one JSONL line per input with
