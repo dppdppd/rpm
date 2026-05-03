@@ -4,15 +4,6 @@
 # shellcheck source=./_directives.sh
 source "$(dirname "${BASH_SOURCE[0]}")/_directives.sh"
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
-PM_DIR="$PROJECT_DIR/docs/rpm"
-MARKER="$PM_DIR/~rpm-session-start"
-HANDOFF="$PM_DIR/~rpm-session-end"
-CONTEXT="$PM_DIR/context.md"
-FUTURE="$PM_DIR/future/tasks.org"
-PRESENT="$PM_DIR/present/status.md"
-LAST_SESSION="$PM_DIR/~rpm-last-session"
-
 # Read source + session_id from stdin (startup, clear, resume, compact)
 PAYLOAD=$(cat)
 SOURCE=$(echo "$PAYLOAD" | jq -r '.source // empty' 2>/dev/null)
@@ -22,8 +13,23 @@ HOOK_SESSION_ID=$(echo "$PAYLOAD" | jq -r '.session_id // empty' 2>/dev/null)
 [ -z "$HOOK_SESSION_ID" ] && HOOK_SESSION_ID=$(echo "$PAYLOAD" | sed -n 's/.*"session_id" *: *"\([^"]*\)".*/\1/p')
 [ -z "$HOOK_SESSION_ID" ] && HOOK_SESSION_ID="${CLAUDE_CODE_SESSION_ID:-unknown}"
 
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-}"
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR=$(echo "$PAYLOAD" | jq -r '.cwd // empty' 2>/dev/null)
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR=$(echo "$PAYLOAD" | sed -n 's/.*"cwd" *: *"\([^"]*\)".*/\1/p')
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR="."
+PM_DIR="$PROJECT_DIR/docs/rpm"
+MARKER="$PM_DIR/~rpm-session-start"
+HANDOFF="$PM_DIR/~rpm-session-end"
+CONTEXT="$PM_DIR/context.md"
+FUTURE="$PM_DIR/future/tasks.org"
+PRESENT="$PM_DIR/present/status.md"
+LAST_SESSION="$PM_DIR/~rpm-last-session"
+
 # rpm plugin version — appended to session headers for visibility
-PLUGIN_MANIFEST="${CLAUDE_PLUGIN_ROOT:-$(dirname "${BASH_SOURCE[0]}")/..}/.claude-plugin/plugin.json"
+PLUGIN_ROOT="${RPM_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-$(dirname "${BASH_SOURCE[0]}")/..}}"
+PLUGIN_MANIFEST="$PLUGIN_ROOT/.claude-plugin/plugin.json"
+[ -f "$PLUGIN_MANIFEST" ] || PLUGIN_MANIFEST="$PLUGIN_ROOT/.codex-plugin/plugin.json"
+[ -f "$PLUGIN_MANIFEST" ] || PLUGIN_MANIFEST="$PLUGIN_ROOT/../.codex-plugin/plugin.json"
 RPM_VERSION=$(jq -r '.version // empty' "$PLUGIN_MANIFEST" 2>/dev/null)
 [ -z "$RPM_VERSION" ] && RPM_VERSION=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' "$PLUGIN_MANIFEST" 2>/dev/null | head -1)
 VTAG=""
@@ -363,7 +369,8 @@ if [ -f "$LEARNINGS" ]; then
 fi
 
 # --- Random tip (user-visible only, not model context) ---
-TIPS_FILE="${CLAUDE_PLUGIN_ROOT:-$(dirname "${BASH_SOURCE[0]}")/..}/hooks/tips.txt"
+TIPS_FILE="$PLUGIN_ROOT/hooks/tips.txt"
+[ -f "$TIPS_FILE" ] || TIPS_FILE="$(dirname "${BASH_SOURCE[0]}")/tips.txt"
 if [ -f "$TIPS_FILE" ]; then
   TIP=$(shuf -n 1 "$TIPS_FILE" 2>/dev/null)
   [ -n "$TIP" ] && echo "rpm tip: $TIP" >&2

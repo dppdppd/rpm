@@ -41,7 +41,9 @@ esac
 
 # Only fire when the project has a sync-codex.sh — i.e. this IS the
 # rpm monorepo, not a project that merely consumes the rpm plugin.
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-}"
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR=$(echo "$PAYLOAD" | jq -r '.cwd // empty' 2>/dev/null)
+[ -z "$PROJECT_DIR" ] && PROJECT_DIR="."
 [ -f "$PROJECT_DIR/scripts/sync-codex.sh" ] || exit 0
 
 # Stdout → next-turn model context. Keep it terse; one line.
