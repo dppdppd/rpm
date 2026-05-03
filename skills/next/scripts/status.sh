@@ -1,7 +1,8 @@
 #!/bin/bash
 # /next status — read-only view over docs/rpm/~rpm-orchestrator-log.jsonl.
 #
-# Emits four sections:
+# Emits five sections:
+#   == Needs review ==   completed worker results waiting for orchestrator review
 #   == In-flight ==      actionable-backlog dispatches without a matching backlog-result
 #   == Last 10 decisions ==
 #   == Idle streak ==    trailing idle entries; loop-exhausted at 3
@@ -11,10 +12,13 @@
 
 set -euo pipefail
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+PROJECT_DIR="${RPM_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-.}}"
 LOG="$PROJECT_DIR/docs/rpm/~rpm-orchestrator-log.jsonl"
 
 if [ ! -f "$LOG" ]; then
+  echo "== Needs review =="
+  echo "  (none)"
+  echo
   echo "== In-flight =="
   echo "  (none)"
   echo
@@ -25,7 +29,7 @@ if [ ! -f "$LOG" ]; then
   echo "  0  (no /next decisions logged yet)"
   echo
   echo "== Today ($(date +%Y-%m-%d)) =="
-  echo "  drift fixes: 0   dispatches: 0   completions: 0   blocked: 0"
+  echo "  drift fixes: 0   dispatches: 0   needs review: 0   approved: 0   plans: 0   blocked: 0"
   exit 0
 fi
 
@@ -33,6 +37,16 @@ if ! command -v jq >/dev/null 2>&1; then
   echo "jq not found — install jq to use /next status"
   exit 0
 fi
+
+# ---- Needs review: worker results not yet reviewed by orchestrator ----
+echo "== Needs review =="
+REVIEW_READY=$(bash "$(dirname "$0")/review-ready.sh")
+if [ -z "$REVIEW_READY" ]; then
+  echo "  (none)"
+else
+  printf '%s\n' "$REVIEW_READY" | sed 's/^/  /'
+fi
+echo
 
 # ---- In-flight: actionable-backlog without matching backlog-result ----
 # An "in-flight" entry has agent_id A and kind=actionable-backlog with no
@@ -59,7 +73,7 @@ echo
 # ---- Last 10 decisions (orchestrator decisions only, not backlog-results) ----
 echo "== Last 10 decisions =="
 jq -s -r '
-  map(select(.kind | IN("blocked-on-user","drift-fix","actionable-backlog","idle","loop-exhausted")))
+  map(select(.kind | IN("blocked-on-user","drift-fix","actionable-backlog","review-result","idle","loop-exhausted")))
   | .[-10:]
   | if length == 0 then "  (none)"
     else
@@ -74,7 +88,7 @@ echo
 # ---- Idle streak ----
 echo "== Idle streak =="
 STREAK=$(jq -s -r '
-  map(select(.kind | IN("blocked-on-user","drift-fix","actionable-backlog","idle","loop-exhausted")))
+  map(select(.kind | IN("blocked-on-user","drift-fix","actionable-backlog","review-result","idle","loop-exhausted")))
   | reverse
   | map(.kind)
   | (map(. == "idle") | index(false)) // length
@@ -94,7 +108,9 @@ jq -s -r --arg today "$TODAY" '
   map(select((.ts // "") | startswith($today)))
   | (map(select(.kind == "drift-fix"))           | length) as $drift
   | (map(select(.kind == "actionable-backlog"))  | length) as $disp
-  | (map(select(.kind == "backlog-result" and .status == "plan-written")) | length) as $compl
+  | (map(select(.kind == "backlog-result" and .status == "needs-review")) | length) as $review
+  | (map(select(.kind == "review-result" and .status == "approved")) | length) as $done
+  | (map(select(.kind == "backlog-result" and .status == "plan-written")) | length) as $plans
   | (map(select(.kind == "backlog-result" and .status == "blocked"))      | length) as $blocked
-  | "  drift fixes: \($drift)   dispatches: \($disp)   completions: \($compl)   blocked: \($blocked)"
+  | "  drift fixes: \($drift)   dispatches: \($disp)   needs review: \($review)   approved: \($done)   plans: \($plans)   blocked: \($blocked)"
 ' "$LOG"
