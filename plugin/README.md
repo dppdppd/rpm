@@ -35,8 +35,8 @@ Two steps.
 **1. Install the plugin** (once per machine):
 
 ```
-/plugin marketplace add https://github.com/dppdppd/rpm
-/plugin install rpm@dppdppd-plugins
+/plugins marketplace add https://github.com/dppdppd/rpm
+/plugins install rpm@dppdppd-plugins
 ```
 
 Or for local development:
@@ -68,8 +68,8 @@ Using another agent runtime? See the
 Codex quick install:
 
 ```
-/plugin marketplace add dppdppd/rpm@codex
-/plugin install rpm@dppdppd-rpm
+/plugins marketplace add dppdppd/rpm@codex
+/plugins install rpm@dppdppd-rpm
 ```
 
 ## The workflow

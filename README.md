@@ -8,8 +8,8 @@ development sessions. Available for Claude Code, opencode, and Codex.
 **1. Install** (once per machine):
 
 ```
-/plugin marketplace add https://github.com/dppdppd/rpm
-/plugin install rpm@dppdppd-plugins
+/plugins marketplace add https://github.com/dppdppd/rpm
+/plugins install rpm@dppdppd-plugins
 ```
 
 **2. Run `/init-rpm`** inside the project you want to track. It
@@ -38,8 +38,8 @@ publish flow.
 Install from inside Codex:
 
 ```
-/plugin marketplace add dppdppd/rpm@codex
-/plugin install rpm@dppdppd-rpm
+/plugins marketplace add dppdppd/rpm@codex
+/plugins install rpm@dppdppd-rpm
 ```
 
 Then enable hooks in your Codex config if they are not already enabled
