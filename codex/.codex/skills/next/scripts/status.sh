@@ -15,8 +15,17 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 LOG="$PROJECT_DIR/docs/rpm/~rpm-orchestrator-log.jsonl"
 
 if [ ! -f "$LOG" ]; then
-  echo "no orchestrator log yet — run /next once to start logging"
-  echo "(expected at $LOG)"
+  echo "== In-flight =="
+  echo "  (none)"
+  echo
+  echo "== Last 10 decisions =="
+  echo "  (none)"
+  echo
+  echo "== Idle streak =="
+  echo "  0  (no /next decisions logged yet)"
+  echo
+  echo "== Today ($(date +%Y-%m-%d)) =="
+  echo "  drift fixes: 0   dispatches: 0   completions: 0   blocked: 0"
   exit 0
 fi
 
