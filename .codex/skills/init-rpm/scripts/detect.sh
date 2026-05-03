@@ -33,13 +33,15 @@ for f in *_test.* *_spec.*; do
   [ -f "$f" ] 2>/dev/null && echo "file=$f"
 done
 
-# --- Existing LLM config ---
+# --- Existing agent config ---
 echo ""
-echo "=== llm_config ==="
-for f in CLAUDE.md AGENTS.md; do
+echo "=== agent_config ==="
+for f in AGENTS.md CLAUDE.md GEMINI.md; do
   [ -f "$f" ] && echo "file=$f"
 done
 [ -d .claude ] && echo "dir=.claude"
+[ -d .codex ] && echo "dir=.codex"
+[ -d .opencode ] && echo "dir=.opencode"
 [ -f .cursorrules ] && echo "file=.cursorrules"
 
 # --- Git history ---

@@ -1,6 +1,6 @@
 ---
 name: init-rpm
-description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (context.md, past/, present/, future/, reviews/), and creates CLAUDE.md if missing. Run ONCE per project. User-invocable only — never auto-trigger.
+description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (context.md, past/, present/, future/, reviews/), and creates an agent instructions file if missing. Run ONCE per project. User-invocable only — never auto-trigger.
 ---
 
 # /init-rpm — Full Instructions
@@ -39,8 +39,8 @@ what I'm about to do:
 1. Detect the project — language, tests, existing docs
 2. Ask 1–3 questions I can't answer from the codebase
 3. Create `docs/rpm/` scaffolding (context, trackers, past/future/reviews)
-4. Create `CLAUDE.md` if it's missing
-5. Ask once for permission to let rpm read/write `docs/rpm/`
+4. Create an agent instructions file if one is missing
+5. Ask once for runtime permissions if the active agent supports them
 6. Summarize what was created
 
 Starting with detection.
@@ -58,7 +58,8 @@ Proceed immediately to Phase 1.
 Classify silently (do NOT ask the user):
 - **GREENFIELD**: Empty or near-empty directory
 - **EXISTING**: Has source code, build system, tests
-- **HAS_CLAUDE_MD**: Already has CLAUDE.md or AGENTS.md
+- **HAS_AGENT_INSTRUCTIONS**: Already has `AGENTS.md`, `CLAUDE.md`,
+  `.cursorrules`, or another project-level agent instructions file
 
 ## Phase 2: Gather Project Context
 
@@ -132,15 +133,29 @@ mkdir -p docs/rpm/reviews
 
 ## Phase 4: Scaffold Missing Project Infrastructure
 
-**Say to user:** "Checking for missing project files (CLAUDE.md, spec
-template, trackers) and creating only what isn't already there."
+**Say to user:** "Checking for missing project files (agent
+instructions, spec template, trackers) and creating only what isn't
+already there."
 
 For each item below, **check if it exists first**. Only create what's
 missing. Never overwrite existing files.
 
-### CLAUDE.md (if missing)
+### Agent instructions file (if missing)
 
 Target 60-120 lines for greenfield, up to 150 for existing projects.
+If an agent instructions file already exists, augment it only when a
+short rpm section is clearly missing; never overwrite it.
+
+Default target file by runtime:
+
+- Claude Code: `CLAUDE.md`
+- Codex: `AGENTS.md`
+- opencode: `AGENTS.md`
+- Unknown/generic runtime: `AGENTS.md`
+
+If both `AGENTS.md` and `CLAUDE.md` exist, prefer updating `AGENTS.md`
+with generic instructions and leave `CLAUDE.md` untouched unless it
+already contains rpm-specific guidance.
 
 ```markdown
 # Project: {name}
@@ -158,7 +173,7 @@ Target 60-120 lines for greenfield, up to 150 for existing projects.
 {2-5 bullet points with explicit paths}
 
 ## Workflow
-Spec → Approve → Build → Verify → Checkpoint.
+Spec -> Approve -> Build -> Verify -> Checkpoint.
 
 - Create specs before coding: `/spec {feature-name}`
 - Run `{build_cmd} && {test_cmd} && {lint_cmd}` after every task
@@ -269,15 +284,21 @@ demonstrably struggles. Cap at 4. Communicate via typed artifacts.
 
 ## Phase 6: Permissions
 
-**Say to user:** "One permission prompt — so rpm doesn't ask on every
-file write inside `docs/rpm/`."
+**Say to user:** "Checking whether this runtime needs an rpm
+permissions entry."
 
 rpm hooks and skills frequently read/write files under `docs/rpm/`.
-Without explicit permissions, every file operation prompts the user.
+Some runtimes support project-local allowlists; others use sandbox or
+approval policy outside the project.
 
-Check whether `Read(./docs/rpm/**)` and `Edit(./docs/rpm/**)` already
-appear in `.claude/settings.local.json` (or `.claude/settings.json`).
-If they do, skip this phase silently.
+Only perform the `.claude` permissions edit when running under Claude
+Code or when `.claude/settings.local.json` / `.claude/settings.json`
+already exists. Do not create `.claude/` for Codex, opencode, or an
+unknown runtime.
+
+For Claude Code: check whether `Read(./docs/rpm/**)` and
+`Edit(./docs/rpm/**)` already appear in `.claude/settings.local.json`
+(or `.claude/settings.json`). If they do, skip this phase silently.
 
 If not, ask:
 
@@ -293,6 +314,9 @@ If yes: read `.claude/settings.local.json` (create if missing), merge
 `permissions.allow`, and write the file back. Do not overwrite
 existing entries.
 
+For Codex, opencode, and unknown runtimes: do not prompt for this
+permission. Continue to Phase 7.
+
 ## Phase 7: Create All Files
 
 **Say to user:** "Writing the scaffolding now."
@@ -301,15 +325,15 @@ Create all files from Phase 3 and Phase 4 that do not already exist.
 Do NOT prompt the user to select which files to create — all are
 required for the plugin to function.
 
-**Then activate hooks for the current session.** The session-start
-hook already ran at the top of this session, before `docs/rpm/`
-existed, and exited without writing `~rpm-session-start` — so runtime
-hooks (`context-monitor`, `stop-learn-capture`, `pre-compact`,
-`session-end`, `task-capture`) are currently gated off. Write the
-marker now so every hook activates immediately, no restart needed:
+**Then activate hooks for the current session when supported.** The
+runtime startup hook may already have run before `docs/rpm/` existed
+and exited without writing `~rpm-session-start` — so lifecycle hooks
+can be gated off until the next session. Write the marker now so hooks
+activate immediately in runtimes that use the rpm marker, no restart
+needed:
 
 ```bash
-SID="${CLAUDE_CODE_SESSION_ID:-unknown}"
+SID="${CLAUDE_CODE_SESSION_ID:-${CODEX_SESSION_ID:-${OPENCODE_SESSION_ID:-unknown}}}"
 cat > docs/rpm/~rpm-session-start <<EOF
 ---
 session_id: $SID
@@ -333,7 +357,7 @@ Created: {list of created files}
 
 Next steps:
 - rpm is active in this session already — hooks will fire as you work
-  (you'll see the backlog menu on the next session-start)
+  where the active runtime exposes lifecycle hooks
 - `/backlog add <description>` — add entries to your rpm backlog
 - `/audit project` — run a full consultant review when you want
   outside perspective on code, architecture, and competitive positioning
@@ -345,8 +369,9 @@ changing.
 
 ## Scaling Notes
 
-- **CLAUDE.md too long/stale** → Split into root + per-service files
-- **Tasks parallelizable** → Multi-agent with git worktrees
-- **Context bottleneck** → Three-tier knowledge with MCP retrieval
+- **Agent instructions too long/stale** -> Split into root +
+  per-service files
+- **Tasks parallelizable** -> Multi-agent with git worktrees
+- **Context bottleneck** -> Three-tier knowledge with MCP retrieval
 
 **Cost awareness:** Multi-agent = 4-220x more tokens. Monitor weekly.
