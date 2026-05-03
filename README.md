@@ -1,8 +1,7 @@
 # rpm — Relentless Project Manager
 
 Prevents documentation drift and keeps you on task across LLM-assisted
-development sessions. Available as a plugin for both Claude Code and
-opencode.
+development sessions. Available for Claude Code, opencode, and Codex.
 
 ## Getting started — Claude Code
 
@@ -33,6 +32,29 @@ agents) into your project's opencode config directory. Then run
 
 See [opencode/README.md](opencode/README.md) for the port status and
 publish flow.
+
+## Getting started — Codex
+
+Install from the published `codex` branch:
+
+```bash
+git clone --branch codex --depth 1 https://github.com/dppdppd/rpm.git /tmp/rpm-codex
+cp -R /tmp/rpm-codex/.codex .
+```
+
+Then enable hooks in your Codex config (`~/.codex/config.toml` or the
+project's `.codex/config.toml`):
+
+```toml
+[features]
+codex_hooks = true
+```
+
+Run `$init-rpm` inside the project you want to track. Codex skills use
+`$skill-name` invocation rather than slash commands.
+
+See [codex/README.md](codex/README.md) for the port status and publish
+flow.
 
 ## License
 
