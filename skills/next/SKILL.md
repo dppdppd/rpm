@@ -50,10 +50,9 @@ Evaluate top-to-bottom; first match wins:
 3. **actionable-backlog** — `tasks.org` has at least one TODO or
    IN-PROGRESS entry whose `:BLOCKED_BY:` deps all resolve to DONE
    or CANCELLED. Action: pick the topmost across all `* Parent`
-   groups, dispatch a `general-purpose` subagent with
-   `run_in_background: true` to investigate and draft a plan
-   (subagent emits a `## Plan` block to be appended to the task's
-   detail file). Log the dispatch.
+   groups, dispatch a worker using the contract below, and log the
+   dispatch. Workers must persist their own result; do not rely on a
+   background notification as the only return path.
 
 4. **idle** — none of the above matched. Action: emit summary, log
    `idle`. After 3 consecutive `idle` entries in the log, output
@@ -107,10 +106,55 @@ appropriate kind:
   `<target>` and `<agent-id>` plus a `<status>` of
   `plan-written | blocked | no-op`. This pairing is what powers
   the `in-flight: <N>` count.
+  If the worker already wrote this line itself, do not duplicate it.
 
 The script writes to `docs/rpm/~rpm-orchestrator-log.jsonl`
 (gitignored, ephemeral). Failures print a stderr warning and
 exit 0 — never block the orchestrator.
+
+## Worker Contract
+
+When dispatching `actionable-backlog`, include this contract in the
+worker prompt. This is mandatory for Codex, where background workers
+may not reliably re-enter the orchestrator thread.
+
+```
+You are an rpm backlog worker.
+
+Task:
+- target id: <task-id>
+- task heading: <task heading from tasks.org>
+- detail file: docs/rpm/future/<detail-file>.md
+- orchestrator log: docs/rpm/~rpm-orchestrator-log.jsonl
+- worker id: <agent-id if known, otherwise worker-unknown>
+
+Rules:
+1. Read docs/rpm/future/tasks.org and the detail file before writing.
+2. Do not implement production code unless the task explicitly asks for
+   implementation. Default job: investigate and draft a plan.
+3. Append a `## Plan` section to the detail file. Include:
+   - Summary
+   - Proposed steps
+   - Files likely to change
+   - Verification
+   - Blockers or assumptions
+4. If you cannot write a useful plan, append `## Blocked` instead with
+   the missing information.
+5. Before finishing, log your result:
+
+   bash ${CLAUDE_SKILL_DIR}/scripts/log-decision.sh backlog-result \
+     "<task-id>" "<one-line result>" "<agent-id>" "plan-written"
+
+   Use status `blocked` if you appended `## Blocked`; use `no-op` only
+   when the task is already fully handled.
+6. In your final response, state the detail file changed and the status
+   you logged. The file + JSONL log are the source of truth.
+```
+
+When dispatching from Codex, the generated skill rewrites the helper
+path to the installed marketplace plugin path. If you are hand-running
+the command, set `RPM_PROJECT_DIR=/absolute/project/root` when the
+worker's cwd is not the project root.
 
 ## Idle terminal
 
