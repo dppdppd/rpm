@@ -42,9 +42,11 @@ Scan the project and report findings.
      runtime hook or equivalent enforcement when the runtime supports
      hooks?
 
-5. **GUIDANCE ALIGNMENT:** Read all memory files of type `feedback`.
-   For each, check if codified in the active agent instructions file,
-   tier-2 docs, skills, or hooks. Classify:
+5. **GUIDANCE ALIGNMENT:** Read all memory files of type `feedback`
+   and any Claude-era project guidance that exists (`CLAUDE.md`,
+   `.claude/`, `MEMORY.md`, `feedback_*.md`). For each, check if
+   codified in the active agent instructions file, tier-2 docs,
+   skills, or hooks. Classify:
    `CODIFIED | PARTIAL | GAP | STALE`.
 
 6. **GAP ANALYSIS:** Simulate critical workflows (build, test,

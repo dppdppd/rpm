@@ -21,7 +21,7 @@ Print this exact list and stop:
 ```
 /session-end     — wrap up, update trackers, commit, hand off
 /init-rpm        — scaffold rpm infrastructure for a new project
-/audit documents — scan docs, CLAUDE.md, memory, session drift
+/audit documents — scan docs, agent instructions, memory, session drift
 /audit project   — full review with competitive research and plan
 /backlog         — manage rpm backlog (add, list, review, postpone, done)
 /next            — one-step orchestrator (loop-friendly: /loop /next)
@@ -49,7 +49,7 @@ recommend. You do NOT write feature code.
 |---|---|
 | `/session-end` | Wrap up — update trackers, present findings, commit, hand off |
 | `/init-rpm` | Onboard — scaffold rpm infrastructure for a new project |
-| `/audit documents` | Scan docs, CLAUDE.md, memory, session drift via `rpm:auditor` |
+| `/audit documents` | Scan docs, agent instructions, memory, session drift via `rpm:auditor` |
 | `/audit project` | Full review — code, architecture, competitive research, plan file |
 | `/backlog` | Manage the **rpm backlog** (long-term, `tasks.org`) — add, list, review, postpone, complete. Distinct from Claude's native `TaskCreate` list (session-scoped). |
 | `/next` | One-step orchestrator — picks one action per turn from a priority list (drift-fix → actionable backlog → idle), dispatches subagents in background, terminates loop after 3 idle ticks. Wrap with `/loop /next` for unattended execution. |
@@ -87,7 +87,11 @@ developer or an audit needs external knowledge.
 ## Governing Principles
 
 1. **Less is more.** Every doc must earn its place.
-2. **Three-tier knowledge.** Hot (CLAUDE.md <150 lines) -> Warm (on demand) -> Cold (archives).
+2. **Three-tier knowledge.** Hot agent instructions (<150 lines) -> Warm (on demand) -> Cold (archives).
+   In Codex, also read Claude-era project memory (`CLAUDE.md`,
+   `.claude/` guidance, `MEMORY.md`, `feedback_*.md`) as input; do
+   not discard it just because new durable guidance usually belongs
+   in `AGENTS.md` or an rpm feedback file.
 3. **Structured > prose.** Tables and checklists outperform paragraphs.
 4. **Single source of truth.** Each fact lives in one place.
 5. **Proximity.** Guidance lives near the code it governs.
@@ -105,7 +109,8 @@ test -f docs/rpm/context.md && echo "LOCAL_PM_EXISTS" || echo "NO_LOCAL_PM"
 ```
 
 **If `docs/rpm/context.md` exists:** Read it in full.
-**If not:** Offer `/init-rpm` or do a lightweight scan (CLAUDE.md, README, git log).
+**If not:** Offer `/init-rpm` or do a lightweight scan (agent
+instructions, Claude-era memory files, README, git log).
 
 `docs/rpm/past/log.md` is append-only history. Only read for audit or when user asks.
 

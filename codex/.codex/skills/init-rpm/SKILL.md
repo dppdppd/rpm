@@ -1,12 +1,18 @@
 ---
 name: init-rpm
-description: First-run rpm plugin setup for a project. Detects project state, scaffolds docs/rpm/ infrastructure (context.md, past/, present/, future/, reviews/), and creates an agent instructions file if missing. Run ONCE per project. User-invocable only — never auto-trigger.
+description: rpm project setup and verification. First run scaffolds docs/rpm/ infrastructure and agent instructions; repeat runs verify and migrate an existing rpm setup to the latest expected layout. User-invocable only — never auto-trigger.
 ---
 
 # /init-rpm — Full Instructions
 
-First-run setup. Creates or updates rpm context for a project. Run once per project,
-or run once after installing rpm in a new agent runtime such as Codex.
+Project setup and verification. First run creates rpm context for a
+project. Repeat runs verify that an existing rpm setup matches the
+latest expected layout and apply safe migrations.
+
+Run once per project, or run again after installing rpm in a new agent
+runtime such as Codex. On repeat runs, do not re-ask first-run
+project context questions unless a required canonical file is missing
+and the answer cannot be inferred from existing files.
 If `docs/rpm/context.md` already exists, read it and **augment** — do not
 overwrite. Merge in missing sections only.
 
@@ -27,8 +33,14 @@ by what `/init-rpm` creates or writes.
 
 ## Phase 0: Introduce
 
-Before running anything, tell the user what /init-rpm will do. Use
-roughly this wording (adapt freely):
+Before running anything, detect whether this is a first run:
+
+- If `docs/rpm/` does not exist, use the first-run introduction below.
+- If any `docs/rpm/` content exists, this is a repeat run. Use the
+  verification introduction below, then follow **Repeat-run
+  verification mode**.
+
+First-run wording (adapt freely):
 
 ```
 ## /init-rpm — rpm first-run setup
@@ -48,6 +60,67 @@ Starting with detection.
 
 Do NOT wait for confirmation — this is informative, not gating.
 Proceed immediately to Phase 1.
+
+Repeat-run wording (adapt freely):
+
+```
+## /init-rpm — rpm setup verification
+
+I found existing rpm state. I won't re-bootstrap this project or ask
+first-run questions. I'll verify it against the latest rpm layout,
+apply safe migrations for missing canonical files or legacy names, and
+ask before changing agent guidance.
+
+Starting with verification.
+```
+
+Do NOT wait for confirmation — this is informative, not gating.
+
+### Repeat-run verification mode
+
+Run this mode when `docs/rpm/` exists, `docs/rpm/context.md` exists,
+or any legacy rpm file exists (`docs/rpm/RPM.md`,
+`docs/rpm/FUTURE.org`, `docs/rpm/PRESENT.md`,
+`docs/rpm/RPM-LOG.md`).
+
+1. **Scan current state.** Run the Phase 1 detector and read existing
+   `docs/rpm/context.md`, `docs/rpm/present/status.md`,
+   `docs/rpm/future/tasks.org`, `docs/rpm/future/done.org`, and
+   `docs/rpm/past/log.md` only when they exist.
+2. **Verify canonical rpm files.** Create only missing canonical
+   files/directories:
+   - `docs/rpm/context.md`
+   - `docs/rpm/past/log.md`
+   - `docs/rpm/present/status.md`
+   - `docs/rpm/future/tasks.org`
+   - `docs/rpm/future/done.org`
+   - `docs/rpm/reviews/`
+3. **Apply safe legacy migrations.** Move legacy names listed above
+   to the canonical paths only when the canonical target is missing.
+   If both old and new paths exist, do not overwrite; report the old
+   path as leftover legacy state.
+4. **Verify agent guidance layout.** If `CLAUDE.md` exists and
+   `AGENTS.md` is missing or `CLAUDE.md` appears to contain general
+   project guidance, ask the Claude guidance migration question from
+   Phase 4. Do not move guidance without confirmation.
+5. **Verify runtime-specific permissions.** Run Phase 6 checks, but
+   only apply permission changes for runtimes that support them.
+6. **Verify current-session activation.** Ensure
+   `docs/rpm/~rpm-session-start` exists for the current session when
+   the active runtime uses rpm lifecycle hooks.
+7. **Summarize and stop.** Print:
+
+   ```
+   ## /init-rpm verification complete
+
+   Verified: {list}
+   Created: {list or "nothing"}
+   Migrated: {list or "nothing"}
+   Needs attention: {list or "nothing"}
+   ```
+
+Do not continue into the first-run Phase 2 question flow after repeat
+verification mode completes.
 
 ## Phase 1: Detect Project State
 
@@ -140,22 +213,70 @@ already there."
 For each item below, **check if it exists first**. Only create what's
 missing. Never overwrite existing files.
 
-### Agent instructions file (if missing)
+### Agent instructions file and Claude guidance migration
 
 Target 60-120 lines for greenfield, up to 150 for existing projects.
 If an agent instructions file already exists, augment it only when a
 short rpm section is clearly missing; never overwrite it.
 
-Default target file by runtime:
+Default general-purpose target file:
 
-- Claude Code: `CLAUDE.md`
 - Codex: `AGENTS.md`
 - opencode: `AGENTS.md`
 - Unknown/generic runtime: `AGENTS.md`
+- Claude Code: use `AGENTS.md` for general project/agent guidance
+  and keep `CLAUDE.md` only for Claude Code-exclusive directives.
 
-If both `AGENTS.md` and `CLAUDE.md` exist, prefer updating `AGENTS.md`
-with generic instructions and leave `CLAUDE.md` untouched unless it
-already contains rpm-specific guidance.
+If `CLAUDE.md` exists, do not silently leave general guidance trapped
+there. Tell the user:
+
+```
+I found `CLAUDE.md`. rpm works across Claude Code, Codex, and
+opencode, so I want to move guidance that is not Claude-specific into
+`AGENTS.md` and leave `CLAUDE.md` for Claude Code-only directives.
+
+QUESTION: Move general guidance from `CLAUDE.md` to `AGENTS.md` now?
+(`yes` / `no`)
+```
+
+If the user says `yes`:
+
+1. Read `CLAUDE.md` and classify each section:
+   - **General guidance**: project summary, commands, architecture,
+     workflow, testing, guardrails, coding conventions, repository
+     paths, domain notes, rpm process.
+   - **Claude-exclusive guidance**: Claude Code tool names, Claude
+     permissions, Claude hook behavior, Claude native tasks,
+     Claude-specific slash-command mechanics, `.claude/` settings,
+     model-specific Claude instructions.
+2. Create or update `AGENTS.md` with the general guidance. Preserve
+   existing `AGENTS.md` content and merge without duplication.
+3. Rewrite `CLAUDE.md` so it keeps only Claude-exclusive directives
+   and includes this policy near the top:
+
+   ```markdown
+   # Claude Code Directives
+
+   General project and agent guidance belongs in `AGENTS.md` by
+   default. Keep this file limited to Claude Code-exclusive
+   directives: Claude-specific tools, hooks, permissions, native task
+   behavior, and slash-command mechanics.
+
+   Claude Code should read `AGENTS.md` first, then apply the
+   Claude-only directives below.
+   ```
+
+4. If there is no Claude-exclusive guidance, leave `CLAUDE.md` as the
+   policy stub above plus a short pointer to `AGENTS.md`.
+
+If the user says `no`, preserve `CLAUDE.md` exactly as-is. Still
+create `AGENTS.md` if missing, using the template below, so future
+general guidance has a runtime-neutral home.
+
+If only `AGENTS.md` exists, update it directly. If neither exists,
+create `AGENTS.md` from the template below. Do not create
+`CLAUDE.md` unless Claude Code-exclusive guidance exists or the
+project already had `CLAUDE.md`.
 
 ```markdown
 # Project: {name}

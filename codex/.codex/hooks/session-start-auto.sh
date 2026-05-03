@@ -448,5 +448,5 @@ echo "Native tasks (TaskCreate / TaskList) = this session's active work only. Yo
 echo ""
 emit_rpm_directives
 echo ""
-echo "Context: docs/rpm/context.md, docs/rpm/present/status.md, docs/rpm/future/tasks.org, CLAUDE.md"
+echo "Context: docs/rpm/context.md, docs/rpm/present/status.md, docs/rpm/future/tasks.org, AGENTS.md/CLAUDE.md, Claude-era memory files when present"
 echo "Wrap up: /session-end | All commands: /rpm ?"
