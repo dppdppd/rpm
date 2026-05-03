@@ -40,8 +40,7 @@ AGENT_TO_SKILL=(
   "auditor.md:audit"
 )
 
-mkdir -p "$DST/skills" "$DST/hooks"
-mkdir -p "$REPO_ROOT/codex/.codex-plugin" "$DST/.codex-plugin"
+mkdir -p "$DST/skills" "$DST/hooks" "$DST/.codex-plugin"
 
 is_manual() {
   [ -f "$1" ] && head -n 20 "$1" | grep -qF "$SENTINEL"
@@ -87,7 +86,6 @@ done
 
 # --- Plugin manifest --------------------------------------------------------
 python3 - "$SRC/.claude-plugin/plugin.json" \
-  "$REPO_ROOT/codex/.codex-plugin/plugin.json" \
   "$DST/.codex-plugin/plugin.json" <<'PY'
 import json
 import sys
@@ -174,7 +172,7 @@ done
 
 # --- Report -----------------------------------------------------------------
 echo "sync-codex: $DST"
-echo "  manifest synced: codex/.codex-plugin/plugin.json codex/.codex/.codex-plugin/plugin.json"
+echo "  manifest synced: codex/.codex/.codex-plugin/plugin.json"
 [ ${#synced_skills[@]} -gt 0 ] && printf '  skills synced:   %s\n' "${synced_skills[*]}"
 [ ${#skipped_skills[@]} -gt 0 ] && printf '  skills skipped:  %s\n' "${skipped_skills[*]}"
 [ ${#synced_hooks[@]} -gt 0 ]  && printf '  hooks synced:    %s\n' "${synced_hooks[*]}"
