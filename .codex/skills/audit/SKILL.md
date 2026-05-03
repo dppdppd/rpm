@@ -1,6 +1,6 @@
 ---
 name: audit
-description: On-demand audit. Target `quick` runs the mechanical scan.sh only (zero-LLM drift check). Target `documents` scans docs + CLAUDE.md + memory + session drift via the rpm:auditor subagent. Target `project` runs a full consultant review — code, architecture, inward + outward research, 7-dimension analysis, saved plan file. Routine doc-drift is handled automatically by /session-end — run audit only when you have a specific concern.
+description: On-demand audit. Target `quick` runs the mechanical scan.sh only (zero-LLM drift check). Target `documents` scans docs + agent instructions + memory + session drift via the rpm:auditor review agent. Target `project` runs a full consultant review — code, architecture, inward + outward research, 7-dimension analysis, saved plan file. Routine doc-drift is handled automatically by /session-end — run audit only when you have a specific concern.
 ---
 
 # /audit
@@ -27,12 +27,13 @@ Parse `$ARGUMENTS`:
   ## /audit — pick a target
 
   - `/audit quick` — mechanical scan.sh only. Git state,
-    CLAUDE.md size, NOT_IMPLEMENTED, broken refs, daily-log gap,
-    session marker, spec inventory drift, log/tracker staleness.
+    agent instructions size, NOT_IMPLEMENTED, broken refs,
+    daily-log gap, session marker, spec inventory drift,
+    log/tracker staleness.
     Zero LLM tokens for the scan itself. ~5sec.
-  - `/audit documents` — scan docs + CLAUDE.md + memory + session
-    drift via the rpm:auditor subagent. Scored findings, hookify
-    repeat offenders. ~3min.
+  - `/audit documents` — scan docs + agent instructions + memory +
+    session drift via the rpm:auditor review agent. Scored findings,
+    codify repeat offenders. ~3min.
   - `/audit project` — full consultant review: code, architecture,
     inward + outward research, 7-dimension analysis, saved plan file.
     ~30min+.
@@ -68,7 +69,9 @@ Phase 1a describes — the interpretation rules are identical.
 From the scan output, collect actionable items into a findings list:
 
 - `git` — only flag if the user seems unaware of uncommitted work
-- `claude_md` — flag if `status=warn` or `status=critical`
+- `agent_instructions` — flag if `status=warn` or `status=critical`
+  (fall back to legacy `claude_md` only if `agent_instructions` is
+  absent from older scan output)
 - `not_implemented` — flag only real source stubs, suppress meta
 - `broken_refs` — always flag if `count > 0`
 - `daily_log` — flag if `today_exists=false` AND `commits_since > 0`
@@ -112,26 +115,29 @@ minimal. If the user wants detail, they can re-run or upgrade to
 
 ## Target: Documents
 
-Scan docs, CLAUDE.md, memory files, trackers, and recent session
-jsonl logs for drift. Runs via the `rpm:auditor` subagent. Scored,
-confidence-gated, hookifies repeat offenders.
+Scan docs, agent instructions, memory files, trackers, and recent
+session logs for drift. Runs via the `rpm:auditor` review agent when
+the current runtime can dispatch one. Scored, confidence-gated,
+codifies repeat offenders.
 
-### Phase 1: Dispatch (background subagent)
+### Phase 1: Dispatch (review agent)
 
-Launch the `rpm:auditor` subagent with `run_in_background: true` and
-return immediately — do NOT block-wait. The audit takes ~3 minutes;
-the main session stays interactive while it runs. The scan spec
-lives in `agents/auditor.md` — do not duplicate it here.
+Launch the `rpm:auditor` review agent using the current runtime's
+agent mechanism. In Claude Code, use the `Agent` tool with
+`subagent_type: "rpm:auditor"` and `run_in_background: true`, then
+return immediately. In runtimes without a compatible background-agent
+notification path, run the same auditor protocol synchronously in the
+main session. The scan spec lives in `agents/auditor.md` (or the
+Codex reference copy) — do not duplicate it here.
 
 In the same response, surface a one-line dispatch confirmation to
 the user (`audit: dispatched rpm:auditor in background — results
 will appear when ready`) and stop. Do NOT invent findings or guess
 at outcomes.
 
-When the agent's `<task-notification>` arrives, re-enter the skill
-at Phase 2 with the report content. The notification carries the
-agent ID; read its output via the file referenced in the
-notification's `<output-file>` tag.
+When the runtime reports the agent result, re-enter the skill at
+Phase 2 with the report content. For Claude Code task notifications,
+read the output via the file referenced in the `<output-file>` tag.
 
 ### Phase 2: Score findings, present menu
 
@@ -167,9 +173,9 @@ the right answer is just guidance:
 
 | Finding type | Intervention |
 |---|---|
-| Hard rule, tool-enforceable (editing wrong file, skipping a flow) | PreToolUse hook → `.claude/hookify.{name}.local.md` |
+| Hard rule, tool-enforceable (editing wrong file, skipping a flow) | Runtime hook/rule file where supported; Claude Code uses PreToolUse hook -> `.claude/hookify.{name}.local.md` |
 | Detection-side gap (scan.sh missed a category, recurring scan blind spot) | Edit `plugin/skills/session-end/scripts/scan.sh` |
-| LLM behavior pattern (wrong command name, missed convention, repeated word choice) | New `feedback_*.md` memory rule or one-line CLAUDE.md addition |
+| LLM behavior pattern (wrong command name, missed convention, repeated word choice) | New `feedback_*.md` memory rule or one-line addition to the active agent instructions file |
 | Skill output drift (session-end / audit / etc. keeps producing wrong format) | Edit the relevant skill body |
 | Doc/tracker rot (status.md keeps going stale, log gaps) | Add a check to scan.sh, or codify the update in the originating skill |
 
