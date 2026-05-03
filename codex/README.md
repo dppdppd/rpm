@@ -46,14 +46,8 @@ enabled = true
 ```
 
 The `codex plugin` CLI currently manages marketplaces only; it does
-not provide a `codex plugin install` subcommand. If you are already
-inside the Codex TUI, you can use the interactive plugin commands
-instead:
-
-```
-/plugins marketplace add dppdppd/rpm@codex
-/plugins install rpm@dppdppd-rpm
-```
+not provide a `codex plugin install` subcommand. Plugin activation is
+the `[plugins."rpm@dppdppd-rpm"]` config entry above.
 
 For project-level copy install from GitHub, from your project root:
 

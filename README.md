@@ -48,13 +48,6 @@ Then enable the plugin in `~/.codex/config.toml`:
 enabled = true
 ```
 
-Or install from inside the Codex TUI:
-
-```
-/plugins marketplace add dppdppd/rpm@codex
-/plugins install rpm@dppdppd-rpm
-```
-
 Codex hooks also require this feature flag in your Codex config if it
 is not already enabled (`~/.codex/config.toml` or the project's
 `.codex/config.toml`):
