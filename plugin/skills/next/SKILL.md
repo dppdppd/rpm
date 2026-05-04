@@ -190,15 +190,23 @@ The 3-idle threshold prevents runaway dynamic-mode loops. The user
 can resume by running `/next` directly; the next invocation reads
 the log fresh and picks up wherever priority leads.
 
-## Concurrency
+## Concurrency — one worker at a time
 
-`/next` itself is single-threaded — one action per turn. But the
-subagents it dispatches for `actionable-backlog` run in background,
-so multiple investigations can be in-flight across loop ticks. The
-log's `in-flight: <N>` count surfaces this honestly.
+`/next` itself is single-threaded — one action per turn. The
+subagent it dispatches for `actionable-backlog` runs in background,
+but only ONE may be in-flight at a time. Full depth, multi-game
+verified before merge.
 
-If `<N>` ≥ 4 already, fall through `actionable-backlog` to `idle` —
-back-pressure to keep the agent fleet bounded.
+If `<N>` ≥ 1 already, fall through `actionable-backlog` to `idle` —
+wait for the current worker to complete before dispatching another.
+
+Rationale (2026-05-04 audit): saturating to 4 produced an 8.4%
+dispatch hit rate (107 dispatches → 9 shipped fixes) because (a)
+workers competed for the daemon render queue, (b) concurrent edits
+created non-FF push conflicts, (c) each fix verified against one
+game shipped before contradictions in other games surfaced. Single-
+threaded with corpus-wide verification trades throughput for hit
+rate.
 
 ## What this skill does NOT do
 
