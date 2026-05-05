@@ -1,6 +1,6 @@
 ---
 name: next
-description: One-step rpm orchestrator. Runs preflight maintenance, then either starts the next obvious backlog action or asks for clarification when direct use leaves no clear next task. Designed to be wrapped by `/loop /next` — never loops internally. In loop mode it never waits for input: it dispatches only unambiguous work and otherwise idles or exhausts after 3 idle ticks. Use when the user wants the session to autonomously work the rpm backlog.
+description: One-step rpm orchestrator. Runs preflight maintenance, then either starts the next obvious backlog action or asks for clarification when direct use leaves no clear next task. Designed to be wrapped by `/loop /next` — never loops internally. In loop mode it never waits for input; it dispatches only unambiguous work and otherwise idles or exhausts after 3 idle ticks. Use when the user wants the session to autonomously work the rpm backlog.
 argument-hint: "[status]"
 allowed-tools: Read Write Edit Glob Grep Bash Agent
 ---
