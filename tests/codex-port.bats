@@ -20,6 +20,26 @@ repo_root() {
   [[ "$output" == *$'rpm\n'"${version}"$'\n./skills/\n./hooks.json\nrpm'* ]]
 }
 
+@test "codex skill frontmatter avoids unsafe plain YAML scalars" {
+  local root bad
+  root=$(repo_root)
+
+  bad=$(
+    awk '
+      FNR == 1 && $0 == "---" { in_fm = 1; next }
+      in_fm && $0 == "---" { in_fm = 0; nextfile }
+      in_fm && /^[A-Za-z][A-Za-z0-9_-]*:[[:space:]]+/ {
+        value = $0
+        sub(/^[^:]+:[[:space:]]*/, "", value)
+        if (value !~ /^[">|]/ && substr(value, 1, 1) != sprintf("%c", 39) && value ~ /:[[:space:]]/) {
+          print FILENAME ":" FNR ":" $0
+        }
+      }
+    ' "$root"/codex/.codex/skills/*/SKILL.md
+  )
+  [ -z "$bad" ] || { echo "$bad"; return 1; }
+}
+
 @test "codex skill translation rewrites Claude-only runtime paths" {
   local root
   root=$(repo_root)
