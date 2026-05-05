@@ -9,19 +9,15 @@ repo_root() {
   cd "$BATS_TEST_DIRNAME/../.." && pwd
 }
 
-@test "codex manifests exist and carry plugin metadata" {
+@test "codex manifest exists and carries plugin metadata" {
   local root
   root=$(repo_root)
   local version
   version=$(jq -r '.version' "$root/plugin/.claude-plugin/plugin.json")
 
-  run jq -r '.name, .version, .skills, .hooks, .interface.displayName' "$root/codex/.codex-plugin/plugin.json"
+  run jq -r '.name, .version, .skills, .hooks, .interface.displayName' "$root/codex/.codex/.codex-plugin/plugin.json"
   [ "$status" -eq 0 ]
   [[ "$output" == *$'rpm\n'"${version}"$'\n./skills/\n./hooks.json\nrpm'* ]]
-
-  run jq -r '.name, .version, .skills, .hooks' "$root/codex/.codex/.codex-plugin/plugin.json"
-  [ "$status" -eq 0 ]
-  [[ "$output" == *$'rpm\n'"${version}"$'\n./skills/\n./hooks.json'* ]]
 }
 
 @test "codex skill translation rewrites Claude-only runtime paths" {
@@ -33,9 +29,9 @@ repo_root() {
   run grep -F '${CLAUDE_SKILL_DIR}' "$root/codex/.codex/skills/init-rpm/SKILL.md"
   [ "$status" -eq 1 ]
 
-  run grep -F '${RPM_PLUGIN_ROOT:-.codex}/.codex-plugin/plugin.json' "$root/codex/.codex/skills/rpm/SKILL.md"
+  run grep -F '${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/.codex-plugin/plugin.json' "$root/codex/.codex/skills/rpm/SKILL.md"
   [ "$status" -eq 0 ]
-  run grep -F '.codex/skills/init-rpm/scripts/detect.sh' "$root/codex/.codex/skills/init-rpm/SKILL.md"
+  run grep -F '${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/init-rpm/scripts/detect.sh' "$root/codex/.codex/skills/init-rpm/SKILL.md"
   [ "$status" -eq 0 ]
 }
 
@@ -69,7 +65,7 @@ repo_root() {
   unset CLAUDE_PROJECT_DIR
 
   run jq -e '.hooks.PostToolUse[0].hooks[]
-             | select(.command == "bash .codex/hooks/codex-sync-reminder.sh")' \
+             | select(.command == "bash ./hooks/codex-sync-reminder.sh")' \
     "$root/codex/.codex/hooks.json"
   [ "$status" -eq 0 ]
 
