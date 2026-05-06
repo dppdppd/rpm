@@ -65,6 +65,20 @@ require_codex_port_layout() {
   [ "$status" -eq 0 ]
 }
 
+@test "codex next worker contract wakes parent without waiting" {
+  require_codex_port_layout
+  local root skill
+  root=$(repo_root)
+  skill="$root/codex/.codex/skills/next/SKILL.md"
+
+  run grep -F 'CODEX_THREAD_ID' "$skill"
+  [ "$status" -eq 0 ]
+  run grep -F 'send_input target=<orchestrator-thread-id> interrupt=false' "$skill"
+  [ "$status" -eq 0 ]
+  run grep -F 'do not call `wait_agent`' "$skill"
+  [ "$status" -eq 0 ]
+}
+
 @test "codex audit skill includes linked support docs" {
   require_codex_port_layout
   local root
