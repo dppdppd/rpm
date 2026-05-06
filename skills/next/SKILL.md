@@ -113,7 +113,9 @@ After preflight, recompute `in-flight`.
 3. If there is a clear next task, dispatch a worker using the contract
    below and log `actionable-backlog`. Workers must persist their own
    result; do not rely on a background notification as the only return
-   path.
+   path. In Codex, do not call `wait_agent` as part of this dispatch:
+   the orchestrator must remain free to handle user work or future
+   preflight while the worker runs.
 
 4. If there is no actionable task, or the top task is missing an ID,
    missing a readable detail file, marked watch/deferred, or otherwise
@@ -198,6 +200,12 @@ When dispatching `actionable-backlog`, include this contract in the
 worker prompt. This is mandatory for Codex, where background workers
 may not reliably re-enter the orchestrator thread.
 
+In Codex, first read the parent thread id from `CODEX_THREAD_ID` and
+include it as `orchestrator thread id` below. After `spawn_agent`
+returns the worker id, immediately send the worker a follow-up with
+that exact id so it can log and report using the same identifier. Do
+not wait for the worker.
+
 ```
 You are an rpm backlog worker.
 
@@ -207,6 +215,7 @@ Task:
 - detail file: docs/rpm/future/<detail-file>.md
 - orchestrator log: docs/rpm/~rpm-orchestrator-log.jsonl
 - worker id: <agent-id if known, otherwise worker-unknown>
+- orchestrator thread id: <CODEX_THREAD_ID when running in Codex, otherwise unavailable>
 
 Rules:
 1. Read docs/rpm/future/tasks.org and the detail file before writing.
@@ -230,7 +239,17 @@ Rules:
    orchestrator to review it. Use `plan-written` if you only appended
    `## Plan`, `blocked` if you appended `## Blocked`, and `no-op` only
    when the task is already fully handled.
-6. In your final response, state the detail file changed and the status
+6. In Codex, after the durable log entry is written and if an
+   orchestrator thread id was provided, notify the orchestrator without
+   interrupting active work:
+
+   send_input target=<orchestrator-thread-id> interrupt=false message:
+   `rpm worker result ready: <status> <task-id> by <agent-id>; run /next
+   worker review preflight when convenient.`
+
+   If `send_input` is unavailable, continue; the file + JSONL log are
+   still the source of truth.
+7. In your final response, state the detail file changed and the status
    you logged. The file + JSONL log are the source of truth.
 ```
 
