@@ -80,10 +80,12 @@ unambiguous next action.
    `bash ${CLAUDE_SKILL_DIR}/scripts/review-ready.sh`.
    If it reports a worker result with `status=needs-review` and no
    matching `review-result`, review the first row before starting new
-   work. If a matching `<subagent_notification>` or task notification is
-   visible in the current conversation, surface it briefly first:
-   worker ID, target, status, claimed changes, and claimed
-   verification. Then review the detail file, git diff, and any
+   work. Surface the worker result before reviewing even when no
+   user-visible chat notification exists: worker ID, target, status,
+   result rationale from `review-ready.sh` or the orchestrator log,
+   claimed changes and verification from the detail file, and any
+   matching `<subagent_notification>` or task notification if available
+   in model context. Then review the detail file, git diff, and any
    verification noted by the worker. Do not approve based on the
    notification alone.
 
@@ -146,9 +148,10 @@ next: <hint or USER ATTENTION>
 After the four-line block, include follow-on output for preflight work
 and for the terminal outcome: drift-fix details, review summary,
 dispatch confirmation, clarification question, or loop idle reason. For
-review preflight, include the surfaced subagent notification summary
-before the review result whenever the current conversation contains a
-matching notification.
+every worker-review preflight, include the surfaced worker-result
+summary before the review result. Use the matching notification when it
+is available; otherwise reconstruct the summary from `review-ready.sh`,
+the orchestrator log, and the detail file.
 
 ## Logging
 
