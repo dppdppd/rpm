@@ -9,7 +9,15 @@ repo_root() {
   cd "$BATS_TEST_DIRNAME/../.." && pwd
 }
 
+require_codex_port_layout() {
+  local root
+  root=$(repo_root)
+  [ -f "$root/plugin/.claude-plugin/plugin.json" ] || skip "codex port tests require monorepo layout"
+  [ -d "$root/codex/.codex/skills" ] || skip "codex port tests require monorepo layout"
+}
+
 @test "codex manifest exists and carries plugin metadata" {
+  require_codex_port_layout
   local root
   root=$(repo_root)
   local version
@@ -21,6 +29,7 @@ repo_root() {
 }
 
 @test "codex skill frontmatter avoids unsafe plain YAML scalars" {
+  require_codex_port_layout
   local root bad
   root=$(repo_root)
 
@@ -41,6 +50,7 @@ repo_root() {
 }
 
 @test "codex skill translation rewrites Claude-only runtime paths" {
+  require_codex_port_layout
   local root
   root=$(repo_root)
 
@@ -56,6 +66,7 @@ repo_root() {
 }
 
 @test "codex audit skill includes linked support docs" {
+  require_codex_port_layout
   local root
   root=$(repo_root)
 
@@ -65,6 +76,7 @@ repo_root() {
 }
 
 @test "codex scan script resolves rpm version without Claude env" {
+  require_codex_port_layout
   local root
   root=$(repo_root)
   local version
@@ -80,6 +92,7 @@ repo_root() {
 }
 
 @test "codex sync reminder hook is wired and uses payload cwd" {
+  require_codex_port_layout
   local root
   root=$(repo_root)
   unset CLAUDE_PROJECT_DIR
@@ -95,6 +108,7 @@ repo_root() {
 }
 
 @test "codex session-start hook uses payload cwd without Claude env" {
+  require_codex_port_layout
   local root
   root=$(repo_root)
   local version
