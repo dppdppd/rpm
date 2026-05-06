@@ -9,6 +9,12 @@ repo_root() {
   cd "$BATS_TEST_DIRNAME/../.." && pwd
 }
 
+require_codex_port_layout() {
+  local root
+  root=$(repo_root)
+  [ -d "$root/codex/.codex" ] || skip "codex nudge tests require monorepo layout"
+}
+
 seed_review_ready_result() {
   cat > "$PM_DIR/future/tasks.org" <<'EOF'
 ** TODO Review task
@@ -37,6 +43,7 @@ run_nudge_hook() {
 }
 
 @test "review-ready nudge emits one reminder for pending worker result" {
+  require_codex_port_layout
   seed_review_ready_result
   unset CLAUDE_PROJECT_DIR
 
@@ -52,6 +59,7 @@ run_nudge_hook() {
 }
 
 @test "review-ready nudge is quiet after review result exists" {
+  require_codex_port_layout
   seed_review_ready_result
   bash "$CLAUDE_PLUGIN_ROOT/skills/next/scripts/log-decision.sh" \
     review-result task-one "approved" agent-1 approved
