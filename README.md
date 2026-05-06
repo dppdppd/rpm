@@ -8,10 +8,11 @@ Codex CLI port of the rpm plugin. Generated from `plugin/` via
 | Surface | Status | Notes |
 |---|---|---|
 | Plugin manifest | Full | `.codex-plugin/plugin.json` is generated from the Claude plugin manifest and points at the Codex skills/hooks |
-| Skills | Full | All six skills sync 1:1; Codex frontmatter is a strict subset of Claude Code's |
+| Skills | Full | Skills sync from the Claude plugin, with Codex-only overlays appended after translation when needed |
 | `SessionStart` hook | Full | `session-start-auto.sh` — context injection, marker bookkeeping, backlog menu |
 | `PostToolUse` hook | Full | `context-monitor.sh` — fires for all tools (per Codex schema) |
 | Codex sync reminder | Full | `codex-sync-reminder.sh` — reminds rpm contributors to run `sync-codex.sh` after source edits |
+| Review-ready nudge | Codex-only | `review-ready-nudge.sh` — fallback reminder for completed `/next` workers when the experimental parent wake path does not surface |
 | `Stop` hook | Full | `stop-learn-capture.sh` + `handoff-validator.sh` — Codex's Stop payload includes `last_assistant_message`, no transcript scraping needed |
 | Auditor system prompt | Reference doc | Lives at `.codex/skills/audit/references/auditor.md`; the audit skill should Read it and hand it to a sub-agent (Codex has no separate "subagent definition" file format that fits) |
 
@@ -69,7 +70,11 @@ everything else is regenerated. Currently marked manual:
   (`web_search`, `shell`, sub-agent reframing) that don't pass cleanly
   through automated translation.
 
-To regenerate from `plugin/`:
+Codex-specific generated additions live under `codex/overlays/` so
+experimental Codex behavior does not alter the shared Claude Code
+plugin guidance.
+
+To regenerate from `plugin/` plus Codex overlays:
 
 ```bash
 ./scripts/sync-codex.sh
