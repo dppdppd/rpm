@@ -65,17 +65,39 @@ require_codex_port_layout() {
   [ "$status" -eq 0 ]
 }
 
-@test "codex next worker contract wakes parent without waiting" {
+@test "shared next skill keeps Codex wake guidance out of Claude surface" {
+  require_codex_port_layout
+  local root skill
+  root=$(repo_root)
+  skill="$root/plugin/skills/next/SKILL.md"
+
+  run grep -F 'CODEX_THREAD_ID' "$skill"
+  [ "$status" -eq 1 ]
+  run grep -F 'Codex Experimental Worker Wake' "$skill"
+  [ "$status" -eq 1 ]
+  run grep -F 'send_input({ target:' "$skill"
+  [ "$status" -eq 1 ]
+  run grep -F 'review-ready-nudge.sh' "$root/plugin/hooks/hooks.json"
+  [ "$status" -eq 1 ]
+}
+
+@test "codex next worker contract adds experimental nonblocking wake overlay" {
   require_codex_port_layout
   local root skill
   root=$(repo_root)
   skill="$root/codex/.codex/skills/next/SKILL.md"
 
+  run grep -F 'Codex Experimental Worker Wake' "$skill"
+  [ "$status" -eq 0 ]
   run grep -F 'CODEX_THREAD_ID' "$skill"
   [ "$status" -eq 0 ]
-  run grep -F 'send_input target=<orchestrator-thread-id> interrupt=false' "$skill"
+  run grep -F 'send_input target=<orchestrator-thread-id>' "$skill"
+  [ "$status" -eq 1 ]
+  run grep -F 'send_input({ target: "<parent-thread-id>", message: "rpm worker result ready:' "$skill"
   [ "$status" -eq 0 ]
-  run grep -F 'do not call `wait_agent`' "$skill"
+  run grep -F 'Do not call' "$skill"
+  [ "$status" -eq 0 ]
+  run grep -F 'wait_agent' "$skill"
   [ "$status" -eq 0 ]
 }
 
@@ -119,6 +141,19 @@ require_codex_port_layout() {
   run bash -c "printf '%s\n' '{\"cwd\":\"$root\",\"tool_input\":{\"file_path\":\"$root/plugin/hooks/session-start-auto.sh\"}}' | bash '$root/codex/.codex/hooks/codex-sync-reminder.sh'"
   [ "$status" -eq 0 ]
   [[ "$output" == *"run \`bash scripts/sync-codex.sh\`"* ]]
+}
+
+@test "codex review-ready nudge hook is wired" {
+  require_codex_port_layout
+  local root
+  root=$(repo_root)
+
+  [ -f "$root/codex/.codex/hooks/review-ready-nudge.sh" ]
+
+  run jq -e '.hooks.PostToolUse[0].hooks[]
+             | select(.command == "bash ./hooks/review-ready-nudge.sh")' \
+    "$root/codex/.codex/hooks.json"
+  [ "$status" -eq 0 ]
 }
 
 @test "codex session-start hook uses payload cwd without Claude env" {
