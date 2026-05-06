@@ -20,6 +20,7 @@ set -euo pipefail
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 SRC="$REPO_ROOT/plugin"
 DST="$REPO_ROOT/codex/.codex"
+CODEX_OVERLAYS="$REPO_ROOT/codex/overlays"
 SENTINEL='codex-sync: manual'
 
 # Hooks Codex actually fires (the others have no event source — see codex/README.md).
@@ -82,6 +83,14 @@ for skill_dir in "$SRC"/skills/*/; do
     | while IFS= read -r -d '' support_file; do
         cp "$support_file" "$DST/skills/$name/$(basename "$support_file")"
       done
+
+  codex_guidance="$CODEX_OVERLAYS/skills/${name}-codex-guidance.md"
+  if [ -f "$codex_guidance" ]; then
+    {
+      printf '\n'
+      cat "$codex_guidance"
+    } >> "$dst_md"
+  fi
 done
 
 # --- Plugin manifest --------------------------------------------------------
@@ -150,6 +159,22 @@ for f in "${CODEX_HOOK_SCRIPTS[@]}"; do
   cp "$src_f" "$dst_f"
   synced_hooks+=("$f")
 done
+
+if [ -d "$CODEX_OVERLAYS/hooks" ]; then
+  for src_f in "$CODEX_OVERLAYS"/hooks/*; do
+    [ -f "$src_f" ] || continue
+    f=$(basename "$src_f")
+    dst_f="$DST/hooks/$f"
+
+    if is_manual "$dst_f"; then
+      skipped_hooks+=("$f")
+      continue
+    fi
+
+    cp "$src_f" "$dst_f"
+    synced_hooks+=("$f (codex-only)")
+  done
+fi
 
 # --- Agents → references inside skills --------------------------------------
 synced_refs=()

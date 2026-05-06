@@ -21,6 +21,10 @@
           },
           {
             "type": "command",
+            "command": "bash ./hooks/review-ready-nudge.sh"
+          },
+          {
+            "type": "command",
             "command": "bash ./hooks/codex-sync-reminder.sh"
           }
         ]
