@@ -68,7 +68,7 @@ Using another agent runtime? See the
 Codex quick install:
 
 ```bash
-codex plugin marketplace add dppdppd/rpm@codex --enable codex_hooks
+codex plugin marketplace add dppdppd/rpm@codex --enable hooks
 ```
 
 Then add this to `~/.codex/config.toml`:

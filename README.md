@@ -38,7 +38,7 @@ publish flow.
 Install from a shell:
 
 ```bash
-codex plugin marketplace add dppdppd/rpm@codex --enable codex_hooks
+codex plugin marketplace add dppdppd/rpm@codex --enable hooks
 ```
 
 Then enable the plugin in `~/.codex/config.toml`:
@@ -53,7 +53,7 @@ if it is not already enabled:
 
 ```toml
 [features]
-codex_hooks = true
+hooks = true
 ```
 
 Run `$init-rpm` inside the project you want to track. Codex skills use

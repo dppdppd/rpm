@@ -49,7 +49,7 @@ Skills port 1:1; the hook layer is more limited.
 
 ## Hook system details
 
-Codex hooks are **experimental** (behind `features.codex_hooks = true`
+Codex hooks are **experimental** (behind `features.hooks = true`
 in `config.toml`). Available events:
 
 | Event             | Matcher             | Notes                    |
