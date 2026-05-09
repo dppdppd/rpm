@@ -76,23 +76,30 @@ unambiguous next action.
 
 3. **Worker review** — run:
    `bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/review-ready.sh`.
-   If it reports a worker result with `status=needs-review` and no
-   matching `review-result`, review the first row before starting new
-   work. Surface the worker result before reviewing even when no
-   user-visible chat notification exists: worker ID, target, status,
-   result rationale from `review-ready.sh` or the orchestrator log,
-   claimed changes and verification from the detail file, and any
-   matching `<subagent_notification>` or task notification if available
-   in model context. Then review the detail file, git diff, and any
-   verification noted by the worker. Do not approve based on the
+   If it reports any worker result with no matching `review-result`,
+   review the first row before starting new work. This applies to every
+   durable worker output status: `needs-review`, `plan-written`,
+   `blocked`, and `no-op`. Surface the worker result before reviewing
+   even when no user-visible chat notification exists: worker ID,
+   target, status, result rationale from `review-ready.sh` or the
+   orchestrator log, claimed changes and verification from the detail
+   file, and any matching `<subagent_notification>` or task notification
+   if available in model context. Then review the detail file, git diff,
+   and any verification noted by the worker. Do not approve based on the
    notification alone.
 
+   For `needs-review`, evaluate the changed files and verification.
+   For `plan-written`, evaluate whether the plan is clear and actionable.
+   For `blocked`, evaluate whether the blocker is real and whether it
+   requires user input. For `no-op`, verify the claimed no-op is valid.
    If acceptable, mark the backlog entry DONE or leave a clear
    session-end reconciliation note, then log `review-result` with
    status `approved`. If more work is needed, append reviewer notes to
    the detail file and log `review-result` with status
-   `changes-requested`. Continue to task selection unless the review
-   exposed unsafe repo state or a question the user must answer.
+   `changes-requested`. If an approved blocker still needs user input,
+   surface it and log the terminal outcome as `blocked-on-user`.
+   Continue to task selection unless the review exposed unsafe repo
+   state or a question the user must answer.
 
 ### Task Selection
 
@@ -101,29 +108,59 @@ After preflight, recompute `in-flight`.
 1. If `in-flight >= 1`, log `idle` with rationale
    `waiting on in-flight worker`, output the waiting state, and stop.
 
-2. Read `docs/rpm/future/tasks.org`. The clear next task is the
-   topmost TODO or IN-PROGRESS entry whose `:BLOCKED_BY:` deps all
-   resolve to DONE or CANCELLED, as long as it has an `:ID:` and a
-   readable linked detail file. If multiple tasks are actionable, the
-   topmost one is the expected next task; do not ask solely because
-   more than one exists.
+2. Read `docs/rpm/future/tasks.org` **and walk the whole tree**, not
+   just the recurring/triage sub-task you most recently dispatched.
+   Each `*` parent should carry a `Goal:` body line stating the
+   measurable success metric for that tier; tasks are evaluated
+   against it (see "Goal-aligned dispatch" below).
 
-3. If there is a clear next task, dispatch a worker using the contract
+3. The clear next task is the topmost TODO or IN-PROGRESS entry
+   whose `:BLOCKED_BY:` deps all resolve to DONE or CANCELLED, as
+   long as it has an `:ID:` and a readable linked detail file. If
+   multiple tasks are actionable, the topmost one is the expected
+   next task; do not ask solely because more than one exists.
+
+4. **Goal-aligned dispatch.** Before picking the topmost actionable
+   task, score it against its `*` parent's `Goal:` line. The task
+   should either (a) close a stated success-metric gap or
+   (b) unblock a critical-path item. Side-quest tasks that don't
+   move the goal are deprioritized in favor of goal-aligned ones,
+   even when topmost in file order. If NO actionable task in any
+   parent moves a goal, that's a **gap** — file a new
+   research/triage/scoping task on the gap before dispatching
+   anything else, instead of idling.
+
+5. If there is a clear next task, dispatch a worker using the contract
    below and log `actionable-backlog`. Workers must persist their own
    result; do not rely on a background notification as the only return
    path.
 
-4. If there is no actionable task, or the top task is missing an ID,
+6. If there is no actionable task, or the top task is missing an ID,
    missing a readable detail file, marked watch/deferred, or otherwise
    not scoped enough to start without guessing:
    - Direct mode: ask a concise clarification question, log
      `blocked-on-user` with that question as rationale, and stop.
    - Loop mode: log `idle` with the reason and stop. If this is the
-     third consecutive idle tick, emit `loop-exhausted`.
+     third consecutive idle tick, emit `loop-exhausted`. **Do not
+     collapse "visible queue=0" to "no work" before walking the
+     full tree against parent Goal: lines** — the recurring/triage
+     queue is one node of one parent; many other goals may have
+     unaddressed critical-path items.
+
+7. **Saturation override.** If the user has set a saturation
+   directive in memory (e.g. "1 tier3 + 1 tier2 at all times"),
+   the `in-flight >= 1` rule from step 1 is replaced by per-slot
+   counts: dispatch as long as the directive's slots aren't all
+   full and the new dispatch wouldn't violate "never 2 daemon-using
+   simultaneously." When all slots are filled, log `idle` with
+   rationale `saturated at directive ceiling` — do **not** treat
+   this as exhaustion (it's intentional waiting, not "no work").
 
 ## Output Format
 
-Four lines, exactly:
+Four lines, plus an optional fifth `gaps:` line when the goal-aligned
+dispatch step (Task Selection step 4) found unaddressed critical-path
+items:
 
 ```
 action: <kind>
@@ -222,12 +259,20 @@ Rules:
 5. Before finishing, log your result:
 
    bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/log-decision.sh backlog-result \
-     "<task-id>" "<one-line result>" "<agent-id>" "needs-review"
+     "<task-id>" "<one-line result>" "<agent-id>" "<status>"
 
-   Use status `needs-review` when you did work and want the
-   orchestrator to review it. Use `plan-written` if you only appended
-   `## Plan`, `blocked` if you appended `## Blocked`, and `no-op` only
-   when the task is already fully handled.
+   `<status>` for `log-decision.sh backlog-result`:
+   - `needs-review` — you did work and want the orchestrator to review it
+   - `plan-written` — you only appended `## Plan`
+   - `blocked` — you appended `## Blocked`
+   - `no-op` — the task is already fully handled
+
+   If your project also uses an orch-job tracker (e.g. Volta's
+   `tools/scripts/orch-job.sh`), close it with the equivalent status.
+   Status enums may differ between the two helpers — check the script's
+   usage line. Common mapping: `needs-review` → orch-job `success`;
+   `plan-written` → orch-job `success` (with summary noting the plan);
+   `blocked` → orch-job `blocked`; `no-op` → orch-job `no-op`.
 6. In your final response, state the detail file changed and the status
    you logged. The file + JSONL log are the source of truth.
 ```
@@ -240,6 +285,21 @@ to `kind` in {`blocked-on-user`, `drift-fix`, `actionable-backlog`,
 If the file does not exist, the idle streak is `0`. If the last three
 filtered entries are `idle`, this turn becomes `loop-exhausted` instead
 of `idle`.
+
+**Saturation exception:** if the current `idle` rationale starts with
+`saturated` (i.e. workers are intentionally running at the saturation
+directive's ceiling, see Task Selection step 7), the 3-idle threshold
+does NOT apply — saturation idles are not "no work," they're "work in
+flight," and exhausting the loop here is wrong. Log normal `idle` and
+keep the cron armed.
+
+**Killed workers.** A worker that registers an orch-job but never
+calls `complete` (process killed mid-run, runtime early-terminated,
+quota exhausted) leaves a phantom `running` entry. The orchestrator
+must close the orch-job (`orch-job.sh complete <id> <success|no-op|
+failed> "killed: <reason>"`) and log a paired `backlog-result` so the
+dashboard reflects reality and the in-flight count is accurate. Do
+not rely on the worker's own logging — it didn't reach that step.
 
 Idle is for loop-mode ambiguity or waiting on in-flight work, not for a
 direct-mode "no obvious next task" state. In direct mode, ask the user
