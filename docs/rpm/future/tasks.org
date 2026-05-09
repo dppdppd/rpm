@@ -3,15 +3,17 @@
 
 * Active
 
-** TODO Make session-end leaner — encourage small sessions [[file:2026-05-02-session-end-leaner.md]]
+** DONE Make session-end leaner — encourage small sessions [[file:2026-05-02-session-end-leaner.md]]
    :PROPERTIES:
    :ID: session-end-leaner
    :END:
+   CLOSED: 2026-05-09. Reduced session-end skill body below the target while preserving lean mode behavior.
 
-** TODO Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
+** DONE Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
    :PROPERTIES:
    :ID: sessionstart-clear-flake
    :END:
+   CLOSED: 2026-05-09. Approved no-op: watch-only harness flake had no fresh repro and no rpm-side fix.
 
 ** TODO Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:

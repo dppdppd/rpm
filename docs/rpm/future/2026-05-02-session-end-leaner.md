@@ -36,3 +36,26 @@ genuine multi-decision complexity. Concretely:
 - Skill body shrinks substantially (target: under ~250 lines).
 - Most real sessions wrap up in 1–2 messages, not 4.
 - Phase ceremony only triggers when warranted.
+
+## Worker Result
+
+### Summary
+Reduced the session-end skill body from 615 lines to 198 lines while
+preserving the Express / Inline / Phased mode contract, silent prep,
+tracker updates, native cleanup, backlog reconciliation, and handoff
+cleanup guidance. Synced the Codex mirror, which now stands at 196
+lines.
+
+### Files changed
+- `plugin/skills/session-end/SKILL.md`
+- `codex/.codex/skills/session-end/SKILL.md`
+- `docs/rpm/future/tasks.org`
+
+### Verification run
+- `bash plugin/tests/run.sh` — 127/127 passing
+
+### Remaining risks or follow-ups
+- This is a substantial prose compression of a core operational skill.
+  The behavior is covered indirectly by the existing hook and sync
+  tests, but future real `/session-end` runs should watch for any
+  missing edge-case instruction that needs to be restored tersely.
