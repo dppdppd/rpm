@@ -30,7 +30,7 @@ Codex CLI port of the rpm plugin. Generated from `plugin/` via
 This port supports marketplace install only. From a shell:
 
 ```bash
-codex plugin marketplace add dppdppd/rpm@codex --enable codex_hooks
+codex plugin marketplace add dppdppd/rpm@codex --enable hooks
 ```
 
 Then enable the plugin in `~/.codex/config.toml`:
@@ -48,7 +48,7 @@ Then merge `.codex/config.toml.sample` into `~/.codex/config.toml`:
 
 ```toml
 [features]
-codex_hooks = true
+hooks = true
 ```
 
 Without that flag, Codex parses `hooks.json` but skips dispatch

@@ -4,10 +4,10 @@
 # below into your `~/.codex/config.toml` so the marketplace plugin hooks
 # actually fire.
 #
-# Without `codex_hooks = true`, Codex will load `hooks.json` but skip
+# Without `hooks = true`, Codex will load `hooks.json` but skip
 # dispatch silently — the rpm SessionStart context-injection won't
 # happen, drift won't be checked, and the Stop-time learnings/handoff
 # pipeline won't run.
 
 [features]
-codex_hooks = true
+hooks = true
