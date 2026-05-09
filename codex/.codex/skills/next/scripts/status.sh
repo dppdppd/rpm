@@ -29,7 +29,7 @@ if [ ! -f "$LOG" ]; then
   echo "  0  (no /next decisions logged yet)"
   echo
   echo "== Today ($(date +%Y-%m-%d)) =="
-  echo "  drift fixes: 0   dispatches: 0   needs review: 0   approved: 0   plans: 0   blocked: 0"
+  echo "  drift fixes: 0   dispatches: 0   needs review: 0   approved: 0   plans: 0   blocked: 0   no-ops: 0"
   exit 0
 fi
 
@@ -112,5 +112,6 @@ jq -s -r --arg today "$TODAY" '
   | (map(select(.kind == "review-result" and .status == "approved")) | length) as $done
   | (map(select(.kind == "backlog-result" and .status == "plan-written")) | length) as $plans
   | (map(select(.kind == "backlog-result" and .status == "blocked"))      | length) as $blocked
-  | "  drift fixes: \($drift)   dispatches: \($disp)   needs review: \($review)   approved: \($done)   plans: \($plans)   blocked: \($blocked)"
+  | (map(select(.kind == "backlog-result" and .status == "no-op"))        | length) as $noop
+  | "  drift fixes: \($drift)   dispatches: \($disp)   needs review: \($review)   approved: \($done)   plans: \($plans)   blocked: \($blocked)   no-ops: \($noop)"
 ' "$LOG"

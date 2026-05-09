@@ -1,8 +1,8 @@
 #!/bin/bash
 # List worker results that need orchestrator review.
 #
-# A pending review is a backlog-result with status=needs-review that has no
-# later review-result for the same target + agent_id pair.
+# A pending review is any backlog-result that has no later review-result for
+# the same target + agent_id pair.
 
 set -euo pipefail
 
@@ -48,12 +48,15 @@ detail_for_id() {
 
 jq -s -r '
   . as $all
-  | map(select(.kind == "backlog-result" and .status == "needs-review"))
-  | map(. as $result
+  | ($all | to_entries | map(select(.value.kind == "backlog-result")))
+  | map(. as $entry
+      | $entry.value as $result
       | ($all
-          | map(select(.kind == "review-result"
-                       and .target == $result.target
-                       and ((.agent_id // "") == ($result.agent_id // ""))))
+          | to_entries
+          | map(select(.value.kind == "review-result"
+                       and .key > ($entry.key)
+                       and .value.target == $result.target
+                       and ((.value.agent_id // "") == ($result.agent_id // ""))))
           | length) as $reviewed
       | $result + {reviewed: $reviewed})
   | map(select(.reviewed == 0))
@@ -61,13 +64,14 @@ jq -s -r '
   | [
       (.target // ""),
       (.agent_id // ""),
+      (.status // ""),
       (.ts // ""),
       (.rationale // "")
     ]
   | @tsv
-' "$LOG" | while IFS=$'\t' read -r target agent_id ts rationale; do
+' "$LOG" | while IFS=$'\t' read -r target agent_id status ts rationale; do
   [ -n "$target" ] || continue
   detail=$(detail_for_id "$target")
-  printf 'target=%s\tagent_id=%s\tts=%s\tdetail=%s\trationale=%s\n' \
-    "$target" "$agent_id" "$ts" "$detail" "$rationale"
+  printf 'target=%s\tagent_id=%s\tstatus=%s\tts=%s\tdetail=%s\trationale=%s\n' \
+    "$target" "$agent_id" "$status" "$ts" "$detail" "$rationale"
 done
