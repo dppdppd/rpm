@@ -167,6 +167,7 @@ action: <kind>
 preflight: <none or comma-separated completed preflight actions>
 in-flight: <N>
 next: <hint or USER ATTENTION>
+gaps: <none or comma-separated parent:metric pairs with no actionable task>
 ```
 
 - `<kind>`: the terminal outcome for this turn, one of
@@ -293,6 +294,13 @@ does NOT apply — saturation idles are not "no work," they're "work in
 flight," and exhausting the loop here is wrong. Log normal `idle` and
 keep the cron armed.
 
+Idle is for loop-mode ambiguity or waiting on in-flight work, not for a
+direct-mode "no obvious next task" state. In direct mode, ask the user
+when task selection is unclear. In loop mode, never ask; log idle and
+let the 3-idle threshold stop runaway autonomous loops. The user can
+resume by running `/next` directly; the next invocation reads the log
+fresh and picks up wherever priority leads.
+
 **Killed workers.** A worker that registers an orch-job but never
 calls `complete` (process killed mid-run, runtime early-terminated,
 quota exhausted) leaves a phantom `running` entry. The orchestrator
@@ -300,13 +308,6 @@ must close the orch-job (`orch-job.sh complete <id> <success|no-op|
 failed> "killed: <reason>"`) and log a paired `backlog-result` so the
 dashboard reflects reality and the in-flight count is accurate. Do
 not rely on the worker's own logging — it didn't reach that step.
-
-Idle is for loop-mode ambiguity or waiting on in-flight work, not for a
-direct-mode "no obvious next task" state. In direct mode, ask the user
-when task selection is unclear. In loop mode, never ask; log idle and
-let the 3-idle threshold stop runaway autonomous loops. The user can
-resume by running `/next` directly; the next invocation reads the log
-fresh and picks up wherever priority leads.
 
 ## Concurrency — one worker at a time
 
