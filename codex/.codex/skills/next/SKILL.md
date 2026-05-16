@@ -1,17 +1,18 @@
 ---
 name: next
-description: One-step rpm orchestrator. Runs preflight maintenance, then either starts the next obvious backlog action or asks for clarification when direct use leaves no clear next task. Designed to be wrapped by `/loop /next` — never loops internally. In loop mode it never waits for input; it dispatches only unambiguous work and otherwise idles or exhausts after 3 idle ticks. Use when the user wants the session to autonomously work the rpm backlog.
+description: One-step rpm orchestrator. Runs preflight maintenance, then either starts the next obvious backlog action or asks for clarification when direct use leaves no clear next task. Designed for Codex directives such as `do rpm:next until blocked` — never loops internally. In autonomous directive mode it never waits for input; it dispatches only unambiguous work and otherwise idles or exhausts after 3 idle ticks. Use when the user wants the session to autonomously work the rpm backlog.
 ---
 
-# /next
+# rpm:next
 
 Single-step orchestrator that handles preflight maintenance, then tries
-to move the backlog forward. A normal direct `/next` turn should end by
+to move the backlog forward. A normal direct `rpm:next` turn should end by
 either starting the next obvious backlog action or asking the user to
-clarify what should be next. A looped `/next` turn must not expect user
-input; it dispatches only unambiguous work and otherwise idles until the
-loop-exhausted guard stops it. **Never loops internally.** Wrap with
-`/loop /next` for self-paced execution.
+clarify what should be next. An autonomous Codex directive must not
+expect user input; it dispatches only unambiguous work and otherwise
+idles until the loop-exhausted guard stops it. **Never loops internally.** For
+self-paced execution, use a directive such as
+`do rpm:next until blocked`.
 
 ## Routing
 
@@ -27,30 +28,31 @@ If `$ARGUMENTS` is empty, continue with the orchestrator below.
 If `$ARGUMENTS` is anything else, print:
 
 ```
-/next        — one orchestrator step (use `/loop /next` for autonomous mode)
-/next status — show in-flight subagents, recent decisions, idle streak, daily counters
+rpm:next     — one orchestrator step; for autonomous mode, ask `do rpm:next until blocked`
+rpm:next status — show in-flight subagents, recent decisions, idle streak, daily counters
 ```
 
 and stop.
 
 ## Mode
 
-Infer loop mode when the current invocation is visibly part of
-`/loop /next`, an unattended dynamic loop, or repeated automatic
-invocation. Otherwise treat it as direct interactive mode.
+Infer autonomous directive mode when the current invocation is visibly
+part of a Codex directive such as `do rpm:next until blocked`, an
+unattended dynamic run, or repeated automatic invocation.
+Otherwise treat it as direct interactive mode.
 
 - **Direct mode** may ask one concise clarification question when no
   obvious next backlog action can be started safely.
-- **Loop mode** must not ask for input. If there is no unambiguous
-  action, log `idle` with the reason and stop. After 3 consecutive idle
-  ticks, emit `loop-exhausted`.
+- **Autonomous directive mode** must not ask for input. If there is no
+  unambiguous action, log `idle` with the reason and stop. After 3
+  consecutive idle ticks, emit `loop-exhausted`.
 
 ## Orchestrator Flow
 
 Do not treat preflight and tasking as mutually exclusive. Run preflight
 first, in order, and continue to task selection when the preflight item
 was resolved locally. Stop only when continuing would be unsafe, when a
-direct-mode user question is required, or when loop mode has no
+direct-mode user question is required, or when autonomous directive mode has no
 unambiguous next action.
 
 ### Preflight
@@ -60,7 +62,8 @@ unambiguous next action.
    most recent user message did not address the question:
    - Direct mode: re-surface what we are waiting on, log
      `blocked-on-user` if needed, and stop.
-   - Loop mode: do not ask again. Log `idle` with rationale
+   - Autonomous directive mode: do not ask again. Log `idle` with
+     rationale
      `blocked-on-user unresolved`, then stop or `loop-exhausted` if the
      idle streak reached 3.
 
@@ -72,7 +75,8 @@ unambiguous next action.
    Continue to the next preflight item. If a drift item needs a product
    decision:
    - Direct mode: ask a concise question, log `blocked-on-user`, stop.
-   - Loop mode: log `idle` with the ambiguity, then stop or exhaust.
+   - Autonomous directive mode: log `idle` with the ambiguity, then
+     stop or exhaust.
 
 3. **Worker review** — run:
    `bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/review-ready.sh`.
@@ -140,7 +144,7 @@ After preflight, recompute `in-flight`.
    not scoped enough to start without guessing:
    - Direct mode: ask a concise clarification question, log
      `blocked-on-user` with that question as rationale, and stop.
-   - Loop mode: log `idle` with the reason and stop. If this is the
+   - Autonomous directive mode: log `idle` with the reason and stop. If this is the
      third consecutive idle tick, emit `loop-exhausted`. **Do not
      collapse "visible queue=0" to "no work" before walking the
      full tree against parent Goal: lines** — the recurring/triage
@@ -294,11 +298,11 @@ does NOT apply — saturation idles are not "no work," they're "work in
 flight," and exhausting the loop here is wrong. Log normal `idle` and
 keep the cron armed.
 
-Idle is for loop-mode ambiguity or waiting on in-flight work, not for a
+Idle is for autonomous directive ambiguity or waiting on in-flight work, not for a
 direct-mode "no obvious next task" state. In direct mode, ask the user
-when task selection is unclear. In loop mode, never ask; log idle and
-let the 3-idle threshold stop runaway autonomous loops. The user can
-resume by running `/next` directly; the next invocation reads the log
+when task selection is unclear. In autonomous directive mode, never ask; log idle and
+let the 3-idle threshold stop runaway autonomous runs. The user can
+resume by asking for `rpm:next` directly; the next invocation reads the log
 fresh and picks up wherever priority leads.
 
 **Killed workers.** A worker that registers an orch-job but never
@@ -311,7 +315,7 @@ not rely on the worker's own logging — it didn't reach that step.
 
 ## Concurrency — one worker at a time
 
-`/next` itself is a single orchestrator turn. It may do several
+`rpm:next` itself is a single orchestrator turn. It may do several
 preflight actions inline, but it dispatches at most one new
 `actionable-backlog` worker. The subagent runs in background, but only
 ONE may be in-flight at a time. Full depth, multi-game verified before
@@ -329,22 +333,22 @@ with corpus-wide verification trades throughput for hit rate.
 
 ## What this skill does NOT do
 
-- Does not pick up tactical user requests — `/next` is for unattended
+- Does not pick up tactical user requests — `rpm:next` is for unattended
   autonomous work, not the conversational thread.
 - Does not modify `tasks.org` ordering — that's `/backlog review`'s
-  job. `/next` only reads.
+  job. `rpm:next` only reads.
 - Does not run audits, releases, or session-end. Those are explicit
   user-invoked operations.
 - Does not retry failed dispatches. A failed subagent logs a
-  `backlog-result` with `status: blocked`; the next `/next` tick picks
+  `backlog-result` with `status: blocked`; the next `rpm:next` tick picks
   the next unblocked item.
 
 ## Example Sessions
 
-Looped run with mechanical preflight and a clear next task:
+Autonomous Codex directive run with mechanical preflight and a clear next task:
 
 ```
-$ /loop /next
+User directive: do rpm:next until blocked
 
 action: actionable-backlog
 preflight: drift-fix: context.md broken-ref
@@ -357,13 +361,13 @@ Will append a result to 2026-04-30-sync-codex-scripts.md when it
 returns.
 ```
 
-Looped run with no unambiguous task:
+Autonomous Codex directive run with no unambiguous task:
 
 ```
 action: idle
 preflight: none
 in-flight: 0
-next: no unambiguous backlog task; loop mode will not ask for input
+next: no unambiguous backlog task; autonomous directive mode will not ask for input
 
 No unblocked TODO/IN-PROGRESS backlog entry has a readable detail file.
 ```
@@ -411,7 +415,7 @@ When dispatching `actionable-backlog` from Codex:
    backlog-result log row and before finishing, make exactly one
    best-effort parent wake call using this exact tool shape:
 
-   send_input({ target: "<parent-thread-id>", message: "rpm worker result ready: <status> <task-id> by <agent-id>; run /next worker review preflight when convenient." })
+   send_input({ target: "<parent-thread-id>", message: "rpm worker result ready: <status> <task-id> by <agent-id>; run rpm:next worker review preflight when convenient." })
 
    Do not set interrupt true. Do not include raw worker results in this
    message. If the tool is unavailable or rejects the target, continue;
@@ -419,6 +423,6 @@ When dispatching `actionable-backlog` from Codex:
    the Codex review-ready hook is the fallback.
    ```
 
-This wake call is only a pointer. `/next` worker-review preflight must
+This wake call is only a pointer. `rpm:next` worker-review preflight must
 still read `review-ready.sh`, inspect the detail file and git diff, and
 log `review-result` before dispatching more backlog work.

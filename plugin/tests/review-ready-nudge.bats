@@ -50,6 +50,7 @@ run_nudge_hook() {
   run run_nudge_hook "$TEST_DIR/nudges"
   [ "$status" -eq 0 ]
   [[ "$output" == *"rpm: worker result ready for review"* ]]
+  [[ "$output" == *"Run rpm:next before dispatching more backlog work"* ]]
   [[ "$output" == *"target=task-one"* ]]
   [[ "$output" == *"agent_id=agent-1"* ]]
 

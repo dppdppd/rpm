@@ -29,7 +29,7 @@ When dispatching `actionable-backlog` from Codex:
    backlog-result log row and before finishing, make exactly one
    best-effort parent wake call using this exact tool shape:
 
-   send_input({ target: "<parent-thread-id>", message: "rpm worker result ready: <status> <task-id> by <agent-id>; run /next worker review preflight when convenient." })
+   send_input({ target: "<parent-thread-id>", message: "rpm worker result ready: <status> <task-id> by <agent-id>; run rpm:next worker review preflight when convenient." })
 
    Do not set interrupt true. Do not include raw worker results in this
    message. If the tool is unavailable or rejects the target, continue;
@@ -37,6 +37,6 @@ When dispatching `actionable-backlog` from Codex:
    the Codex review-ready hook is the fallback.
    ```
 
-This wake call is only a pointer. `/next` worker-review preflight must
+This wake call is only a pointer. `rpm:next` worker-review preflight must
 still read `review-ready.sh`, inspect the detail file and git diff, and
 log `review-result` before dispatching more backlog work.
