@@ -93,7 +93,11 @@ require_codex_port_layout() {
   [ "$status" -eq 0 ]
   run grep -F 'send_input target=<orchestrator-thread-id>' "$skill"
   [ "$status" -eq 1 ]
-  run grep -F 'send_input({ target: "<parent-thread-id>", message: "rpm worker result ready:' "$skill"
+  run grep -F 'send_input({ target: "<parent-thread-id>", message: "rpm worker result ready: <status> <task-id> by <agent-id>; run rpm:next worker review preflight when convenient." })' "$skill"
+  [ "$status" -eq 0 ]
+  run grep -F '/loop /next' "$skill"
+  [ "$status" -eq 1 ]
+  run grep -F 'do rpm:next until blocked' "$skill"
   [ "$status" -eq 0 ]
   run grep -F 'Do not call' "$skill"
   [ "$status" -eq 0 ]
