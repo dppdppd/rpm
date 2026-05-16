@@ -36,7 +36,7 @@ MARKER="$NUDGE_DIR/rpm-review-ready-nudge-$KEY"
 : > "$MARKER" 2>/dev/null || true
 
 SUMMARY=$(printf '%s\n' "$READY" | head -3)
-MESSAGE=$(printf 'rpm: worker result ready for review. Run /next before dispatching more backlog work.\n%s' "$SUMMARY")
+MESSAGE=$(printf 'rpm: worker result ready for review. Run rpm:next before dispatching more backlog work.\n%s' "$SUMMARY")
 
 if command -v jq >/dev/null 2>&1; then
   jq -n --arg msg "$MESSAGE" \

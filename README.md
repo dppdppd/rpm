@@ -12,7 +12,7 @@ Codex CLI port of the rpm plugin. Generated from `plugin/` via
 | `SessionStart` hook | Full | `session-start-auto.sh` — context injection, marker bookkeeping, backlog menu |
 | `PostToolUse` hook | Full | `context-monitor.sh` — fires for all tools (per Codex schema) |
 | Codex sync reminder | Full | `codex-sync-reminder.sh` — reminds rpm contributors to run `sync-codex.sh` after source edits |
-| Review-ready nudge | Codex-only | `review-ready-nudge.sh` — fallback reminder for completed `/next` workers when the experimental parent wake path does not surface |
+| Review-ready nudge | Codex-only | `review-ready-nudge.sh` — fallback reminder for completed `rpm:next` workers when the experimental parent wake path does not surface |
 | `Stop` hook | Full | `stop-learn-capture.sh` + `handoff-validator.sh` — Codex's Stop payload includes `last_assistant_message`, no transcript scraping needed |
 | Auditor system prompt | Reference doc | Lives at `.codex/skills/audit/references/auditor.md`; the audit skill should Read it and hand it to a sub-agent (Codex has no separate "subagent definition" file format that fits) |
 
