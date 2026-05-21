@@ -171,6 +171,21 @@ for src in AGENTS.md CLAUDE.md GEMINI.md .cursorrules README.md docs/rpm/context
     fi
   done <<< "$TOKENS"
 done
+# tasks.org [[file:...]] detail-file links resolve relative to the
+# tasks.org directory (docs/rpm/future/). Catches off-by-one relative
+# paths — both the 2026-04-17 and 2026-05-21 audits found these.
+TASKS_ORG="docs/rpm/future/tasks.org"
+if [ -f "$TASKS_ORG" ]; then
+  ORG_LINKS=$(grep -oE '\[\[file:[^]]+\]\]' "$TASKS_ORG" 2>/dev/null \
+    | sed -E 's/^\[\[file://; s/\]\]$//' || true)
+  while IFS= read -r link; do
+    [ -z "$link" ] && continue
+    if [ ! -e "docs/rpm/future/$link" ]; then
+      echo "broken=tasks.org:[[file:$link]]"
+      BROKEN_COUNT=$((BROKEN_COUNT + 1))
+    fi
+  done <<< "$ORG_LINKS"
+fi
 echo "count=$BROKEN_COUNT"
 
 # ----------------------------------------------------------------
