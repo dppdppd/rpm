@@ -138,7 +138,7 @@ require_codex_port_layout() {
   unset CLAUDE_PROJECT_DIR
 
   run jq -e '.hooks.PostToolUse[0].hooks[]
-             | select(.command == "bash ./hooks/codex-sync-reminder.sh")' \
+             | select((.command | contains("codex-sync-reminder.sh")) and (.command | contains("RPM_PLUGIN_ROOT")))' \
     "$root/codex/.codex/hooks.json"
   [ "$status" -eq 0 ]
 
@@ -155,8 +155,24 @@ require_codex_port_layout() {
   [ -f "$root/codex/.codex/hooks/review-ready-nudge.sh" ]
 
   run jq -e '.hooks.PostToolUse[0].hooks[]
-             | select(.command == "bash ./hooks/review-ready-nudge.sh")' \
+             | select((.command | contains("review-ready-nudge.sh")) and (.command | contains("RPM_PLUGIN_ROOT")))' \
     "$root/codex/.codex/hooks.json"
+  [ "$status" -eq 0 ]
+}
+
+@test "codex hook commands do not require project-local hooks directory" {
+  require_codex_port_layout
+  local root cmd payload
+  root=$(repo_root)
+  seed_minimal_trackers
+  unset CLAUDE_PROJECT_DIR
+  unset CLAUDE_PLUGIN_ROOT
+  rm -rf "$TEST_DIR/hooks"
+
+  cmd=$(jq -r '.hooks.Stop[0].hooks[0].command' "$root/codex/.codex/hooks.json")
+  payload=$(printf '{"cwd":"%s","session_id":"codex-sess","last_assistant_message":"root cause debug message long enough to trigger learning capture root cause debug message long enough to trigger learning capture root cause debug message long enough to trigger learning capture"}' "$TEST_DIR")
+
+  run env RPM_PLUGIN_ROOT="$root/codex/.codex" bash -c 'cd "$1" && printf "%s" "$2" | bash -c "$3"' _ "$TEST_DIR" "$payload" "$cmd"
   [ "$status" -eq 0 ]
 }
 
