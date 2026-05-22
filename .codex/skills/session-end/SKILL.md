@@ -64,7 +64,10 @@ Apply obvious tracker updates immediately:
 
 - `docs/rpm/past/YYYY-MM-DD.md`: create or append Accomplished, Key
   Discoveries, What Didn't Work, and Next.
-- `docs/rpm/present/status.md`: update only fields that changed.
+- `docs/rpm/present/status.md`: update only fields that changed. When
+  scan.sh `specs_inventory` reports `unlisted > 0`, append a fresh
+  `Behavioral spec inventory (YYYY-MM-DD): N specs total` line — the
+  inventory self-heals each session instead of drifting until an audit.
 - `docs/rpm/future/tasks.org`: mark completed backlog items DONE,
   update IN-PROGRESS items, and add clear TODOs with detail files.
 - `docs/rpm/future/done.org`: archive every DONE/CANCELLED heading
