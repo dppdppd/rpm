@@ -31,3 +31,33 @@ Update `plugin/skills/next/SKILL.md` description to include:
 - Test prompts: `next?`, `next`, `what's next`, `next task` should each
   trigger `/next` skill (verify via skill activation in fresh sessions).
 - Reduce inline-next-handling rate in next month of sampling.
+
+## Worker Result
+
+**Status:** needs-review (resolved inline by orchestrator)
+
+**Summary:** Tightened `/next` SKILL.md description on both runtimes
+with a `TRIGGER on terse forward-motion prompts — phrasings like
+"next", "next?", "next.", "next task", "what's next", "do next", "go
+next", "keep going", "continue" (when the prior turn was rpm work) all
+qualify and must route through this skill instead of being answered
+inline from the SessionStart preview.` block. Preserved the
+runtime-specific wording divergence (`/loop /next` on Claude vs Codex
+directives `do rpm:next until blocked`) from commit c99ca4b.
+
+**Files changed:**
+- `plugin/skills/next/SKILL.md` — added TRIGGER block + directive that
+  bare-`next` prompts must route through the skill.
+- `codex/.codex/skills/next/SKILL.md` — same TRIGGER block; runtime
+  wording deliberately kept divergent.
+
+**Verification:**
+- `bash plugin/tests/run.sh` → 136/136 green.
+- Manual inspection: both descriptions now lead the natural-language
+  trigger phrases before "Use when..." like `/deep-research` does.
+
+**Remaining risks:**
+- Effectiveness is observational. Real-session sampling required to
+  confirm the inline-next-handling rate drops; the four reddit-reports
+  cases cited (reddit1.jsonl:9, reddit2.jsonl:9/18/217) are the
+  baseline to compare against after this ships.

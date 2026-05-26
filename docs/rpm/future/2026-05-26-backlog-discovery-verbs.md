@@ -39,3 +39,40 @@ edits are the supported path.
   cache install issue") and assert `/backlog` skill triggers.
 - Reduce direct-edit-to-skill-invocation ratio to ≤ 5:1 in next month of
   sampling.
+
+## Worker Result
+
+**Status:** needs-review (resolved inline by orchestrator)
+
+**Summary:** Implemented Proposed-fix path 1 — tightened the SKILL.md
+`description:` line to lead with an explicit `TRIGGER on
+natural-language backlog operations — phrasings like ...` block listing
+the discoverable verbs (`backlog X`, `add to backlog`, `backlog the
+following`, `what's on the backlog`, `show/list backlog`, `review
+backlog`, `postpone N`, `done N`, `mark N done`, `defer X`) plus the
+directive that these "must route through this skill instead of editing
+tasks.org directly." Mirrors the `TRIGGER whenever the user asks for…`
+shape that `/deep-research`'s description uses successfully.
+
+Path 2 (UserPromptSubmit hook) deliberately deferred — more invasive,
+not necessary if path 1 raises the trigger rate. Re-sample after the
+release and reopen if the direct-edit-to-skill ratio doesn't move.
+
+**Files changed:**
+- `plugin/skills/backlog/SKILL.md` — description-line rewrite.
+- `codex/.codex/skills/backlog/SKILL.md` — identical description line
+  (parity verified by grep diff).
+
+**Verification:**
+- `diff <(grep ^description: plugin/.../SKILL.md) <(grep ^description:
+  codex/.../SKILL.md)` → empty (lines identical).
+- `bash plugin/tests/run.sh` → 136/136 green (description-only change,
+  no behavior surface).
+
+**Remaining risks:**
+- Effectiveness is observational, not testable in-repo. Validation
+  step "Spawn 10 test prompts → assert skill triggers" still pending —
+  the only way to confirm path 1 worked is to sample real Claude/Codex
+  sessions across a release cycle and compare the direct-edit-to-skill
+  ratio to the baseline cited above. If it doesn't move, reopen and
+  implement the UserPromptSubmit hook (path 2).
