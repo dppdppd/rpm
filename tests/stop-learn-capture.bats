@@ -88,3 +88,83 @@ long() {
   lines=$(wc -l < "$TEST_DIR/$LEARN_REL")
   [ "$lines" -eq 2 ]
 }
+
+# --- Backfill task: (unassigned) when session did real work ---
+
+seed_unassigned_marker() {
+  local started="${1:-2020-01-01T00:00:00Z}"
+  cat > "$TEST_DIR/$MARKER_REL" <<EOF
+session_id: test-sess
+started: $started
+task: (unassigned)
+EOF
+}
+
+@test "backfill: rewrites (unassigned) to commit subject when session has new commits" {
+  seed_unassigned_marker "2020-01-01T00:00:00Z"
+  (cd "$TEST_DIR" && \
+    echo hello > example.txt && \
+    git add example.txt && \
+    git commit -q -m "add example feature")
+  # Short message — learning capture skipped, but backfill should run.
+  run run_capture "n/a"
+  [ "$status" -eq 0 ]
+  marker_content=$(cat "$TEST_DIR/$MARKER_REL")
+  [[ "$marker_content" != *"task: (unassigned)"* ]]
+  [[ "$marker_content" == *"task: add example feature"* ]]
+}
+
+@test "backfill: strips conventional-commit prefix" {
+  seed_unassigned_marker "2020-01-01T00:00:00Z"
+  (cd "$TEST_DIR" && \
+    echo x > x.txt && git add x.txt && \
+    git commit -q -m "fix: handle the race condition")
+  run run_capture "n/a"
+  marker_content=$(cat "$TEST_DIR/$MARKER_REL")
+  [[ "$marker_content" == *"task: handle the race condition"* ]]
+  [[ "$marker_content" != *"fix:"* ]]
+}
+
+@test "backfill: uses modified file basenames when there are uncommitted edits but no new commits" {
+  # started: set to future so the init commit doesn't qualify.
+  seed_unassigned_marker "2099-01-01T00:00:00Z"
+  (cd "$TEST_DIR" && echo dirty > scratch.md && git add scratch.md)
+  run run_capture "n/a"
+  marker_content=$(cat "$TEST_DIR/$MARKER_REL")
+  [[ "$marker_content" == *"task: edits in: scratch.md"* ]]
+}
+
+@test "backfill negative: clean repo with no new commits → marker untouched" {
+  # No edits, started: in the future so init commit doesn't count.
+  seed_unassigned_marker "2099-01-01T00:00:00Z"
+  run run_capture "n/a"
+  marker_content=$(cat "$TEST_DIR/$MARKER_REL")
+  [[ "$marker_content" == *"task: (unassigned)"* ]]
+}
+
+@test "backfill: does not touch already-titled marker" {
+  cat > "$TEST_DIR/$MARKER_REL" <<EOF
+session_id: test-sess
+started: 2020-01-01T00:00:00Z
+task: real existing title
+EOF
+  (cd "$TEST_DIR" && echo x > x.txt && git add x.txt && \
+    git commit -q -m "some commit")
+  run run_capture "n/a"
+  marker_content=$(cat "$TEST_DIR/$MARKER_REL")
+  [[ "$marker_content" == *"task: real existing title"* ]]
+  [[ "$marker_content" != *"some commit"* ]]
+}
+
+@test "backfill: caps derived title at 80 chars" {
+  seed_unassigned_marker "2020-01-01T00:00:00Z"
+  long_subj="this is a very long commit subject that absolutely exceeds eighty characters and then keeps going further still"
+  (cd "$TEST_DIR" && echo x > x.txt && git add x.txt && \
+    git commit -q -m "$long_subj")
+  run run_capture "n/a"
+  marker_content=$(cat "$TEST_DIR/$MARKER_REL")
+  task_line=$(grep '^task: ' "$TEST_DIR/$MARKER_REL")
+  # 'task: ' is 6 chars; remainder ≤ 80
+  remainder=${task_line#task: }
+  [ "${#remainder}" -le 80 ]
+}

@@ -22,10 +22,21 @@ teardown_sandbox() {
 }
 
 # Write a minimal context.md / status.md / tasks.org so session-start runs.
+# Commits them so subsequent `git status` only reflects test-driven edits,
+# matching what a real rpm-initialized project looks like on disk.
 seed_minimal_trackers() {
   echo "# context" > "$PM_DIR/context.md"
   printf '# status\n\nLast updated: %s\n' "$(date +%Y-%m-%d)" > "$PM_DIR/present/status.md"
   : > "$PM_DIR/future/tasks.org"
+  (
+    cd "$TEST_DIR"
+    # ~rpm-* runtime files are session-scoped — gitignore them like real projects.
+    cat >> .gitignore <<'GITIGNORE_EOF'
+docs/rpm/~rpm-*
+GITIGNORE_EOF
+    git add .gitignore docs/rpm/context.md docs/rpm/present/status.md docs/rpm/future/tasks.org 2>/dev/null
+    git commit -q -m "seed trackers" 2>/dev/null
+  ) || true
 }
 
 # Invoke a hook with a given SessionStart source payload. Captures stdout.

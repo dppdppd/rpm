@@ -56,6 +56,22 @@ if [ -f "$MARKER" ]; then
   STARTED=$(grep -oP 'started: \K.*' "$MARKER" 2>/dev/null | head -1)
   SESSION_ID=$(grep -oP 'session_id: \K.*' "$MARKER" 2>/dev/null | head -1)
 
+  # Fallback for display: when task is the placeholder, substitute the
+  # last session's top_actionable (preferred) or next: line for the resume
+  # nudge so users see something useful. Don't rewrite the marker here —
+  # the stop-learn-capture hook handles that path.
+  if [ "$TASK" = "(unassigned)" ] && [ -f "$LAST_SESSION" ]; then
+    FALLBACK=$(grep -oP '^top_actionable: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
+    [ -z "$FALLBACK" ] && FALLBACK=$(grep -oP '^next: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
+    if [ -n "$FALLBACK" ]; then
+      TASK="$FALLBACK"
+    else
+      TASK="(no task recorded)"
+    fi
+  elif [ "$TASK" = "(unassigned)" ]; then
+    TASK="(no task recorded)"
+  fi
+
   # Different CC process? session_id mismatch handles --continue, --resume
   # across CC processes, and fresh startup alike; /clear and /resume
   # within the same CC process preserve session_id, so they stay on the
