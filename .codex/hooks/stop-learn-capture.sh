@@ -74,6 +74,23 @@ backfill_unassigned_marker() {
 
 backfill_unassigned_marker "$MARKER" "$PROJECT_DIR"
 
+# --- Defensive cleanup: ~rpm-context.md after /session-end ---
+# /session-end's handoff cleanup is supposed to remove ~rpm-context.md
+# (the SessionStart-mirrored file Codex includes via AGENTS.md). If the
+# user invokes /session-end but the cleanup block is interrupted, the
+# context file can leak into the next session. Detect this post-handoff
+# window via the ~rpm-session-end marker and remove the context file.
+# This is a no-op during normal conversation — ~rpm-session-end only
+# exists after /session-end has run its handoff write. The Codex
+# runtime has no SessionEnd hook, so the Stop hook is the only place
+# where this safety net can fire. Runs before the learning-capture
+# gates below so it can't be short-circuited by short messages.
+HANDOFF="$PM_DIR/~rpm-session-end"
+CONTEXT="$PM_DIR/~rpm-context.md"
+if [ -f "$HANDOFF" ] && [ -f "$CONTEXT" ]; then
+  rm -f "$CONTEXT" 2>/dev/null || true
+fi
+
 # Skip empty or short responses (< 200 chars unlikely to contain learnings)
 [ ${#MSG} -lt 200 ] && exit 0
 
