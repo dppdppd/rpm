@@ -49,6 +49,33 @@ if [ ! -d "$PM_DIR" ]; then
   exit 0
 fi
 
+# --- Mirror stdout to docs/rpm/~rpm-context.md ---
+# Claude captures SessionStart stdout into model context; Codex does not.
+# Writing the same content to a file under docs/rpm/ lets Codex pick it up
+# via an AGENTS.md `# include:` directive. The Claude side is a no-op
+# duplicate (stdout still reaches the model), but mirroring the discipline
+# across runtimes keeps the two hook copies byte-identical. The file is
+# cleaned up by /session-end and (defensively) by the Stop hook.
+CONTEXT_FILE="$PM_DIR/~rpm-context.md"
+CONTEXT_TMP=$(mktemp "$PM_DIR/.rpm-context.XXXXXX" 2>/dev/null || true)
+if [ -n "$CONTEXT_TMP" ] && [ -f "$CONTEXT_TMP" ]; then
+  exec 3>&1
+  # shellcheck disable=SC2094
+  exec > >(tee "$CONTEXT_TMP" >&3)
+  TEE_PID=$!
+  finalize_context() {
+    # Close fd 1 (the tee pipe) so tee sees EOF, then wait for it to flush.
+    exec 1>&3 3>&-
+    [ -n "${TEE_PID:-}" ] && wait "$TEE_PID" 2>/dev/null
+    if [ -s "$CONTEXT_TMP" ]; then
+      mv -f "$CONTEXT_TMP" "$CONTEXT_FILE" 2>/dev/null || rm -f "$CONTEXT_TMP" 2>/dev/null
+    else
+      rm -f "$CONTEXT_TMP" 2>/dev/null
+    fi
+  }
+  trap finalize_context EXIT
+fi
+
 # --- Active marker present — resume, wrap up stale session, or drop orphan ---
 # Covers clear, resume, and fresh startup where the user exited without /session-end.
 if [ -f "$MARKER" ]; then

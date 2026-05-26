@@ -433,3 +433,80 @@ EOF
   [[ "$output" == *"rpm: resuming — (no task recorded)"* ]]
   [[ "$output" != *"rpm: resuming — (unassigned)"* ]]
 }
+
+# --- ~rpm-context.md mirror (Codex SessionStart strategy) ---
+# Claude captures SessionStart stdout natively; Codex does not. The hook
+# mirrors the same stdout to docs/rpm/~rpm-context.md so AGENTS.md can
+# pick it up via a `# include:` directive. Both runtimes use the file.
+
+@test "context mirror: main path writes ~rpm-context.md byte-equivalent to stdout" {
+  seed_minimal_trackers
+  # Capture stdout only (bats `run` merges stderr — the rpm-tip line goes
+  # to stderr and would not appear in the file mirror).
+  local stdout_file
+  stdout_file=$(mktemp)
+  echo '{"source":"startup","session_id":"test-sess-123"}' \
+    | bash "$CLAUDE_PLUGIN_ROOT/hooks/session-start-auto.sh" \
+      > "$stdout_file" 2>/dev/null
+  [ -f "$PM_DIR/~rpm-context.md" ]
+  # The file contains the same banner/sections the model would receive.
+  grep -q '^=== git ===$' "$PM_DIR/~rpm-context.md"
+  grep -q '^=== context ===$' "$PM_DIR/~rpm-context.md"
+  grep -q '^=== backlog_menu ===$' "$PM_DIR/~rpm-context.md"
+  grep -q '^=== instructions ===$' "$PM_DIR/~rpm-context.md"
+  grep -q 'rpm: session active' "$PM_DIR/~rpm-context.md"
+  # Stdout content matches the file content, byte for byte.
+  cmp -s "$stdout_file" "$PM_DIR/~rpm-context.md"
+  cmp_status=$?
+  rm -f "$stdout_file"
+  [ "$cmp_status" -eq 0 ]
+}
+
+@test "context mirror: resume path also writes ~rpm-context.md" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: same-proc-sess
+started: 2026-04-12T10:00:00Z
+task: fix flux capacitor
+EOF
+  run run_session_start clear same-proc-sess
+  [ "$status" -eq 0 ]
+  [ -f "$PM_DIR/~rpm-context.md" ]
+  grep -q 'rpm: resuming' "$PM_DIR/~rpm-context.md"
+  grep -q 'fix flux capacitor' "$PM_DIR/~rpm-context.md"
+}
+
+@test "context mirror: not written when docs/rpm/ missing (skip-no-init guard)" {
+  rm -rf "$PM_DIR"
+  local stderr_file
+  stderr_file=$(mktemp)
+  run bash -c "echo '{\"source\":\"startup\",\"session_id\":\"abc\"}' | bash '$CLAUDE_PLUGIN_ROOT/hooks/session-start-auto.sh' 2>'$stderr_file'"
+  rm -f "$stderr_file"
+  [ "$status" -eq 0 ]
+  # PM_DIR doesn't exist → file can't be written.
+  [ ! -f "$PM_DIR/~rpm-context.md" ]
+}
+
+@test "context mirror: compact source skips file write (no stdout to mirror)" {
+  seed_minimal_trackers
+  run run_session_start compact
+  [ "$status" -eq 0 ]
+  # compact returns before the mirror is set up; no file should be created.
+  [ ! -f "$PM_DIR/~rpm-context.md" ]
+}
+
+@test "context mirror: re-running overwrites prior file (no append leak)" {
+  seed_minimal_trackers
+  # First run produces a file.
+  run run_session_start startup first-sess
+  [ -f "$PM_DIR/~rpm-context.md" ]
+  size_first=$(wc -c < "$PM_DIR/~rpm-context.md")
+  # Second run should overwrite — not append.
+  run run_session_start startup second-sess
+  [ -f "$PM_DIR/~rpm-context.md" ]
+  size_second=$(wc -c < "$PM_DIR/~rpm-context.md")
+  # Sizes should be similar (same content shape). Either way, no run-on.
+  # The new content should contain only one "=== git ===" header.
+  count=$(grep -c '^=== git ===$' "$PM_DIR/~rpm-context.md")
+  [ "$count" -eq 1 ]
+}

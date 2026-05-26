@@ -278,7 +278,21 @@ create `AGENTS.md` from the template below. Do not create
 `CLAUDE.md` unless Claude Code-exclusive guidance exists or the
 project already had `CLAUDE.md`.
 
+When creating a new `AGENTS.md`, keep the `# include:` directive at
+the very top of the file. It points to a transient session-context
+file written by the rpm SessionStart hook (`docs/rpm/~rpm-context.md`,
+deleted by `/session-end`). Codex runtimes that don't capture
+SessionStart stdout pick the context up through this include; Claude
+Code already receives the same content via the hook itself, so the
+line is harmless there.
+
+When augmenting an existing `AGENTS.md`, add this `# include:` line
+near the top if it's missing — without it, the SessionStart context
+won't reach Codex agents in this project.
+
 ```markdown
+# include: docs/rpm/~rpm-context.md
+
 # Project: {name}
 
 {One-sentence description}

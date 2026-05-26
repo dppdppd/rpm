@@ -92,3 +92,33 @@ EOF
   today=$(date +%Y-%m-%d)
   grep -Fq "Task:** unknown" "$PM_DIR/past/$today.md"
 }
+
+# --- Defensive ~rpm-context.md cleanup ---
+# SessionEnd fires when the user exits without running /session-end. The
+# hook backfills the daily log AND removes the SessionStart-mirrored
+# context file so the next session doesn't inherit stale state.
+
+@test "removes ~rpm-context.md alongside the daily-log backfill" {
+  seed_marker
+  printf 'stale context\n' > "$PM_DIR/~rpm-context.md"
+  run run_end_hook logout
+  [ "$status" -eq 0 ]
+  [ ! -f "$PM_DIR/~rpm-context.md" ]
+}
+
+@test "context cleanup is silent when ~rpm-context.md is absent" {
+  seed_marker
+  run run_end_hook logout
+  [ "$status" -eq 0 ]
+  [ ! -f "$PM_DIR/~rpm-context.md" ]
+}
+
+@test "context cleanup skipped when marker missing (early exit)" {
+  # Clean /session-end already removed the marker; this hook short-circuits
+  # before touching the context file. The handoff cleanup in /session-end
+  # is the one that removes the file in this path.
+  printf 'present\n' > "$PM_DIR/~rpm-context.md"
+  run run_end_hook logout
+  [ "$status" -eq 0 ]
+  [ -f "$PM_DIR/~rpm-context.md" ]
+}

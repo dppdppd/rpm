@@ -3,7 +3,7 @@
 
 * Active
 
-** TODO Codex SessionStart: implement option B (transient ~rpm-context.md + AGENTS.md include) [[file:2026-05-26-codex-sessionstart-strategy.md]]
+** DONE Codex SessionStart: implement option B (transient ~rpm-context.md + AGENTS.md include) [[file:2026-05-26-codex-sessionstart-strategy.md]]
    :PROPERTIES:
    :ID: codex-sessionstart-strategy
    :END:
