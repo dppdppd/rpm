@@ -25,9 +25,15 @@ MARKER="$PM_DIR/~rpm-session-start"
 
 SESSION_ID=$(echo "$PAYLOAD" | jq -r '.session_id // "unknown"' 2>/dev/null)
 COUNTER_FILE="/tmp/rpm-ctx-counter-${SESSION_ID}"
-COUNT=$(cat "$COUNTER_FILE" 2>/dev/null || echo 0)
+# Defensive read: only the first line, digits only. Recovers gracefully if a
+# prior concurrent write corrupted the file into a multi-line value.
+COUNT=$(head -1 "$COUNTER_FILE" 2>/dev/null | tr -dc 0-9)
+COUNT=${COUNT:-0}
 COUNT=$((COUNT + 1))
-echo "$COUNT" > "$COUNTER_FILE"
+# Atomic write: stage in .tmp, rename into place. mv(1) is atomic within a
+# single filesystem, so concurrent PostToolUse fires can clobber each other
+# but never produce a torn/multi-line counter file.
+printf '%d\n' "$COUNT" > "$COUNTER_FILE.tmp" && mv -f "$COUNTER_FILE.tmp" "$COUNTER_FILE"
 
 [ "$COUNT" -lt 3 ] && exit 0
 [ $((COUNT % 10)) -ne 0 ] && exit 0

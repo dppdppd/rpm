@@ -159,3 +159,74 @@ prime_counter() {
   [ -z "$output" ]
   rm -f "$transcript"
 }
+
+# --- Counter-file robustness (race condition fix) ---
+
+@test "recovers from a pre-corrupted multi-line counter file" {
+  seed_marker
+  sid="ctxmon-corrupt-$$"
+  # Simulate a torn write left behind by a previous concurrent run.
+  printf '1\n50\n' > "/tmp/rpm-ctx-counter-$sid"
+  run run_monitor 0 "$sid"
+  [ "$status" -eq 0 ]
+  # Stderr would have carried the old "syntax error in expression" crash.
+  [ -z "$output" ]
+  # Defensive read takes the first line (1), strips digits-only, increments to 2.
+  recovered=$(cat "/tmp/rpm-ctx-counter-$sid")
+  [ "$recovered" = "2" ]
+}
+
+@test "rewrites a clean single-line integer after corrupted read" {
+  seed_marker
+  sid="ctxmon-rewrite-$$"
+  # Pre-seed with junk that previously crashed line 29.
+  printf 'garbage\n42\n' > "/tmp/rpm-ctx-counter-$sid"
+  run run_monitor 0 "$sid"
+  [ "$status" -eq 0 ]
+  # File is now exactly one digit-line ending in a newline.
+  line_count=$(wc -l < "/tmp/rpm-ctx-counter-$sid")
+  [ "$line_count" -eq 1 ]
+  body=$(cat "/tmp/rpm-ctx-counter-$sid")
+  [[ "$body" =~ ^[0-9]+$ ]]
+}
+
+@test "20 concurrent invocations never crash and produce a valid integer counter" {
+  seed_marker
+  sid="ctxmon-race-$$"
+  : > "/tmp/rpm-ctx-counter-$sid"
+
+  transcript="$(mktemp)"
+  # Force the silent path (no usage block) so the hook focuses on the
+  # counter update only — keeps the test about race safety, not the
+  # threshold message.
+  echo '{"type":"user","message":{"role":"user","content":"hi"}}' > "$transcript"
+
+  stderr_log="$(mktemp)"
+
+  for _ in $(seq 1 20); do
+    (
+      printf '{"session_id":"%s","transcript_path":"%s"}' "$sid" "$transcript" \
+        | bash "$CLAUDE_PLUGIN_ROOT/hooks/context-monitor.sh" \
+            >/dev/null 2>>"$stderr_log"
+    ) &
+  done
+  wait
+
+  # No syntax-error crash output from any worker — the file-format
+  # corruption that previously crashed line 29 is gone.
+  ! grep -q "syntax error" "$stderr_log"
+  ! grep -q "integer expression expected" "$stderr_log"
+
+  # Counter file is a clean one-line integer (atomic mv guarantee).
+  line_count=$(wc -l < "/tmp/rpm-ctx-counter-$sid")
+  [ "$line_count" -eq 1 ]
+  final=$(cat "/tmp/rpm-ctx-counter-$sid")
+  [[ "$final" =~ ^[0-9]+$ ]]
+  # Atomic-write fix (approach #2) eliminates file corruption but does
+  # NOT serialize the read-modify-write — concurrent workers may still
+  # lose an increment. Contract: counter is a valid integer in (0, 20].
+  [ "$final" -gt 0 ]
+  [ "$final" -le 20 ]
+
+  rm -f "$transcript" "$stderr_log"
+}
