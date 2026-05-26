@@ -102,16 +102,20 @@ or any legacy rpm file exists (`docs/rpm/RPM.md`,
    to the canonical paths only when the canonical target is missing.
    If both old and new paths exist, do not overwrite; report the old
    path as leftover legacy state.
-4. **Verify agent guidance layout.** If `CLAUDE.md` exists and
+4. **Repair stale configs.** Run the unified repair pass — see
+   the **Phase 4a: Repair stale configs** section below. It brings
+   `.gitignore` and `AGENTS.md` in line with the current rpm layout
+   (wildcard ignore rule + `# include:` directive for Codex).
+5. **Verify agent guidance layout.** If `CLAUDE.md` exists and
    `AGENTS.md` is missing or `CLAUDE.md` appears to contain general
    project guidance, ask the Claude guidance migration question from
    Phase 4. Do not move guidance without confirmation.
-5. **Verify runtime-specific permissions.** Run Phase 6 checks, but
+6. **Verify runtime-specific permissions.** Run Phase 6 checks, but
    only apply permission changes for runtimes that support them.
-6. **Verify current-session activation.** Ensure
+7. **Verify current-session activation.** Ensure
    `docs/rpm/~rpm-session-start` exists for the current session when
    the active runtime uses rpm lifecycle hooks.
-7. **Summarize and stop.** Print:
+8. **Summarize and stop.** Print:
 
    ```
    ## /init-rpm verification complete
@@ -119,6 +123,7 @@ or any legacy rpm file exists (`docs/rpm/RPM.md`,
    Verified: {list}
    Created: {list or "nothing"}
    Migrated: {list or "nothing"}
+   Repaired: {list or "nothing"}
    Needs attention: {list or "nothing"}
    ```
 
@@ -414,6 +419,126 @@ swept out of tasks.org by `/session-end`):
 
 Closed entries swept from tasks.org by session-end. Newest first.
 ```
+
+## Phase 4a: Repair stale configs (gitignore wildcard + AGENTS.md include)
+
+**Say to user:** "Checking `.gitignore` and `AGENTS.md` against the
+current rpm layout."
+
+Both fresh bootstraps and repeat runs reach this phase. Two stale-config
+gaps appear in projects bootstrapped before today's layout:
+
+1. **`.gitignore` wildcard.** rpm scatters transient session-state
+   under `docs/rpm/~rpm-*`. The current convention is one wildcard
+   line that covers all of them. Older bootstraps either had no
+   `.gitignore` entry at all or accumulated one explicit line per
+   transient file.
+
+2. **`AGENTS.md` include directive.** Codex (and any other runtime
+   that doesn't capture SessionStart stdout) picks up rpm session
+   context through a top-of-file `# include: docs/rpm/~rpm-context.md`
+   line in `AGENTS.md`. Older bootstraps wrote `AGENTS.md` without
+   the line, so the SessionStart hook's file write isn't visible to
+   the LLM.
+
+Run the repair helper to detect and fix both in one pass:
+
+```bash
+bash "${CLAUDE_SKILL_DIR}/scripts/repair.sh" --check
+```
+
+The helper prints a structured report. Use the report to decide what
+to do, then re-run without `--check` (or with `--auto-yes` for fully
+non-interactive repair) to apply the changes the user has approved.
+
+The repair helper is **safe to run on any project**, including
+those already migrated — it's idempotent and reports `wildcard=present`
+/ `agents_md=include_present` when there's nothing to do.
+
+### Handling the report
+
+The helper emits two sections — `=== gitignore ===` and
+`=== agents_md ===` — each followed by `key=value` lines.
+
+**gitignore section**
+
+| Output                                  | What it means                              | What to do                                   |
+| --------------------------------------- | ------------------------------------------ | -------------------------------------------- |
+| `wildcard=present`                      | `docs/rpm/~rpm-*` already in `.gitignore`  | Skip silently.                               |
+| `wildcard=absent`                       | Wildcard missing or `.gitignore` missing   | Re-run helper without `--check` to add it.   |
+| `explicit_count=N` with `N > 0`         | N explicit `docs/rpm/~rpm-*` lines present | Offer to collapse them (see below).          |
+| `action=appended_wildcard`              | Helper added the wildcard line             | Mention in summary.                          |
+| `action=created_gitignore`              | Helper created `.gitignore` from scratch   | Mention in summary.                          |
+| `action=offer_collapse count=N`         | Helper sees explicit lines, awaits consent | Ask user (see below).                        |
+| `explicit_line=<line>` (repeated)       | The explicit lines that would be collapsed | List them in the offer.                      |
+| `action=collapsed_explicit count=N`     | Helper removed N explicit lines            | Mention in summary.                          |
+
+If `action=offer_collapse` appears, surface this one-line offer with
+the listed lines:
+
+```
+Found N explicit docs/rpm/~rpm-* entries in .gitignore. These are all
+covered by the docs/rpm/~rpm-* wildcard the helper just added.
+
+  {list of explicit_line= values, one per line}
+
+QUESTION: Collapse these N lines into the wildcard? (`yes` / `no`)
+```
+
+On `yes`, re-run with `--auto-yes` (or `--gitignore-only --auto-yes`
+if you don't want to re-prompt the AGENTS.md decision). On `no`, leave
+them in place — they're redundant but harmless, and the helper will
+offer again on the next repeat run.
+
+**agents_md section**
+
+| Output                                  | What it means                                | What to do                                |
+| --------------------------------------- | -------------------------------------------- | ----------------------------------------- |
+| `agents_md=absent`                      | No AGENTS.md in this project                 | Skip — fresh bootstrap creates it later.  |
+| `agents_md=include_present`             | Include directive already at top of AGENTS.md| Skip silently.                            |
+| `agents_md=include_missing`             | AGENTS.md exists but lacks the include line  | Offer to prepend (see below).             |
+| `action=offer_prepend`                  | Helper awaits consent                        | Ask user.                                 |
+| `action=prepended_at_top`               | Helper added the line at line 1              | Mention in summary.                       |
+| `action=prepended_after_frontmatter`    | Helper inserted line after YAML frontmatter  | Mention in summary.                       |
+
+If `action=offer_prepend` appears, surface this offer:
+
+```
+AGENTS.md is missing the rpm context include directive
+(`# include: docs/rpm/~rpm-context.md`). Without it, the SessionStart
+hook's context file isn't picked up by Codex agents in this project.
+
+QUESTION: Prepend the include line to AGENTS.md? (`yes` / `no`)
+```
+
+On `yes`, re-run with `--auto-yes` (or `--agents-only --auto-yes`).
+The helper preserves all existing AGENTS.md content verbatim and
+places the include directive immediately after any YAML frontmatter.
+On `no`, leave AGENTS.md unchanged — the helper will offer again on
+the next repeat run.
+
+### Repair invocation flow
+
+1. Run `repair.sh --check` and read the structured report.
+2. For each `action=offer_*` line, surface the offer to the user.
+3. If both offers are accepted, run `repair.sh --auto-yes` once.
+4. If only one is accepted, run `repair.sh --gitignore-only --auto-yes`
+   or `repair.sh --agents-only --auto-yes` as appropriate.
+5. If neither is accepted, skip the apply step — the helper has
+   already added non-destructive defaults (wildcard ignore line,
+   newly created `.gitignore`) during the dry-run; only the
+   destructive/opt-in operations (collapse explicit lines, prepend
+   AGENTS.md include) are gated by user consent.
+
+   Note: in `--check` mode, the helper makes no writes — so if you
+   want the non-destructive defaults applied without prompting for
+   the opt-in operations, run it without `--check` and without
+   `--auto-yes`; the wildcard append / `.gitignore` create happens,
+   but explicit-line collapse and AGENTS.md prepend are skipped.
+
+If the active runtime is non-interactive (worker subagent, automated
+pipeline), default both offers to `no` and report them under
+`Needs attention` in the verification summary.
 
 ## Phase 5: Adapt for Team Size
 
