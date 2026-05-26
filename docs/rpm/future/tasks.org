@@ -3,7 +3,7 @@
 
 * Active
 
-** TODO review-ready.sh / status.sh: agent_id pairing bug [[file:2026-05-26-review-ready-agent-id-pairing.md]]
+** DONE review-ready.sh / status.sh: agent_id pairing bug [[file:2026-05-26-review-ready-agent-id-pairing.md]]
    :PROPERTIES:
    :ID: review-ready-agent-id-pairing
    :END:

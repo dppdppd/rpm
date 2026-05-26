@@ -59,3 +59,57 @@ every dispatcher remembering to template the ID in.
   `in-flight: 0`.
 - Run `/next status` after a dispatch+review cycle in a real session;
   confirm queues match reality.
+
+## Worker Result
+
+### Summary
+Implemented option A: dropped the `agent_id` clause from the `(target, agent_id)`
+join in both `review-ready.sh` (review queue) and `status.sh` (in-flight count).
+Workers can keep emitting `agent_id="worker-unknown"`; the orchestrator can keep
+recording dispatch IDs. The match is target-only, and timestamp ordering
+(`.key > .key`) is now the sole dedupe guarantee for repeated dispatches of the
+same target (e.g. changes-requested re-issues). For `status.sh` this required
+adding the equivalent timestamp clause — without it, a single backlog-result
+would falsely resolve every prior dispatch of the same target.
+
+### Files changed
+- `plugin/skills/next/scripts/review-ready.sh` — removed `agent_id` clause from
+  the jq filter; updated the header comment to explain the join.
+- `plugin/skills/next/scripts/status.sh` — same: target-only match in the
+  in-flight calculation, plus a new `.key > .key` clause so each backlog-result
+  only resolves an earlier actionable-backlog.
+- `codex/.codex/skills/next/scripts/review-ready.sh` — mirrored from plugin
+  (verified byte-identical post-edit).
+- `codex/.codex/skills/next/scripts/status.sh` — mirrored from plugin
+  (verified byte-identical post-edit).
+- `plugin/tests/agent-id-pairing.bats` — new file with 4 tests:
+  - target-only join clears worker-unknown vs dispatch-ID review;
+  - in-flight count is 0 for worker-unknown backlog-result vs dispatch-ID
+    actionable-backlog;
+  - changes-requested cycle — only the unpaired second dispatch counts as
+    in-flight;
+  - changes-requested cycle — only the unreviewed worker result surfaces in
+    review-ready.
+
+### Verification
+- `bash plugin/tests/run.sh` → 175/175 pass (4 new + 171 prior).
+- `shellcheck plugin/.../review-ready.sh plugin/.../status.sh
+  codex/.../review-ready.sh codex/.../status.sh` → exit 0.
+- `bash plugin/skills/next/scripts/status.sh` against the real project log:
+  pre-existing entries from earlier today now join correctly. The only
+  in-flight entry is this task's own dispatch
+  (`review-ready-agent-id-pairing`) — which is correct: the worker hasn't
+  logged its result yet at the time of this verification snapshot.
+
+### Remaining risks
+- Two concurrent dispatches of the same target would be indistinguishable
+  under the new join (the first backlog-result would resolve the earlier
+  dispatch only thanks to ts ordering, but a second backlog-result could
+  resolve either of two remaining open dispatches). This is the
+  acknowledged tradeoff of option A and matches the detail file's
+  mitigation note. Concurrent same-target dispatches are not a current
+  use-case — the orchestrator enforces single-worker concurrency.
+- Workers still default to `agent_id="worker-unknown"`; the `agent_id`
+  field on `backlog-result` entries remains an audit-only signal, not a
+  join key. If a future change wants per-worker attribution, option B
+  (pass dispatch ID into the worker prompt) is still on the table.

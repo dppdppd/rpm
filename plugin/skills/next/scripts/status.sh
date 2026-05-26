@@ -49,16 +49,26 @@ fi
 echo
 
 # ---- In-flight: actionable-backlog without matching backlog-result ----
-# An "in-flight" entry has agent_id A and kind=actionable-backlog with no
-# subsequent kind=backlog-result for the same agent_id.
+# An "in-flight" entry is a kind=actionable-backlog with no subsequent
+# kind=backlog-result for the same target. We match on target alone, not
+# (target, agent_id), because workers default to agent_id="worker-unknown"
+# while the orchestrator records the dispatch ID — the IDs never align.
+# The .key > .key clause ensures a backlog-result only resolves an earlier
+# actionable-backlog (matters when the same target is re-dispatched, e.g.
+# after a changes-requested review).
 echo "== In-flight =="
 jq -s -r '
   . as $all
-  | map(select(.kind == "actionable-backlog"))
-  | map(. as $d
-        | $all
-        | map(select(.kind == "backlog-result" and .agent_id == $d.agent_id))
-        | length as $resolved
+  | ($all | to_entries) as $idx
+  | $idx
+  | map(select(.value.kind == "actionable-backlog"))
+  | map(. as $entry
+        | $entry.value as $d
+        | ($idx
+           | map(select(.value.kind == "backlog-result"
+                        and .key > ($entry.key)
+                        and .value.target == $d.target))
+           | length) as $resolved
         | $d + {resolved: $resolved})
   | map(select(.resolved == 0))
   | if length == 0 then "  (none)"
