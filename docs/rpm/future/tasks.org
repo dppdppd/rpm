@@ -3,21 +3,6 @@
 
 * Active
 
-** DONE review-ready.sh / status.sh: agent_id pairing bug [[file:2026-05-26-review-ready-agent-id-pairing.md]]
-   :PROPERTIES:
-   :ID: review-ready-agent-id-pairing
-   :END:
-
-** TODO /init-rpm: auto-patch existing AGENTS.md with `# include` line [[file:2026-05-26-init-rpm-agents-md-patch.md]]
-   :PROPERTIES:
-   :ID: init-rpm-agents-md-patch
-   :END:
-
-** TODO /init-rpm: write `docs/rpm/~rpm-*` wildcard to .gitignore [[file:2026-05-26-init-rpm-gitignore-wildcard.md]]
-   :PROPERTIES:
-   :ID: init-rpm-gitignore-wildcard
-   :END:
-
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook

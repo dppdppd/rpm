@@ -6,6 +6,24 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE /init-rpm: write `docs/rpm/~rpm-*` wildcard to .gitignore [[file:2026-05-26-init-rpm-gitignore-wildcard.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: init-rpm-gitignore-wildcard
+   :END:
+
+** DONE /init-rpm: auto-patch existing AGENTS.md with `# include` line [[file:2026-05-26-init-rpm-agents-md-patch.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: init-rpm-agents-md-patch
+   :END:
+
+** DONE review-ready.sh / status.sh: agent_id pairing bug [[file:2026-05-26-review-ready-agent-id-pairing.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: review-ready-agent-id-pairing
+   :END:
+
 ** DONE Codex SessionStart: implement option B (transient ~rpm-context.md + AGENTS.md include) [[file:2026-05-26-codex-sessionstart-strategy.md]]
    CLOSED: [2026-05-26]
    :PROPERTIES:
