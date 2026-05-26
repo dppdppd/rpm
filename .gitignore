@@ -1,18 +1,6 @@
 # Claude Code harness runtime state (lock files, local settings)
 .claude/
 
-# Session state — ephemeral, recreated each session
-docs/rpm/~rpm-session-start
-docs/rpm/~rpm-session-end
-docs/rpm/~rpm-compact-state
-docs/rpm/~rpm-context.md
-docs/rpm/~rpm-learnings.jsonl
-docs/rpm/~rpm-native-tasks.jsonl
-docs/rpm/~rpm-last-session
-docs/rpm/~rpm-last-validated-commit
-docs/rpm/~rpm-task-candidates.jsonl
-docs/rpm/~rpm-orchestrator-log.jsonl
-
 # opencode sibling package — derived mirrors populated by
 # scripts/sync-opencode.sh; source of truth lives in plugin/
 opencode/.opencode/skills/
@@ -22,3 +10,6 @@ opencode/.opencode/plugins/hooks/
 opencode/.opencode/.claude-plugin/
 opencode/node_modules/
 opencode/package-lock.json
+
+# rpm session-state (transient, regenerated per session)
+docs/rpm/~rpm-*
