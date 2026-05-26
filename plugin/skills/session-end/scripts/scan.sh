@@ -16,26 +16,31 @@ cd "$ROOT" 2>/dev/null || { echo "error=cannot_cd_to_root"; exit 0; }
 
 # ----------------------------------------------------------------
 echo "=== plugin ==="
+# Resolve plugin manifest. Mirrors the chain used by session-start-auto.sh
+# plus the Codex cache glob from hooks.json — keeps Claude + Codex aligned
+# so neither emits version=unknown.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PLUGIN_ROOT="${RPM_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}"
 PLUGIN_MANIFEST=""
-for candidate in \
-  "$PLUGIN_ROOT/.claude-plugin/plugin.json" \
-  "$PLUGIN_ROOT/.codex-plugin/plugin.json" \
-  "$SCRIPT_DIR/../../../.claude-plugin/plugin.json" \
-  "$SCRIPT_DIR/../../../.codex-plugin/plugin.json" \
-  "$SCRIPT_DIR/../../../../.codex-plugin/plugin.json"
-do
-  [ -n "$candidate" ] && [ -f "$candidate" ] && { PLUGIN_MANIFEST="$candidate"; break; }
+candidate_roots=()
+[ -n "${RPM_PLUGIN_ROOT:-}" ]    && candidate_roots+=("$RPM_PLUGIN_ROOT")
+[ -n "${CODEX_PLUGIN_ROOT:-}" ]  && candidate_roots+=("$CODEX_PLUGIN_ROOT")
+[ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && candidate_roots+=("$CLAUDE_PLUGIN_ROOT")
+[ -n "${CLAUDE_SKILL_DIR:-}" ]   && candidate_roots+=("$CLAUDE_SKILL_DIR/../..")
+# Relative fallbacks for monorepo dev layout
+candidate_roots+=("$SCRIPT_DIR/../../..")
+candidate_roots+=("$SCRIPT_DIR/../../../..")
+# Codex cache glob fallback (matches the chain in codex/.codex/hooks.json)
+for cache_root in "${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/"*; do
+  [ -d "$cache_root" ] && candidate_roots+=("$cache_root")
 done
-if [ -z "$PLUGIN_MANIFEST" ] && [ -n "${CLAUDE_SKILL_DIR:-}" ]; then
-  for candidate in \
-    "$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json" \
-    "$CLAUDE_SKILL_DIR/../../.codex-plugin/plugin.json"
-  do
-    [ -f "$candidate" ] && { PLUGIN_MANIFEST="$candidate"; break; }
+for root in "${candidate_roots[@]}"; do
+  for sub in .claude-plugin .codex-plugin; do
+    if [ -f "$root/$sub/plugin.json" ]; then
+      PLUGIN_MANIFEST="$root/$sub/plugin.json"
+      break 2
+    fi
   done
-fi
+done
 RPM_VERSION=""
 if [ -f "$PLUGIN_MANIFEST" ]; then
   RPM_VERSION=$(jq -r '.version // empty' "$PLUGIN_MANIFEST" 2>/dev/null)
@@ -109,11 +114,20 @@ fi
 # ----------------------------------------------------------------
 echo
 echo "=== not_implemented ==="
-# Count and sample NOT_IMPLEMENTED references across common source types
+# Count and sample NOT_IMPLEMENTED references across common source types.
+# Excludes vendored / build directories — a single .opencode/node_modules
+# tree produced 3.6MB of output in real projects, gutting the audit.
 NI_OUT=$(grep -rn NOT_IMPLEMENTED \
   --include='*.md' --include='*.sh' --include='*.py' \
   --include='*.ts' --include='*.tsx' --include='*.js' \
   --include='*.go' --include='*.rs' \
+  --exclude-dir=node_modules \
+  --exclude-dir=.opencode \
+  --exclude-dir=.venv \
+  --exclude-dir=.git \
+  --exclude-dir=dist \
+  --exclude-dir=build \
+  --exclude-dir=target \
   . 2>/dev/null || true)
 if [ -n "$NI_OUT" ]; then
   COUNT=$(echo "$NI_OUT" | wc -l | tr -d ' ')

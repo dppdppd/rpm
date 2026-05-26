@@ -43,6 +43,60 @@ section() {
   ! ( section plugin | grep -qE '^version=unknown$' )
 }
 
+@test "plugin: version resolves via RPM_PLUGIN_ROOT pointing at stub manifest" {
+  # Stand up a stub plugin tree with .claude-plugin/plugin.json so the
+  # resolver picks the env-supplied root over the real one. Mirrors the
+  # Codex install path where RPM_PLUGIN_ROOT is set explicitly.
+  STUB_ROOT="$TEST_DIR/stub-plugin"
+  mkdir -p "$STUB_ROOT/.claude-plugin"
+  printf '{"name":"rpm","version":"9.9.9"}\n' > "$STUB_ROOT/.claude-plugin/plugin.json"
+  run env -u CLAUDE_PLUGIN_ROOT -u CLAUDE_SKILL_DIR -u CODEX_PLUGIN_ROOT \
+    RPM_PLUGIN_ROOT="$STUB_ROOT" \
+    CLAUDE_PROJECT_DIR="$TEST_DIR" \
+    bash "$BATS_TEST_DIRNAME/../skills/session-end/scripts/scan.sh"
+  [ "$status" -eq 0 ]
+  section plugin | grep -qE '^version=9\.9\.9$'
+  ! ( section plugin | grep -qE '^version=unknown$' )
+}
+
+# ----------------------------------------------------------------
+# not_implemented (vendored-dir exclusion + version + size)
+# ----------------------------------------------------------------
+
+@test "not_implemented: skips vendored dirs and total output stays bounded" {
+  # Stub plugin root + project with a .opencode/node_modules tree
+  # containing NOT_IMPLEMENTED. Pre-fix: a real project produced 3.6MB
+  # of grep output. Post-fix: vendored paths excluded, scan output
+  # stays small.
+  STUB_ROOT="$TEST_DIR/stub-plugin"
+  mkdir -p "$STUB_ROOT/.claude-plugin"
+  printf '{"name":"rpm","version":"9.9.9"}\n' > "$STUB_ROOT/.claude-plugin/plugin.json"
+  echo "task: fixture" > "$PM_DIR/~rpm-session-start"
+  mkdir -p "$TEST_DIR/.opencode/node_modules/foo"
+  printf 'export const x = NOT_IMPLEMENTED;\n' \
+    > "$TEST_DIR/.opencode/node_modules/foo/bar.js"
+  # Also drop a real first-party hit so we can confirm normal matches still surface
+  mkdir -p "$TEST_DIR/src"
+  printf 'function todo() { return NOT_IMPLEMENTED; }\n' \
+    > "$TEST_DIR/src/app.js"
+  run env -u CLAUDE_PLUGIN_ROOT -u CLAUDE_SKILL_DIR -u CODEX_PLUGIN_ROOT \
+    RPM_PLUGIN_ROOT="$STUB_ROOT" \
+    CLAUDE_PROJECT_DIR="$TEST_DIR" \
+    bash "$BATS_TEST_DIRNAME/../skills/session-end/scripts/scan.sh"
+  [ "$status" -eq 0 ]
+  section plugin | grep -qE '^version=9\.9\.9$'
+  # Total output bounded — < 10KB
+  output_bytes=${#output}
+  [ "$output_bytes" -lt 10240 ] || {
+    echo "scan output too large: $output_bytes bytes" >&2
+    return 1
+  }
+  # Vendored path must NOT appear in the not_implemented matches
+  ! ( section not_implemented | grep -F '.opencode/node_modules' )
+  # First-party hit DID surface
+  section not_implemented | grep -Fq 'src/app.js'
+}
+
 # ----------------------------------------------------------------
 # git
 # ----------------------------------------------------------------
