@@ -34,3 +34,62 @@ the codebase.
   ends at 20 and no stderr.
 - Manual: trigger several parallel Bash calls in a volta session, watch
   stderr.
+
+## Worker Result
+
+### Summary
+Applied approach #2 (atomic tmp+mv write) plus approach #3 (defensive read
+via `head -1 | tr -dc 0-9`) to the counter-file read/modify/write in
+`context-monitor.sh`. File-format corruption is eliminated; a pre-existing
+torn file now self-heals on first read instead of crashing line 29. The
+identical Codex mirror was patched in lockstep. Three new bats tests guard
+the fix.
+
+### Files changed
+- `plugin/hooks/context-monitor.sh` — lines 26-30 → defensive read +
+  atomic write block.
+- `codex/.codex/hooks/context-monitor.sh` — same change (mirror stayed in
+  lockstep; `diff` confirms files are byte-identical post-edit).
+- `plugin/tests/context-monitor.bats` — three new tests:
+  1. recovers from a pre-corrupted multi-line counter file (asserts no
+     crash + counter becomes `2`),
+  2. rewrites a clean single-line integer after corrupted read (asserts
+     `wc -l == 1` and body matches `^[0-9]+$`),
+  3. 20 concurrent invocations never crash and produce a valid integer
+     counter (asserts no `syntax error` / `integer expression expected`
+     in stderr, file is a clean single-line integer).
+
+### Verification run
+shellcheck (newly installed locally via apt; CI already runs it):
+```
+$ shellcheck plugin/hooks/context-monitor.sh ; echo $?
+0
+$ shellcheck codex/.codex/hooks/context-monitor.sh ; echo $?
+0
+```
+
+bats (full suite via `bash plugin/tests/run.sh`):
+```
+ok 23 recovers from a pre-corrupted multi-line counter file
+ok 24 rewrites a clean single-line integer after corrupted read
+ok 25 20 concurrent invocations never crash and produce a valid integer counter
+...
+132 tests, 0 failures
+```
+
+### Remaining risks / caveats
+- **Read-modify-write race not fully eliminated.** Approach #2 fixes file-
+  format corruption (the actual crash signature in volta) but does NOT
+  serialize increments. Two concurrent workers can both read `N`, both
+  write `N+1`, and one increment is lost. The new 20-concurrent test
+  reflects this: it asserts the final counter is a valid integer in
+  `(0, 20]`, not exactly 20. Brief originally specified `== 20` — flagged
+  this as the chosen approach's intended trade-off. If exact counts ever
+  matter (they don't today — counter just gates the every-10th throttle),
+  switch to approach #1 (`flock -x`).
+- Atomic-write semantics rely on `$COUNTER_FILE.tmp` and `$COUNTER_FILE`
+  living on the same filesystem (both under `/tmp`, so safe).
+- The defensive read returns `0` for an entirely non-numeric file (e.g.
+  someone manually wrote `garbage\n`). That's the same effective behavior
+  as the pre-bug "file missing" branch — counter resets to 1 next call.
+  Acceptable; the only consequence is one cycle of skipped throttling.
