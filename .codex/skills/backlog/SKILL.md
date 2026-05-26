@@ -1,6 +1,6 @@
 ---
 name: backlog
-description: Manage the rpm backlog (long-term project tasks in docs/rpm/future/tasks.org — distinct from Claude's native TaskCreate list, which is session-scoped). Add, list, review, postpone, or complete entries. Use when the user wants to add a backlog item, see what's on the rpm backlog, reorder the execution sequence, defer to the bottom of a group, mark something done, or evaluate backlog health.
+description: Manage the rpm backlog (long-term project tasks in docs/rpm/future/tasks.org — distinct from Claude's native TaskCreate list, which is session-scoped). Add, list, review, postpone, or complete entries. TRIGGER on natural-language backlog operations — phrasings like "backlog X", "add X to backlog", "add to backlog", "backlog the following", "what's on the backlog", "show/list backlog", "review backlog", "postpone N", "done N", "mark N done", "defer X" all qualify and must route through this skill instead of editing tasks.org directly. Also use when the user wants to reorder execution sequence, defer to the bottom of a group, or evaluate backlog health.
 ---
 
 # /backlog
