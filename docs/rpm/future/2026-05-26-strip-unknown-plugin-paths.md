@@ -40,3 +40,36 @@ the chunk lives in shipped skill content.
 - CI grep fails on placeholder strings.
 - Manual: invoke `/session-end` in BGSD-style fresh project, confirm no
   `No such file` errors.
+
+## Worker Result
+
+**Status:** needs-review (resolved inline by orchestrator)
+
+**Summary:** The strip step was a no-op — no `claude-plugins-official`
+or `rpm/unknown` occurrences exist anywhere in `plugin/` or
+`codex/.codex/`. Repo-wide grep confirms the only hits are in `docs/rpm/`
+documents (this detail file itself, the past-log entry citing the bug,
+and unrelated marketplace references like
+"anthropics/claude-plugins-official"). The shipped skill content the
+BGSD `8e17a9ec` LLM ran against is no longer present — likely already
+stripped in an earlier release. The regression-guard CI test step
+remains valuable.
+
+**Files changed:**
+- `plugin/tests/no-placeholder-paths.bats` — new bats file with two
+  guard tests: `claude-plugins-official` and `rpm/unknown` must not
+  appear in `plugin/{skills,agents,hooks}` or
+  `codex/.codex/{skills,hooks}`. Bats runs locally via
+  `plugin/tests/run.sh` and in CI via `plugin/.github/workflows/test.yml`.
+
+**Verification:**
+- `bash plugin/tests/run.sh` → **136 tests, 0 failures** (134 prior + 2
+  new guards).
+- `grep -rn 'claude-plugins-official\|rpm/unknown' plugin/ codex/`
+  returns empty — guard tests pass.
+
+**Remaining risks:**
+- If a future skill author writes the placeholder back in, the guard
+  catches it in CI. Manual `find`/`rg` should still be the first step
+  when investigating new "No such file or directory" reports — the
+  guard only catches the exact two strings.

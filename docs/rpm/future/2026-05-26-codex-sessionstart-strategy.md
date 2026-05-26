@@ -49,6 +49,23 @@ This needs a design call before implementation. Options:
 Recommend **(B)** as default — it's runtime-neutral, doesn't require
 upstream cooperation, and matches Codex's existing AGENTS.md pattern.
 
+## Decision (2026-05-26)
+
+**Chosen: (B) Transient `~rpm-context.md` + AGENTS.md include.**
+
+Implementation surface when a worker picks this up:
+- `codex/.codex/hooks/session-start-auto.sh` (and plugin/ mirror) writes
+  `docs/rpm/~rpm-context.md` with the same content currently emitted to
+  stdout (rpm header, git state, status.md, tasks.org, backlog menu,
+  drift, instructions).
+- `init-rpm` SKILL.md emits an `AGENTS.md` template that includes
+  `# include: docs/rpm/~rpm-context.md` at the top.
+- session-end (and a Stop hook fallback) deletes `~rpm-context.md` so
+  it doesn't propagate stale state into the next run.
+- Add to `.gitignore`: `docs/rpm/~rpm-context.md` (it's transient).
+- bats test: invoke session-start-auto.sh in fixture, assert the
+  context file gets written; invoke session-end, assert it's removed.
+
 ## Validation
 - After implementation, sampled Codex sessions should show the rpm header
   + backlog snapshot in early agent context.
