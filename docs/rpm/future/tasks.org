@@ -3,21 +3,44 @@
 
 * Active
 
-** DONE Make session-end leaner — encourage small sessions [[file:2026-05-02-session-end-leaner.md]]
+** TODO Fix context-monitor.sh race condition [[file:2026-05-26-context-monitor-race.md]]
    :PROPERTIES:
-   :ID: session-end-leaner
+   :ID: context-monitor-race
    :END:
-   CLOSED: 2026-05-09. Reduced session-end skill body below the target while preserving lean mode behavior.
 
-** DONE Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
+** TODO scan.sh: fix version=unknown + exclude vendored dirs [[file:2026-05-26-scan-version-and-excludes.md]]
    :PROPERTIES:
-   :ID: sessionstart-clear-flake
+   :ID: scan-version-and-excludes
    :END:
-   CLOSED: 2026-05-09. Approved no-op: watch-only harness flake had no fresh repro and no rpm-side fix.
 
-** TODO Commit, push, and release current changes [[file:2026-05-22-commit-push-release.md]]
+** TODO Strip `claude-plugins-official/rpm/unknown/` placeholders from skill bodies [[file:2026-05-26-strip-unknown-plugin-paths.md]]
    :PROPERTIES:
-   :ID: commit-push-release-current-changes
+   :ID: strip-unknown-plugin-paths
+   :END:
+
+** TODO /backlog discovery: claim natural-language verbs [[file:2026-05-26-backlog-discovery-verbs.md]]
+   :PROPERTIES:
+   :ID: backlog-discovery-verbs
+   :END:
+
+** TODO /next discovery: trigger on "next?" / terse forms [[file:2026-05-26-next-discovery-verbs.md]]
+   :PROPERTIES:
+   :ID: next-discovery-verbs
+   :END:
+
+** TODO Backfill `task: (unassigned)` before it propagates across sessions [[file:2026-05-26-task-unassigned-backfill.md]]
+   :PROPERTIES:
+   :ID: task-unassigned-backfill
+   :END:
+
+** TODO Auditor: cross-check doc claims against live code [[file:2026-05-26-auditor-code-crosscheck.md]]
+   :PROPERTIES:
+   :ID: auditor-code-crosscheck
+   :END:
+
+** TODO Codex SessionStart strategy decision (stdout invisible) [[file:2026-05-26-codex-sessionstart-strategy.md]]
+   :PROPERTIES:
+   :ID: codex-sessionstart-strategy
    :END:
 
 ** TODO Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]

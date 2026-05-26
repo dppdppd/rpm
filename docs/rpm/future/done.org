@@ -6,6 +6,50 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Mine Claude+Codex histories for rpm usage/implementation gaps [[file:2026-05-26-history-mining-gap-analysis.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: history-mining-gap-analysis
+   :END:
+   - Three-round mining of conversation transcripts (Claude + Codex)
+     produced 33 platform-tagged gap findings and 8 prioritized fix
+     tickets with detail files at `docs/rpm/future/2026-05-26-*.md`.
+   - Sampled 9 Claude projects (~1255 jsonls covering rpm, VOC,
+     draftyard, volta, BGSD, BIT, reddit-reports, counter-tray-designer,
+     docker-coder) + 267 Codex sessions.
+   - Most surprising findings: Codex SessionStart stdout is invisible;
+     /session-end is invoked MORE in Codex (~30%) than in Claude (~2%);
+     volta marker `task: (unassigned)` stuck 27+ days across both
+     runtimes; context-monitor.sh race causing 543+ crashes in 8 volta
+     sessions.
+
+** DONE Commit, push, and release current changes [[file:2026-05-22-commit-push-release.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: commit-push-release-current-changes
+   :END:
+   - Released rpm 2.17.9 (commit 82d780f) bundling: codex hook
+     resolution from plugin install roots (1b27602), session-end
+     bookkeeping fixes (c2f37d8), deep-research plugin-only test
+     layout (e47b355), deep-research PDF preservation (6075793), and
+     codex /next directive wording (c99ca4b).
+
+** DONE Make session-end leaner — encourage small sessions [[file:2026-05-02-session-end-leaner.md]]
+   CLOSED: [2026-05-09]
+   :PROPERTIES:
+   :ID: session-end-leaner
+   :END:
+   - Reduced session-end skill body below the target while preserving
+     lean mode behavior.
+
+** DONE Watch SessionStart:clear flake on Opus 4.7 [[file:2026-04-17-sessionstart-clear-flake.md]]
+   CLOSED: [2026-05-09]
+   :PROPERTIES:
+   :ID: sessionstart-clear-flake
+   :END:
+   - Approved no-op: watch-only harness flake had no fresh repro and
+     no rpm-side fix.
+
 ** DONE scan.sh version=unknown fallback [[file:2026-04-18-scan-version-fallback.md]]
    CLOSED: [2026-04-30]
    :PROPERTIES:
