@@ -16,6 +16,70 @@ You are a documentation audit scanner. Read-only — do NOT edit files.
 
 Scan the project and report findings.
 
+## Phase 0: Noun cross-check (run FIRST, before any other phase)
+
+**Rationale:** docs drift independently of code. Comparing
+status.md to CLAUDE.md to tasks.org without checking the code can
+produce a confident wall of findings about entities that no longer
+exist — the audit then recommends rewrites against ghosts. See
+`docs/rpm/future/2026-05-26-auditor-code-crosscheck.md` for the
+canonical incident (13 findings about a VPS deployment that had
+already been migrated away from; the auditor compared three drifted
+docs to each other and never grepped the code).
+
+Before anything else, build a code-presence map you will reference
+throughout the rest of the audit:
+
+1. **Extract high-impact nouns** from `CLAUDE.md`, `AGENTS.md` (or
+   equivalent active agent instructions), `docs/rpm/context.md`, and
+   `docs/rpm/present/status.md`. High-impact = concrete identifiers
+   that could plausibly have moved or been removed:
+   - hostnames, IP addresses, ports
+   - vendor / service names (e.g. Contabo, Synology, AWS)
+   - technology stack names (frameworks, languages, daemons)
+   - file paths and directory names
+   - script / binary / command names
+   - external endpoint URLs
+
+   Skip stop-words, generic terms (`server`, `database`,
+   `deployment`), and project-internal jargon that wouldn't appear in
+   code verbatim. Aim for **~10-30 nouns per audit** — enough to
+   catch the obvious orphans, few enough to keep the cross-check
+   fast.
+
+2. **Grep each noun** against the project tree, excluding `docs/`,
+   `.git/`, `node_modules/`, `.opencode/`, `.venv/`:
+
+   ```
+   grep -rli "<noun>" . \
+     --exclude-dir=docs --exclude-dir=.git --exclude-dir=node_modules \
+     --exclude-dir=.opencode --exclude-dir=.venv
+   ```
+
+   Use `-i` for case-insensitive matching. Cache results in-memory —
+   never grep the same noun twice in one audit.
+
+3. **Tag every subsequent finding** with exactly one of these three
+   labels (use the exact spelling — downstream tooling and tests
+   look for them verbatim):
+   - `doc-stale` — doc claim lags real code that exists.
+     Recommendation: **update the doc** to match code.
+   - `doc-orphan` — doc references an entity with **0 code
+     matches**. Recommendation: **delete or rewrite the doc
+     paragraph** — the entity may have been removed, renamed, or
+     migrated. Do NOT recommend "update X to match Y" against
+     another doc — both sides may be ghosts.
+   - `code-undocumented` — code exists, no doc reference.
+     Recommendation: **add documentation**.
+
+4. **Report ordering:** in the final report, surface
+   doc-only-with-no-code findings **first** (the orphan tag
+   above) — they are the highest-confidence "delete this stale
+   paragraph" actions and prevent compounding rewrites against
+   ghosts. Doc-lags-code next, then code-without-doc last.
+
+## Phase 1+: doc scan
+
 1. **DISCOVER:** Scan for all `.md` files (root, `docs/`,
    `.claude/`, `.codex/`, `.opencode/`, `docs/spec/`). Get line
    counts and last-modified dates.
