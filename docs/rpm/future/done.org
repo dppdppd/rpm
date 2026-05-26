@@ -1,11 +1,59 @@
 #+TITLE: rpm Archive
-#+TODO: TODO IN-PROGRESS BLOCKED | DONE CANCELLED
+#+TODO: TODO IN-PROGRESS BLOCKED WATCH | DONE CANCELLED
 
 Closed entries swept from tasks.org by session-end. Newest first.
 Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE /next refinements from end-to-end validation [[file:2026-04-30-next-refinements.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: next-refinements
+   :END:
+
+** DONE Auditor: cross-check doc claims against live code [[file:2026-05-26-auditor-code-crosscheck.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: auditor-code-crosscheck
+   :END:
+
+** DONE Backfill `task: (unassigned)` before it propagates across sessions [[file:2026-05-26-task-unassigned-backfill.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: task-unassigned-backfill
+   :END:
+
+** DONE /next discovery: trigger on "next?" / terse forms [[file:2026-05-26-next-discovery-verbs.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: next-discovery-verbs
+   :END:
+
+** DONE /backlog discovery: claim natural-language verbs [[file:2026-05-26-backlog-discovery-verbs.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: backlog-discovery-verbs
+   :END:
+
+** DONE Strip `claude-plugins-official/rpm/unknown/` placeholders from skill bodies [[file:2026-05-26-strip-unknown-plugin-paths.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: strip-unknown-plugin-paths
+   :END:
+
+** DONE scan.sh: fix version=unknown + exclude vendored dirs [[file:2026-05-26-scan-version-and-excludes.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: scan-version-and-excludes
+   :END:
+
+** DONE Fix context-monitor.sh race condition [[file:2026-05-26-context-monitor-race.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: context-monitor-race
+   :END:
+
 ** DONE Mine Claude+Codex histories for rpm usage/implementation gaps [[file:2026-05-26-history-mining-gap-analysis.md]]
    CLOSED: [2026-05-26]
    :PROPERTIES:

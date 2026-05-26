@@ -1,59 +1,19 @@
 #+TITLE: rpm Future
-#+TODO: TODO IN-PROGRESS BLOCKED | DONE
+#+TODO: TODO IN-PROGRESS BLOCKED WATCH | DONE
 
 * Active
 
-** TODO Fix context-monitor.sh race condition [[file:2026-05-26-context-monitor-race.md]]
-   :PROPERTIES:
-   :ID: context-monitor-race
-   :END:
-
-** TODO scan.sh: fix version=unknown + exclude vendored dirs [[file:2026-05-26-scan-version-and-excludes.md]]
-   :PROPERTIES:
-   :ID: scan-version-and-excludes
-   :END:
-
-** TODO Strip `claude-plugins-official/rpm/unknown/` placeholders from skill bodies [[file:2026-05-26-strip-unknown-plugin-paths.md]]
-   :PROPERTIES:
-   :ID: strip-unknown-plugin-paths
-   :END:
-
-** TODO /backlog discovery: claim natural-language verbs [[file:2026-05-26-backlog-discovery-verbs.md]]
-   :PROPERTIES:
-   :ID: backlog-discovery-verbs
-   :END:
-
-** TODO /next discovery: trigger on "next?" / terse forms [[file:2026-05-26-next-discovery-verbs.md]]
-   :PROPERTIES:
-   :ID: next-discovery-verbs
-   :END:
-
-** TODO Backfill `task: (unassigned)` before it propagates across sessions [[file:2026-05-26-task-unassigned-backfill.md]]
-   :PROPERTIES:
-   :ID: task-unassigned-backfill
-   :END:
-
-** TODO Auditor: cross-check doc claims against live code [[file:2026-05-26-auditor-code-crosscheck.md]]
-   :PROPERTIES:
-   :ID: auditor-code-crosscheck
-   :END:
-
-** TODO Codex SessionStart strategy decision (stdout invisible) [[file:2026-05-26-codex-sessionstart-strategy.md]]
+** TODO Codex SessionStart: implement option B (transient ~rpm-context.md + AGENTS.md include) [[file:2026-05-26-codex-sessionstart-strategy.md]]
    :PROPERTIES:
    :ID: codex-sessionstart-strategy
    :END:
 
-** TODO Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
+** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook
    :END:
 
-** TODO deep-research Phase 3 retry/fallback hardening [[file:2026-04-28-phase3-retry-hardening.md]]
+** BLOCKED deep-research Phase 3 retry/fallback hardening [[file:2026-04-28-phase3-retry-hardening.md]]
    :PROPERTIES:
    :ID: phase3-retry-hardening
-   :END:
-
-** TODO /next refinements from end-to-end validation [[file:2026-04-30-next-refinements.md]]
-   :PROPERTIES:
-   :ID: next-refinements
    :END:
