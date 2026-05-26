@@ -13,6 +13,11 @@
    :ID: init-rpm-agents-md-patch
    :END:
 
+** TODO /init-rpm: write `docs/rpm/~rpm-*` wildcard to .gitignore [[file:2026-05-26-init-rpm-gitignore-wildcard.md]]
+   :PROPERTIES:
+   :ID: init-rpm-gitignore-wildcard
+   :END:
+
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook
