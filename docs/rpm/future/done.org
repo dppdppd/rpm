@@ -6,6 +6,12 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Codex SessionStart: implement option B (transient ~rpm-context.md + AGENTS.md include) [[file:2026-05-26-codex-sessionstart-strategy.md]]
+   CLOSED: [2026-05-26]
+   :PROPERTIES:
+   :ID: codex-sessionstart-strategy
+   :END:
+
 ** DONE /next refinements from end-to-end validation [[file:2026-04-30-next-refinements.md]]
    CLOSED: [2026-05-26]
    :PROPERTIES:

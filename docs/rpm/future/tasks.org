@@ -3,9 +3,14 @@
 
 * Active
 
-** DONE Codex SessionStart: implement option B (transient ~rpm-context.md + AGENTS.md include) [[file:2026-05-26-codex-sessionstart-strategy.md]]
+** TODO review-ready.sh / status.sh: agent_id pairing bug [[file:2026-05-26-review-ready-agent-id-pairing.md]]
    :PROPERTIES:
-   :ID: codex-sessionstart-strategy
+   :ID: review-ready-agent-id-pairing
+   :END:
+
+** TODO /init-rpm: auto-patch existing AGENTS.md with `# include` line [[file:2026-05-26-init-rpm-agents-md-patch.md]]
+   :PROPERTIES:
+   :ID: init-rpm-agents-md-patch
    :END:
 
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
