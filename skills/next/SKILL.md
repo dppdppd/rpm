@@ -1,6 +1,6 @@
 ---
 name: next
-description: One-step rpm orchestrator. Runs preflight maintenance, then either starts the next obvious backlog action or asks for clarification when direct use leaves no clear next task. Designed to be wrapped by `/loop /next` — never loops internally. In loop mode it never waits for input; it dispatches only unambiguous work and otherwise idles or exhausts after 3 idle ticks. Use when the user wants the session to autonomously work the rpm backlog.
+description: One-step rpm orchestrator. Runs preflight maintenance, then either starts the next obvious backlog action or asks for clarification when direct use leaves no clear next task. Designed to be wrapped by `/loop /next` — never loops internally. In loop mode it never waits for input; it dispatches only unambiguous work and otherwise idles or exhausts after 3 idle ticks. TRIGGER on terse forward-motion prompts — phrasings like "next", "next?", "next.", "next task", "what's next", "do next", "go next", "keep going", "continue" (when the prior turn was rpm work) all qualify and must route through this skill instead of being answered inline from the SessionStart preview. Use whenever the user wants the session to autonomously work the rpm backlog.
 argument-hint: "[status]"
 allowed-tools: Read Write Edit Glob Grep Bash Agent
 ---
@@ -121,6 +121,15 @@ After preflight, recompute `in-flight`.
    long as it has an `:ID:` and a readable linked detail file. If
    multiple tasks are actionable, the topmost one is the expected
    next task; do not ask solely because more than one exists.
+   **Skip entries keyworded `WATCH` (deferred / observe-only) the
+   same way you skip closed `DONE` / `CANCELLED` — they are not
+   actionable. Entries marked `BLOCKED` without resolved deps are
+   likewise skipped.** Before declaring a TODO or IN-PROGRESS entry
+   actionable, call
+   `bash ${CLAUDE_SKILL_DIR}/scripts/is-pre-completed.sh <id>`;
+   if it exits 0, the linked detail file already has a populated
+   `## Worker Result` — log `drift-fix: pre-completed-todo: <id>`
+   and continue to the next task instead of dispatching.
 
 4. **Goal-aligned dispatch.** Before picking the topmost actionable
    task, score it against its `*` parent's `Goal:` line. The task
@@ -236,6 +245,11 @@ When dispatching `actionable-backlog`, include this contract in the
 worker prompt. Workers must write a durable result to the orchestrator
 log before finishing; chat notifications are only supporting context.
 
+The orchestrator computes today's date at dispatch time
+(`$(date +%Y-%m-%d)`) and substitutes it into the `today:` field
+below. Workers must use that exact value for any dated artifact —
+they cannot infer the current date reliably.
+
 ```
 You are an rpm backlog worker.
 
@@ -245,8 +259,13 @@ Task:
 - detail file: docs/rpm/future/<detail-file>.md
 - orchestrator log: docs/rpm/~rpm-orchestrator-log.jsonl
 - worker id: <agent-id if known, otherwise worker-unknown>
+- today: <YYYY-MM-DD>
 
 Rules:
+0. Use the literal `today:` value above for every dated artifact you
+   create (filenames, frontmatter dates, log entries). Subagents do
+   not have reliable clock access; the orchestrator passes the date
+   in via this field. Do not infer it.
 1. Read docs/rpm/future/tasks.org and the detail file before writing.
 2. Do real work when the task is scoped enough to execute safely.
    Keep changes limited to the task. If the task is ambiguous or too
