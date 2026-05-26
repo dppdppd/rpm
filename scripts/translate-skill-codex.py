@@ -184,8 +184,13 @@ def translate(src: str) -> str:
                 "for Codex directives such as `do rpm:next until blocked` — never "
                 "loops internally. In autonomous directive mode it never waits for "
                 "input; it dispatches only unambiguous work and otherwise idles or "
-                "exhausts after 3 idle ticks. Use when the user wants the session "
-                "to autonomously work the rpm backlog."
+                "exhausts after 3 idle ticks. TRIGGER on terse forward-motion "
+                "prompts — phrasings like \"next\", \"next?\", \"next.\", "
+                "\"next task\", \"what's next\", \"do next\", \"go next\", "
+                "\"keep going\", \"continue\" (when the prior turn was rpm work) "
+                "all qualify and must route through this skill instead of being "
+                "answered inline from the SessionStart preview. Use whenever the "
+                "user wants the session to autonomously work the rpm backlog."
             )
         out.append(line)
         i += 1
