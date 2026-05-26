@@ -168,3 +168,38 @@ EOF
   remainder=${task_line#task: }
   [ "${#remainder}" -le 80 ]
 }
+
+# --- Defensive ~rpm-context.md cleanup after /session-end ---
+# /session-end's handoff cleanup is supposed to delete ~rpm-context.md.
+# If /session-end ran but the cleanup didn't reach that file, the next
+# session-start would inherit stale state. This Stop hook removes the
+# context file when it sees the post-/session-end window (~rpm-session-end
+# marker present).
+
+@test "context cleanup: removes ~rpm-context.md when ~rpm-session-end exists" {
+  seed_marker
+  printf 'session_id: ended-sess\n' > "$PM_DIR/~rpm-session-end"
+  printf 'stale context from previous session\n' > "$PM_DIR/~rpm-context.md"
+  run run_capture "n/a"
+  [ "$status" -eq 0 ]
+  [ ! -f "$PM_DIR/~rpm-context.md" ]
+}
+
+@test "context cleanup: preserves ~rpm-context.md during normal conversation (no handoff marker)" {
+  seed_marker
+  # No ~rpm-session-end → mid-session Stop event; file should survive.
+  printf 'fresh context for active session\n' > "$PM_DIR/~rpm-context.md"
+  run run_capture "n/a"
+  [ "$status" -eq 0 ]
+  [ -f "$PM_DIR/~rpm-context.md" ]
+  grep -q "fresh context" "$PM_DIR/~rpm-context.md"
+}
+
+@test "context cleanup: no-op when ~rpm-context.md doesn't exist" {
+  seed_marker
+  printf 'session_id: ended-sess\n' > "$PM_DIR/~rpm-session-end"
+  # No ~rpm-context.md → nothing to remove, but shouldn't error.
+  run run_capture "n/a"
+  [ "$status" -eq 0 ]
+  [ ! -f "$PM_DIR/~rpm-context.md" ]
+}

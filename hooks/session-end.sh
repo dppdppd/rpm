@@ -53,4 +53,10 @@ mkdir -p "$PM_DIR/past"
   echo "- **Action:** next session should backfill past/ and commit outstanding work"
 } >> "$DAILY_LOG" 2>/dev/null
 
+# Defensive cleanup: drop the SessionStart-mirrored context file so it
+# doesn't propagate into the next session (the AGENTS.md `# include:`
+# would otherwise pull in stale state). /session-end's handoff cleanup
+# already removes it; this catches sessions that ended without /session-end.
+rm -f "$PM_DIR/~rpm-context.md" 2>/dev/null || true
+
 exit 0
