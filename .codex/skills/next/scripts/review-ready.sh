@@ -2,7 +2,11 @@
 # List worker results that need orchestrator review.
 #
 # A pending review is any backlog-result that has no later review-result for
-# the same target + agent_id pair.
+# the same target. The match is target-only (not target + agent_id) because
+# workers default to agent_id="worker-unknown" — the runtime doesn't pass
+# their dispatch ID into the prompt — while the orchestrator records the
+# dispatch ID returned by Agent({...}). Timestamp ordering (.key > .key)
+# disambiguates repeated dispatches: the most recent review-result wins.
 
 set -euo pipefail
 
@@ -55,8 +59,7 @@ jq -s -r '
           | to_entries
           | map(select(.value.kind == "review-result"
                        and .key > ($entry.key)
-                       and .value.target == $result.target
-                       and ((.value.agent_id // "") == ($result.agent_id // ""))))
+                       and .value.target == $result.target))
           | length) as $reviewed
       | $result + {reviewed: $reviewed})
   | map(select(.reviewed == 0))
