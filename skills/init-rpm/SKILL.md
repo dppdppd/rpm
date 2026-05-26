@@ -363,7 +363,7 @@ Create `docs/rpm/future/tasks.org`:
 
 ```org
 #+TITLE: {Project Name} Future
-#+TODO: TODO IN-PROGRESS BLOCKED | DONE
+#+TODO: TODO IN-PROGRESS BLOCKED WATCH | DONE
 
 * {Current Phase}
 ** TODO {first task} [[file:YYYY-MM-DD-slug.md]]
@@ -371,6 +371,12 @@ Create `docs/rpm/future/tasks.org`:
    :ID: {slug}
    :END:
 ```
+
+`WATCH` is for entries that are observe-only / deferred until a
+trigger condition appears. `/next` treats `WATCH` as closed for
+task-selection purposes: it skips `WATCH` the same way it skips
+`DONE`. Use it instead of `TODO` when a follow-up should remain
+visible in the backlog without triggering a worker dispatch.
 
 **Format rule (enforce from day one):** each entry is the
 heading line (with `[[file:...]]` link) plus the standard
