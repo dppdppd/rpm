@@ -378,3 +378,58 @@ EOF
   run run_session_start startup
   [[ "$output" == *"wire up the widget"* ]]
 }
+
+# --- (unassigned) fallback for display: prefer last-session top_actionable ---
+
+@test "(unassigned) marker + last-session top_actionable → resume nudge shows top_actionable" {
+  seed_minimal_trackers
+  # Marker has the placeholder, same session_id so we hit the resume path.
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: same-proc-sess
+started: 2026-04-12T10:00:00Z
+task: (unassigned)
+EOF
+  cat > "$PM_DIR/~rpm-last-session" <<EOF
+task: prior session task
+ended: 2026-04-11T12:00:00Z
+top_actionable: Wire up the widget
+next: something else
+EOF
+  run run_session_start clear same-proc-sess
+  [ "$status" -eq 0 ]
+  # Display substitution: resume header should show top_actionable, not (unassigned).
+  [[ "$output" == *"rpm: resuming — Wire up the widget"* ]]
+  [[ "$output" != *"rpm: resuming — (unassigned)"* ]]
+}
+
+@test "(unassigned) marker + last-session with only next: → falls back to next:" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: same-proc-sess
+started: 2026-04-12T10:00:00Z
+task: (unassigned)
+EOF
+  cat > "$PM_DIR/~rpm-last-session" <<EOF
+task: prior session task
+ended: 2026-04-11T12:00:00Z
+next: do the thing
+EOF
+  run run_session_start clear same-proc-sess
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"rpm: resuming — do the thing"* ]]
+  [[ "$output" != *"(unassigned)"* ]]
+}
+
+@test "(unassigned) marker with no last-session → displays (no task recorded)" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: same-proc-sess
+started: 2026-04-12T10:00:00Z
+task: (unassigned)
+EOF
+  # No ~rpm-last-session file
+  run run_session_start clear same-proc-sess
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"rpm: resuming — (no task recorded)"* ]]
+  [[ "$output" != *"rpm: resuming — (unassigned)"* ]]
+}
