@@ -3,6 +3,11 @@
 
 * Active
 
+** TODO Memory↔docs contradiction checks: lightweight at /next, heavyweight at /session-end [[file:2026-05-27-memory-docs-contradiction-checks.md]]
+   :PROPERTIES:
+   :ID: memory-docs-contradiction-checks
+   :END:
+
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook

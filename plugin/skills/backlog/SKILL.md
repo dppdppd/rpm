@@ -10,6 +10,15 @@ allowed-tools: Read Write Edit Glob Grep
 Manage the **rpm backlog** — persisted at `docs/rpm/future/tasks.org`.
 All operations read and write this file using org-mode format.
 
+## Project Amendments
+
+At the start of every invocation, check whether
+`docs/rpm/skills/backlog.md` exists in the consuming project. If it
+does, read it and apply its contents as additional project-specific
+instructions for this skill. Amendments may add band orderings,
+extra parent groups, or custom triage rules. They cannot remove or
+override plugin defaults — on conflict, this SKILL.md wins.
+
 The backlog is sorted in **execution order** (top-to-bottom = the
 order in which tasks need to get done). "Take from the top" is the
 expected read pattern.

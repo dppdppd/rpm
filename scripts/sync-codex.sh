@@ -39,6 +39,7 @@ CODEX_HOOK_SCRIPTS=(
 # `<plugin-agent>:<codex-skill>` pairs.
 AGENT_TO_SKILL=(
   "auditor.md:audit"
+  "guidance-aligner.md:audit"
 )
 
 mkdir -p "$DST/skills" "$DST/hooks" "$DST/.codex-plugin"

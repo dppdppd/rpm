@@ -14,6 +14,16 @@ Exhaustive multi-agent research on any topic. Invoked as a skill
 a question requiring external knowledge, pause and offer to invoke the
 `deep-research` skill before continuing.
 
+## Project Amendments
+
+At the start of every invocation, check whether
+`docs/rpm/skills/deep-research.md` exists in the consuming project.
+If it does, read it and apply its contents as additional
+project-specific instructions for this skill. Amendments may add
+research dimensions, require specific sources, or extend the output
+format. They cannot remove or override plugin defaults — on
+conflict, this SKILL.md wins.
+
 ## Offer gate (before Phase 0)
 
 If the user asked for research generally (e.g. "research X", "look into

@@ -441,6 +441,25 @@ echo "count=$MIGRATE_COUNT"
 
 # ----------------------------------------------------------------
 echo
+echo "=== overridden_skills ==="
+# Detect project-level skill overrides that shadow an rpm plugin skill.
+# Hard overrides (.claude/skills/<name>/SKILL.md) silently replace the
+# plugin default and survive plugin updates as forks. Recommend
+# migrating to additive amendments at docs/rpm/skills/<name>.md.
+OVERRIDE_COUNT=0
+RPM_SKILLS="next session-end audit backlog deep-research init-rpm version rpm"
+if [ -d ".claude/skills" ]; then
+  for skill in $RPM_SKILLS; do
+    if [ -f ".claude/skills/$skill/SKILL.md" ]; then
+      echo "override=.claude/skills/$skill/SKILL.md→docs/rpm/skills/$skill.md"
+      OVERRIDE_COUNT=$((OVERRIDE_COUNT + 1))
+    fi
+  done
+fi
+echo "count=$OVERRIDE_COUNT"
+
+# ----------------------------------------------------------------
+echo
 echo "=== learnings_capture ==="
 # Check for auto-captured learnings from the Stop hook
 LEARNINGS_FILE="docs/rpm/~rpm-learnings.jsonl"
