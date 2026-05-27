@@ -442,16 +442,27 @@ echo "count=$MIGRATE_COUNT"
 # ----------------------------------------------------------------
 echo
 echo "=== overridden_skills ==="
-# Detect project-level skill overrides that shadow an rpm plugin skill.
-# Hard overrides (.claude/skills/<name>/SKILL.md) silently replace the
-# plugin default and survive plugin updates as forks. Recommend
-# migrating to additive amendments at docs/rpm/skills/<name>.md.
+# Detect project-level overrides that shadow an rpm plugin skill via
+# either CC mechanism:
+#   - .claude/skills/<name>/SKILL.md  (dir-based project skill)
+#   - .claude/commands/<name>.md      (file-based project slash command)
+# Both bind the same /<name> invocation. Hard overrides silently
+# replace the plugin default and survive plugin updates as forks.
+# Recommend migrating to additive amendments at docs/rpm/skills/<name>.md.
 OVERRIDE_COUNT=0
 RPM_SKILLS="next session-end audit backlog deep-research init-rpm version rpm"
 if [ -d ".claude/skills" ]; then
   for skill in $RPM_SKILLS; do
     if [ -f ".claude/skills/$skill/SKILL.md" ]; then
       echo "override=.claude/skills/$skill/SKILL.md→docs/rpm/skills/$skill.md"
+      OVERRIDE_COUNT=$((OVERRIDE_COUNT + 1))
+    fi
+  done
+fi
+if [ -d ".claude/commands" ]; then
+  for skill in $RPM_SKILLS; do
+    if [ -f ".claude/commands/$skill.md" ]; then
+      echo "override=.claude/commands/$skill.md→docs/rpm/skills/$skill.md"
       OVERRIDE_COUNT=$((OVERRIDE_COUNT + 1))
     fi
   done
