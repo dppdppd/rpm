@@ -13,6 +13,15 @@ recommendation. Routine doc-drift is handled automatically by
 `/session-end` — run `/audit` only when you have a specific
 concern that warrants a deeper look.
 
+## Project Amendments
+
+At the start of every invocation, check whether
+`docs/rpm/skills/audit.md` exists in the consuming project. If it
+does, read it and apply its contents as additional project-specific
+instructions for this skill. Amendments may add audit dimensions,
+require extra scans, or extend the report format. They cannot remove
+or override plugin defaults — on conflict, this SKILL.md wins.
+
 ## Routing
 
 Parse `$ARGUMENTS`:

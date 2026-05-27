@@ -15,6 +15,16 @@ input; it dispatches only unambiguous work and otherwise idles until the
 loop-exhausted guard stops it. **Never loops internally.** Wrap with
 `/loop /next` for self-paced execution.
 
+## Project Amendments
+
+At the start of every invocation, check whether
+`docs/rpm/skills/next.md` exists in the consuming project. If it
+does, read it and apply its contents as additional project-specific
+instructions for this skill. Amendments may add preflight steps,
+narrow dispatch criteria, add output requirements, or extend the
+worker contract. They cannot remove or override plugin defaults —
+on conflict, this SKILL.md wins.
+
 ## Routing
 
 If `$ARGUMENTS` is `status`, run the status formatter and stop:
@@ -69,14 +79,39 @@ unambiguous next action.
 2. **Mechanical drift** — run the session-end scan. If
    `skills/session-end/scripts/scan.sh` reports actionable drift
    (`broken_refs.count > 0`, `claude_md.status` warn/critical,
-   stale rpm docs with any `days > 3`, or `migration.count > 0`), apply
-   every obvious mechanical fix inline and log each `drift-fix`.
-   Continue to the next preflight item. If a drift item needs a product
-   decision:
+   stale rpm docs with any `days > 3`, `migration.count > 0`, or
+   `overridden_skills.count > 0`), apply every obvious mechanical fix
+   inline and log each `drift-fix`. For overridden skills, do NOT
+   auto-migrate — the project may have intentional override content
+   that needs review. Surface each `override=<old>→<new>` line as a
+   user-decision drift item recommending migration to the
+   `docs/rpm/skills/` amendment path, log `drift-fix:
+   override-detected <name>`, and continue. Other drift items needing
+   a product decision:
    - Direct mode: ask a concise question, log `blocked-on-user`, stop.
    - Loop mode: log `idle` with the ambiguity, then stop or exhaust.
 
-3. **Worker review** — run:
+3. **Guidance contradictions** — run the cache check:
+   `bash ${CLAUDE_SKILL_DIR}/scripts/contradiction-check.sh check`.
+   - Output `skip <reason>` (no memory dir or no inputs): continue
+     silently.
+   - Output `cached <path>`: read the file's JSON body (everything
+     after the `---` separator). If `findings: []`, continue silently.
+     Otherwise surface a one-line `contradictions: <N>` in output and
+     summarize the first three memory_file / conflict_with pairs.
+   - Output `dispatch <epoch>`: dispatch the `rpm:guidance-aligner`
+     subagent (foreground) with `mode=contradictions-only`,
+     `memory_dir=$HOME/.claude/projects/$(printf '%s' "$PWD" | sed 's|/|-|g')/memory`,
+     and `instructions=` set to the active directive files
+     (`CLAUDE.md`, `AGENTS.md`, `MEMORY.md` at project root if
+     present, plus every `plugin/skills/*/SKILL.md`). Parse the JSON
+     reply, persist via
+     `bash ${CLAUDE_SKILL_DIR}/scripts/contradiction-check.sh save <epoch>`
+     piping the JSON in on stdin, then surface findings as above.
+   Never block the orchestrator on this step. Log
+   `drift-fix: contradictions <N>` if any found; do not log when none.
+
+4. **Worker review** — run:
    `bash ${CLAUDE_SKILL_DIR}/scripts/review-ready.sh`.
    If it reports any worker result with no matching `review-result`,
    review the first row before starting new work. This applies to every

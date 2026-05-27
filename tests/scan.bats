@@ -307,6 +307,33 @@ EOF
 }
 
 # ----------------------------------------------------------------
+# overridden_skills
+# ----------------------------------------------------------------
+
+@test "overridden_skills: count=0 when .claude/skills absent" {
+  run run_scan
+  section overridden_skills | grep -qE '^count=0$'
+}
+
+@test "overridden_skills: count=0 when overrides are not rpm skill names" {
+  mkdir -p "$TEST_DIR/.claude/skills/my-project-skill"
+  touch "$TEST_DIR/.claude/skills/my-project-skill/SKILL.md"
+  run run_scan
+  section overridden_skills | grep -qE '^count=0$'
+}
+
+@test "overridden_skills: detects rpm skill overrides with migration hint" {
+  mkdir -p "$TEST_DIR/.claude/skills/next"
+  mkdir -p "$TEST_DIR/.claude/skills/session-end"
+  touch "$TEST_DIR/.claude/skills/next/SKILL.md"
+  touch "$TEST_DIR/.claude/skills/session-end/SKILL.md"
+  run run_scan
+  section overridden_skills | grep -Fq 'override=.claude/skills/next/SKILL.md→docs/rpm/skills/next.md'
+  section overridden_skills | grep -Fq 'override=.claude/skills/session-end/SKILL.md→docs/rpm/skills/session-end.md'
+  section overridden_skills | grep -qE '^count=2$'
+}
+
+# ----------------------------------------------------------------
 # learnings_capture
 # ----------------------------------------------------------------
 
