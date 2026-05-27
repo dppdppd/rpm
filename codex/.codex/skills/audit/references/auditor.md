@@ -105,13 +105,14 @@ throughout the rest of the audit:
    - Hook coverage: every hard agent-instructions rule has a
      runtime hook or equivalent enforcement when the runtime supports
      hooks?
-   - **Skill overrides.** Glob `.claude/skills/*/SKILL.md`. For each
-     match whose directory name is also an rpm plugin skill (`next`,
-     `session-end`, `audit`, `backlog`, `deep-research`, `init-rpm`,
-     `version`, `rpm`), file a finding recommending migration to
-     `docs/rpm/skills/<name>.md` (additive amendment). Hard overrides
-     silently replace the plugin default and survive plugin updates
-     as forks; amendments do not.
+   - **Skill overrides.** Glob both `.claude/skills/*/SKILL.md` and
+     `.claude/commands/*.md`. For each match whose name (directory
+     name for skills, file basename for commands) is also an rpm
+     plugin skill (`next`, `session-end`, `audit`, `backlog`,
+     `deep-research`, `init-rpm`, `version`, `rpm`), file a finding
+     recommending migration to `docs/rpm/skills/<name>.md` (additive
+     amendment). Hard overrides silently replace the plugin default
+     and survive plugin updates as forks; amendments do not.
 
 5. **GUIDANCE ALIGNMENT:** Read all memory files of type `feedback`
    and any Claude-era project guidance that exists (`CLAUDE.md`,

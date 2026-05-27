@@ -333,6 +333,37 @@ EOF
   section overridden_skills | grep -qE '^count=2$'
 }
 
+@test "overridden_skills: detects .claude/commands/<name>.md overrides" {
+  # CC project slash commands at .claude/commands/<name>.md also
+  # shadow plugin skills. Example: volta's .claude/commands/next.md
+  # is a 278-line full replacement of rpm's /next. Caught after
+  # session-end in volta missed the override because we only
+  # checked .claude/skills/.
+  mkdir -p "$TEST_DIR/.claude/commands"
+  printf '# /next — Volta orchestrator\n' > "$TEST_DIR/.claude/commands/next.md"
+  run run_scan
+  section overridden_skills | grep -Fq 'override=.claude/commands/next.md→docs/rpm/skills/next.md'
+  section overridden_skills | grep -qE '^count=1$'
+}
+
+@test "overridden_skills: ignores commands that are not rpm skill names" {
+  mkdir -p "$TEST_DIR/.claude/commands"
+  touch "$TEST_DIR/.claude/commands/my-project-cmd.md"
+  run run_scan
+  section overridden_skills | grep -qE '^count=0$'
+}
+
+@test "overridden_skills: counts skill + command overrides together" {
+  mkdir -p "$TEST_DIR/.claude/skills/audit"
+  mkdir -p "$TEST_DIR/.claude/commands"
+  touch "$TEST_DIR/.claude/skills/audit/SKILL.md"
+  touch "$TEST_DIR/.claude/commands/next.md"
+  run run_scan
+  section overridden_skills | grep -Fq 'override=.claude/skills/audit/SKILL.md→docs/rpm/skills/audit.md'
+  section overridden_skills | grep -Fq 'override=.claude/commands/next.md→docs/rpm/skills/next.md'
+  section overridden_skills | grep -qE '^count=2$'
+}
+
 # ----------------------------------------------------------------
 # learnings_capture
 # ----------------------------------------------------------------
