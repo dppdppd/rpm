@@ -14,16 +14,25 @@
 # drift and verifying that orphaned entities surface as doc-orphan.
 
 REPO_ROOT="$BATS_TEST_DIRNAME/../.."
-CLAUDE_AGENT="$REPO_ROOT/plugin/agents/auditor.md"
+CLAUDE_AGENT="$BATS_TEST_DIRNAME/../agents/auditor.md"
 CODEX_AGENT="$REPO_ROOT/codex/.codex/skills/audit/references/auditor.md"
 
-auditor_files() {
-  printf '%s\n' "$CLAUDE_AGENT" "$CODEX_AGENT"
+# Codex mirror only exists in the monorepo layout. Subtree-split CI
+# (plugin/ only) skips codex-side assertions.
+have_codex_mirror() {
+  [ -f "$CODEX_AGENT" ]
 }
 
-@test "auditor agent files exist (Claude + Codex mirror)" {
+auditor_files() {
+  printf '%s\n' "$CLAUDE_AGENT"
+  have_codex_mirror && printf '%s\n' "$CODEX_AGENT"
+}
+
+@test "auditor agent exists (Claude side always; Codex mirror in monorepo)" {
   [ -f "$CLAUDE_AGENT" ]
-  [ -f "$CODEX_AGENT" ]
+  if have_codex_mirror; then
+    [ -f "$CODEX_AGENT" ]
+  fi
 }
 
 @test "auditor agent contains a Phase 0 section" {
@@ -55,6 +64,7 @@ auditor_files() {
 }
 
 @test "auditor agent Claude + Codex mirrors are byte-identical" {
+  have_codex_mirror || skip "codex mirror not present (subtree-split layout)"
   run diff "$CLAUDE_AGENT" "$CODEX_AGENT"
   [ "$status" -eq 0 ]
   [ -z "$output" ]
