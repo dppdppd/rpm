@@ -8,13 +8,16 @@
 PLUGIN_DIR="$BATS_TEST_DIRNAME/.."
 REPO_ROOT="$PLUGIN_DIR/.."
 
+# Codex mirror only exists in the monorepo layout. Subtree-split CI
+# (plugin/ only) checks the plugin tree alone — that's the surface that
+# actually ships to the GitHub plugin remote.
 shipped_dirs() {
   printf '%s\n' \
     "$PLUGIN_DIR/skills" \
     "$PLUGIN_DIR/agents" \
-    "$PLUGIN_DIR/hooks" \
-    "$REPO_ROOT/codex/.codex/skills" \
-    "$REPO_ROOT/codex/.codex/hooks"
+    "$PLUGIN_DIR/hooks"
+  [ -d "$REPO_ROOT/codex/.codex/skills" ] && printf '%s\n' "$REPO_ROOT/codex/.codex/skills"
+  [ -d "$REPO_ROOT/codex/.codex/hooks" ]  && printf '%s\n' "$REPO_ROOT/codex/.codex/hooks"
 }
 
 @test "no shipped skill/agent/hook body contains 'claude-plugins-official' placeholder" {
