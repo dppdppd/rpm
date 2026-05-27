@@ -9,6 +9,15 @@ End the current work session. Default to the leanest mode that fits:
 small sessions should be cheap to close, while complicated sessions can
 still use the full ceremony.
 
+## Project Amendments
+
+At the start of every invocation, check whether
+`docs/rpm/skills/session-end.md` exists in the consuming project. If
+it does, read it and apply its contents as additional project-specific
+instructions for this skill. Amendments may add Prep steps, extra
+decision surfaces, or extend the handoff cleanup. They cannot remove
+or override plugin defaults — on conflict, this SKILL.md wins.
+
 - **Express** — clean wrap-up. One message, no questions.
 - **Inline** — one or two small decision surfaces. One message with
   inline asks, then one follow-up that applies decisions and hands off.
@@ -40,9 +49,29 @@ Interpret scan sections compactly: `plugin.version` supplies the
 heading suffix; `git` drives commit and mode selection; instruction
 files warn only on `warn`/`critical`; suppress rpm meta
 `NOT_IMPLEMENTED` hits; `broken_refs.count > 0`, unlisted specs,
-dangling task deps, and migrations are actionable; stale pm docs matter
-only when this session touched related work; create today's log when
-missing and commits exist; use captured learnings as inputs.
+dangling task deps, migrations, and `overridden_skills.count > 0` are
+actionable; stale pm docs matter only when this session touched
+related work; create today's log when missing and commits exist; use
+captured learnings as inputs.
+
+### 1b. Guidance Alignment
+
+Dispatch the `rpm:guidance-aligner` subagent in `full` mode (foreground).
+Inputs:
+
+- `mode=full`
+- `memory_dir=$HOME/.claude/projects/$(printf '%s' "$PWD" | sed 's|/|-|g')/memory`
+- `instructions`: existing combination of `CLAUDE.md`, `AGENTS.md`,
+  `MEMORY.md` at project root, plus every `plugin/skills/*/SKILL.md`.
+
+Persist the JSON reply to `docs/rpm/~rpm-guidance-report.json` and
+also pipe it through
+`bash "${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/contradiction-check.sh" save $(date +%s)`
+so /next reuses the fresh result instead of re-dispatching.
+
+Counts feed the Guidance Surface (see Shared Mechanics). Any
+`CONTRADICTED > 0` or `STALE > 0` forces at least Inline mode in
+Mode Selection.
 
 ### 2. Read And Synthesize
 
@@ -93,18 +122,20 @@ the visible output and continue.
 
 ## Mode Selection
 
-After Prep, count decision surfaces: commit, learning, drift, native
-cleanup, and backlog ordering.
+After Prep, count decision surfaces: commit, learning, drift,
+guidance, native cleanup, and backlog ordering.
 
 Use **Express** only when the post-tracker git tree is clean and every
 surface is empty.
 
 Use **Phased** when any complex trigger exists: 3+ untracked files,
 multiple unrelated commit groups, 5+ learnings, backlog mismatch
-requiring discussion, or 3+ decision surfaces.
+requiring discussion, 2+ CONTRADICTED guidance items, or 3+ decision
+surfaces.
 
 Use **Inline** otherwise. Inline is the default for normal non-clean
-sessions.
+sessions, and forced whenever the guidance report shows any
+`CONTRADICTED > 0` or `STALE > 0`.
 
 ## Shared Mechanics
 
@@ -125,6 +156,40 @@ learnings as a numbered menu with destinations. Ask once:
 Apply obvious fixes silently and list them. Ask only for ambiguous drift.
 If fixes land after the tracker commit, add a "Doc-drift fixes" note to
 today's past log and commit the changed docs.
+
+**Overridden skills.** Treat every `override=<old>→<new>` line from
+scan.sh's `overridden_skills` section as ambiguous drift — never
+auto-migrate. For each, surface a one-line recommendation:
+
+```
+Overridden plugin skill: .claude/skills/<name>/SKILL.md
+  → migrate to docs/rpm/skills/<name>.md (additive amendment)
+```
+
+Ask once whether to migrate (move the project-specific delta into
+the amendment file and delete the override), keep the override
+(note rationale in the amendment file's body), or defer. Hard
+overrides silently replace the plugin default and survive plugin
+updates as forks — flag them every session until resolved.
+
+### Guidance Surface
+
+Read `docs/rpm/~rpm-guidance-report.json` (written in Prep step 1b).
+Surface only when `CONTRADICTED + STALE > 0`. Format:
+
+```
+Memory drift: <C> contradicted, <S> stale, <G> gap, <P> partial
+  - feedback_xxx.md — CONTRADICTED by CLAUDE.md:42 ("...")
+  - feedback_yyy.md — STALE: references removed command /old-name
+```
+
+For each CONTRADICTED entry, ask which side wins: edit the memory
+rule, edit the conflicting directive, or accept the contradiction
+(note in the memory body). For STALE entries, ask whether to delete
+or update the memory rule. GAP and PARTIAL are informational — do
+not ask unless the user wants to address them.
+
+Cap shown entries at 5; reference the report file for the rest.
 
 ### Native Cleanup
 
@@ -176,8 +241,8 @@ questions total; otherwise switch to Phased.
 
 Message 1 output: `## Session end (rpm <version>)`, Accomplished,
 Tracker updates, then only active sections: Commit, Worth keeping,
-Drift, Native cleanup, or Backlog. End each active section with one
-`QUESTION:` line.
+Drift, Memory drift, Native cleanup, or Backlog. End each active
+section with one `QUESTION:` line.
 
 After the user replies, apply decisions, run native cleanup, sweep the
 backlog, run handoff cleanup, and end with:
