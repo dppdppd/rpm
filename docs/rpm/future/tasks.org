@@ -3,6 +3,11 @@
 
 * Active
 
+** DONE /next preflight delegation: run token-heavy phases via background agents, keep orchestrator context lean [[file:2026-05-28-next-preflight-delegation.md]]
+   :PROPERTIES:
+   :ID: next-preflight-delegation
+   :END:
+
 ** TODO Memory↔docs contradiction checks: lightweight at /next, heavyweight at /session-end [[file:2026-05-27-memory-docs-contradiction-checks.md]]
    :PROPERTIES:
    :ID: memory-docs-contradiction-checks

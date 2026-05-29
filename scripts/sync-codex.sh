@@ -40,6 +40,7 @@ CODEX_HOOK_SCRIPTS=(
 AGENT_TO_SKILL=(
   "auditor.md:audit"
   "guidance-aligner.md:audit"
+  "preflight.md:next"
 )
 
 mkdir -p "$DST/skills" "$DST/hooks" "$DST/.codex-plugin"
