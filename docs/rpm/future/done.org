@@ -6,6 +6,18 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE /next preflight delegation: run token-heavy phases via background agents, keep orchestrator context lean [[file:2026-05-28-next-preflight-delegation.md]]
+   CLOSED: [2026-05-28]
+   :PROPERTIES:
+   :ID: next-preflight-delegation
+   :END:
+
+** DONE Memory↔docs contradiction checks: lightweight at /next, heavyweight at /session-end [[file:2026-05-27-memory-docs-contradiction-checks.md]]
+   CLOSED: [2026-05-28]
+   :PROPERTIES:
+   :ID: memory-docs-contradiction-checks
+   :END:
+
 ** DONE /init-rpm: write `docs/rpm/~rpm-*` wildcard to .gitignore [[file:2026-05-26-init-rpm-gitignore-wildcard.md]]
    CLOSED: [2026-05-26]
    :PROPERTIES:
