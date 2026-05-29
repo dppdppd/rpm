@@ -77,68 +77,41 @@ unambiguous next action.
      `blocked-on-user unresolved`, then stop or `loop-exhausted` if the
      idle streak reached 3.
 
-2. **Mechanical drift** — run the session-end scan. If
-   `skills/session-end/scripts/scan.sh` reports actionable drift
-   (`broken_refs.count > 0`, `claude_md.status` warn/critical,
-   stale rpm docs with any `days > 3`, `migration.count > 0`, or
-   `overridden_skills.count > 0`), apply every obvious mechanical fix
-   inline and log each `drift-fix`. For overridden skills, do NOT
-   auto-migrate — the project may have intentional override content
-   that needs review. Surface each `override=<old>→<new>` line as a
-   user-decision drift item recommending migration to the
-   `docs/rpm/skills/` amendment path, log `drift-fix:
-   override-detected <name>`, and continue. Other drift items needing
-   a product decision:
+2. **Delegated preflight** — dispatch the `rpm:preflight` subagent
+   (foreground) so the token-heavy work (raw `scan.sh` output,
+   contradiction classification, worker diffs) stays in the agent's
+   context, not this one. Resolve each value before sending — pass real
+   paths, not literals:
+   - `mode=` `direct` or `loop` (this turn's mode)
+   - `scan_script=${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/session-end/scripts/scan.sh`
+   - `contradiction_script=${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/contradiction-check.sh`
+   - `review_ready_script=${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/review-ready.sh`
+   - `log_script=${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/log-decision.sh`
+   - `memory_dir=$HOME/.claude/projects/$(printf '%s' "$PWD" | sed 's|/|-|g')/memory`
+   - `instructions=` the active directive files (`CLAUDE.md`,
+     `AGENTS.md`, `MEMORY.md` at project root if present, plus every
+     `plugin/skills/*/SKILL.md`)
+   - `today=$(date +%Y-%m-%d)`
+
+   The agent applies obvious mechanical drift fixes, runs the
+   contradiction check, reviews the first ready worker result, and logs
+   each `drift-fix`, contradiction count, and `review-result` itself. It
+   returns ONLY a compact report (`drift-fixes`, `drift-decisions`,
+   `contradictions`, `review`, `repo-safe`, `notes`). Read that report;
+   do NOT re-run the scans, re-review the diff, or re-log what the agent
+   already logged.
+
+   Act on the report. If it reports `repo-safe: no`, an open question
+   the user must answer, or a `drift-decisions` item (e.g. an overridden
+   skill recommended for migration to the `docs/rpm/skills/` amendment
+   path) needing a product decision:
    - Direct mode: ask a concise question, log `blocked-on-user`, stop.
    - Autonomous directive mode: log `idle` with the ambiguity, then
      stop or exhaust.
 
-3. **Guidance contradictions** — run the cache check:
-   `bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/contradiction-check.sh check`.
-   - Output `skip <reason>` (no memory dir or no inputs): continue
-     silently.
-   - Output `cached <path>`: read the file's JSON body (everything
-     after the `---` separator). If `findings: []`, continue silently.
-     Otherwise surface a one-line `contradictions: <N>` in output and
-     summarize the first three memory_file / conflict_with pairs.
-   - Output `dispatch <epoch>`: dispatch the `rpm:guidance-aligner`
-     subagent (foreground) with `mode=contradictions-only`,
-     `memory_dir=$HOME/.claude/projects/$(printf '%s' "$PWD" | sed 's|/|-|g')/memory`,
-     and `instructions=` set to the active directive files
-     (`CLAUDE.md`, `AGENTS.md`, `MEMORY.md` at project root if
-     present, plus every `plugin/skills/*/SKILL.md`). Parse the JSON
-     reply, persist via
-     `bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/contradiction-check.sh save <epoch>`
-     piping the JSON in on stdin, then surface findings as above.
-   Never block the orchestrator on this step. Log
-   `drift-fix: contradictions <N>` if any found; do not log when none.
-
-4. **Worker review** — run:
-   `bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/review-ready.sh`.
-   If it reports any worker result with no matching `review-result`,
-   review the first row before starting new work. This applies to every
-   durable worker output status: `needs-review`, `plan-written`,
-   `blocked`, and `no-op`. Surface the worker result before reviewing
-   even when no user-visible chat notification exists: worker ID,
-   target, status, result rationale from `review-ready.sh` or the
-   orchestrator log, claimed changes and verification from the detail
-   file, and any matching `<subagent_notification>` or task notification
-   if available in model context. Then review the detail file, git diff,
-   and any verification noted by the worker. Do not approve based on the
-   notification alone.
-
-   For `needs-review`, evaluate the changed files and verification.
-   For `plan-written`, evaluate whether the plan is clear and actionable.
-   For `blocked`, evaluate whether the blocker is real and whether it
-   requires user input. For `no-op`, verify the claimed no-op is valid.
-   If acceptable, mark the backlog entry DONE or leave a clear
-   session-end reconciliation note, then log `review-result` with
-   status `approved`. If more work is needed, append reviewer notes to
-   the detail file and log `review-result` with status
-   `changes-requested`. If an approved blocker still needs user input,
-   surface it and log the terminal outcome as `blocked-on-user`.
-   Continue to task selection unless the review exposed unsafe repo
-   state or a question the user must answer.
+   Otherwise carry the report's `drift-fixes`, `contradictions` (count +
+   top pairs), and `review` summary into your `preflight:` output line
+   and continue to task selection.
 
 ### Task Selection
 
@@ -229,13 +202,12 @@ gaps: <none or comma-separated parent:metric pairs with no actionable task>
   `USER ATTENTION needed for: <reason>` only in direct mode or when
   reporting a loop-exhausted terminal state.
 
-After the four-line block, include follow-on output for preflight work
-and for the terminal outcome: drift-fix details, review summary,
-dispatch confirmation, clarification question, or loop idle reason. For
-every worker-review preflight, include the surfaced worker-result
-summary before the review result. Use the matching notification when it
-is available; otherwise reconstruct the summary from `review-ready.sh`,
-the orchestrator log, and the detail file.
+After the four-line block, include follow-on output for the terminal
+outcome: dispatch confirmation, clarification question, or loop idle
+reason. For the delegated preflight, relay the agent's compact report
+verbatim-ish (its `drift-fixes`, `contradictions`, and `review` lines) —
+that summary IS the preflight view; do not re-derive it by re-running
+the scans or re-reading the diff.
 
 ## Logging
 
@@ -245,16 +217,21 @@ Use the helper script — never hand-format JSONL:
 bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/log-decision.sh <kind> [target] [rationale] [agent-id] [status]
 ```
 
-Log every preflight action and the terminal outcome with the
-appropriate kind:
+The `rpm:preflight` agent writes the delegated-preflight entries
+(`drift-fix`, contradiction counts as `drift-fix`, and `review-result`)
+itself — do not duplicate them. The orchestrator logs the step-1
+blocker outcome, the terminal outcome, and `actionable-backlog`.
+
+Log with the appropriate kind:
 
 - `drift-fix` — pass the drift category as `<target>` (e.g.
   `context.md broken-ref`) and the fix summary as `<rationale>`.
+  Emitted by the preflight agent.
 - `review-result` — after reviewing a pending worker result, pass the
   same task ID as `<target>`, the reviewer action as `<rationale>`,
   the worker ID as `<agent-id>`, and a status of
   `approved | changes-requested`. This clears the review queue for
-  that worker result.
+  that worker result. Emitted by the preflight agent.
 - `actionable-backlog` — pass the task ID as `<target>`, the one-line
   rationale, and the dispatched subagent's ID as `<agent-id>`. Match
   volta's idiom: the agent ID is what the Agent tool returned (look
