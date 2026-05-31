@@ -24,6 +24,21 @@ research dimensions, require specific sources, or extend the output
 format. They cannot remove or override plugin defaults — on
 conflict, this SKILL.md wins.
 
+## rpm vs native /deep-research
+
+Claude Code now ships a native bundled `/deep-research` Workflow. On CC you may
+hand off to native when MAXIMUM verification depth matters and cost plus
+CC-lock-in are acceptable (a future Tier-4 fast-path may wire this handoff
+directly). Otherwise use rpm.
+
+rpm's edge is **portability** (opencode and codex have no Workflow — this skill
+runs on all three runtimes), **durable artifacts** (a navigable
+`docs/rpm/research/` tree vs in-conversation-only output), **inline in-session
+delivery**, and **cost governance** (capped fan-out vs a deeper, far costlier
+multi-step Workflow). rpm is explicitly **not** "more rigorous" than native — a
+2026-05-30 bake-off found native matched/edged rpm on citation rigor. Keep the
+fan-out protocol below stable; do not grow it to chase depth.
+
 ## Offer gate (before Phase 0)
 
 If the user asked for research generally (e.g. "research X", "look into
