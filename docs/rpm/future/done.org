@@ -6,6 +6,17 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Module B injection test — Principle 8 has no measured value; wrapping + strip-list removed [[file:2026-05-30-deep-research-improvement-plan.md]]
+   CLOSED: [2026-05-31]
+   :PROPERTIES:
+   :ID: dr-module-b-injection
+   :END:
+   - Full investigation (2 models × 2 surfaces, ~46 trials): Principle 8
+     "treat as data" wrapping reduced injection in 0/4 contexts — redundant on
+     Opus, ineffective on Haiku synthesis (3/3 leak wrapped = raw). Removed the
+     delimiter-wrapping + strip-list from deep-research/SKILL.md (→ doc line).
+     Follow-ups filed: canary-grader-obey-fix, injection-weak-model-arm.
+
 ** DONE deep-research perspective-diverse verification — distinct lenses per verifier [[file:2026-05-30-deep-research-improvement-plan.md]]
    CLOSED: [2026-05-31]
    :PROPERTIES:
