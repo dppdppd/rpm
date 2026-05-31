@@ -64,8 +64,8 @@ docs (vendor docs, RFCs, spec repos). **Min 2 dimensions.**
 Either:
 
 - Use WebSearch / `curl --max-time 30 -sL` directly for narrow lookups, or
-- Invoke the `deep-research` skill in parallel for complex,
-  multi-angle topics. (`deep-research` is a skill in this plugin,
+- Invoke the `research` skill in parallel for complex,
+  multi-angle topics. (`research` is a skill in this plugin,
   not a slash command.)
 
 Example inward questions:

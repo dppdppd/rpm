@@ -109,7 +109,7 @@ throughout the rest of the audit:
      `.claude/commands/*.md`. For each match whose name (directory
      name for skills, file basename for commands) is also an rpm
      plugin skill (`next`, `session-end`, `audit`, `backlog`,
-     `deep-research`, `init-rpm`, `version`, `rpm`), file a finding
+     `research`, `init-rpm`, `version`, `rpm`), file a finding
      recommending migration to `docs/rpm/skills/<name>.md` (additive
      amendment). Hard overrides silently replace the plugin default
      and survive plugin updates as forks; amendments do not.

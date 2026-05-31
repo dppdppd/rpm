@@ -4,4 +4,4 @@
 /backlog to add, list, review, or complete entries in your rpm backlog — anytime, mid-session.
 /compact when you need — we'll pick up where we left off right after.
 Context getting long? /clear and we'll pick up where we left off.
-Need to research something? Ask me — deep research runs parallel search agents and validates findings.
+Need to research something? Ask me — the research skill runs parallel search agents and validates findings.

@@ -64,11 +64,10 @@ manual-sync sentinel near the top:
 ```
 
 Files with that marker are preserved on the next `sync-codex.sh` run;
-everything else is regenerated. Currently marked manual:
-
-- `skills/deep-research/SKILL.md` — Codex-specific tool-name swaps
-  (`web_search`, `shell`, sub-agent reframing) that don't pass cleanly
-  through automated translation.
+everything else is regenerated. Currently marked manual: none — every
+skill auto-translates from `plugin/` (tool-name references like
+`WebSearch` are left for the model to map to the active Codex tool
+surface, per `scripts/translate-skill-codex.py`).
 
 Codex-specific generated additions live under `codex/overlays/` so
 experimental Codex behavior does not alter the shared Claude Code

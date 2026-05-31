@@ -1,8 +1,6 @@
 ---
 name: research
 description: "Exhaustive multi-agent research on any topic. Parallel search, URL fetching, gap analysis, adversarial validation, citation check. TRIGGER whenever the user asks for research, investigation, or an external look-up — phrasings like 'research X', 'look into X', 'investigate X', 'find out about X', 'what's the latest on X', 'compare X vs Y' all qualify. Offer the skill first (see Offer gate in the body); only run the full protocol after the user confirms."
-argument-hint: "<research question or topic>"
-allowed-tools: ["Read", "Write", "Bash(curl:*)", "Bash(mkdir:*)", "Agent", "WebSearch", "Glob", "Grep"]
 ---
 
 # research — Multi-Agent Research Protocol

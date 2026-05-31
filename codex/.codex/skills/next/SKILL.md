@@ -362,6 +362,11 @@ created non-FF push conflicts, (c) each fix verified against one game
 shipped before contradictions in other games surfaced. Single-threaded
 with corpus-wide verification trades throughput for hit rate.
 
+This ceiling is deliberate and overrides any default to fan out —
+including ultracode / automatic Workflow orchestration. Do not raise
+`/next` concurrency to chase throughput; the hit-rate math above is the
+reason.
+
 ## What this skill does NOT do
 
 - Does not pick up tactical user requests — `rpm:next` is for unattended
