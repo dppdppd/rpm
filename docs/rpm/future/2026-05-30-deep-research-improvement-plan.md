@@ -122,3 +122,96 @@ pre-fix baseline unsupported-figure rate. Everything else sequences off that num
   (confirm true-unsupported + in-context support), cached-source-only.
 - **Implication:** the citation-discipline failure is **pervasive (≥56% on figure-dense
   reports), not n=1** — this is the number the hardened skill must beat, measured via Tier-2 replay.
+
+## Worker Result (2026-05-30, dr-verification-hardening)
+
+**Summary.** Landed the verification-chain hardening bundle (backlog items #2, #3, #5)
+as three concrete, observable gates in `plugin/skills/deep-research/SKILL.md`, converting
+prose discipline into surfaced behavior (a logged count, a kill action keyed to the
+offline orphan definition, and a hard post-synthesis assertion):
+
+- **#2 Instrument silent drops (Phase 4).** New "Instrument every drop — no silent
+  truncation" block: every dropped/unverified claim is appended to `refuted.md` with a
+  reason code, a one-line **drop tally** (`DROPPED N/M …`) is written at the top of
+  `refuted.md`, and that tally is carried into the Phase-5 final summary. Explicitly
+  cites the native 47/72-silent-drop failure as the thing the gate prevents. A run that
+  drops claims but reports a zero/absent count fails the gate.
+- **#3 Number-provenance gate (Phase 4).** New "Number-provenance gate →
+  `validation/figure-ledger.md`" block promotes the Tier-1 offline-audit check into a
+  skill phase: a ledger of every distinctive figure (decimal or ≥3-sig-digit integer;
+  2-digit cores must be confirmed by reading the source window, matching the audit's own
+  coincidence caveat) with `figure | cited artifact | literal-presence Y/N | verdict`.
+  Orphans (literal-presence N) and tertiary/amateur/model-memory-only figures are KILLED;
+  a figure ships only as a Y-row with a primary source. The block names
+  `dr-bakeoff/checks/offline_audit.py` as the suite running the identical check, so the
+  gate is defined in the exact terms the regression metric measures.
+- **#5 Post-synthesis citation audit (Phase 5).** New defense step 4: re-extract figures
+  from the *written* report, diff against surviving ledger rows, and **assert
+  `synth-introduced figures = 0`**. Any report figure absent from the surviving ledger is
+  a hard FAILURE — trace-and-add or strike-to-refuted; result recorded in
+  `figure-ledger.md` and carried into the final summary. "The run is not done until this
+  count is zero." Also added a mandatory **Verification ledger line** (drop tally + orphan
+  count + `synth-introduced figures: 0`) to the chat final summary so a silent truncation
+  cannot hide.
+- Directory Structure updated to list `figure-ledger.md` under `validation/`.
+
+**Files changed.**
+- `plugin/skills/deep-research/SKILL.md` (+49/−1): Directory Structure + Phase 4 (two new
+  mandatory blocks) + Phase 5 (new post-hoc defense #4 + final-summary ledger line).
+- `docs/rpm/future/2026-05-30-deep-research-improvement-plan.md` (this section).
+
+**Verification run.**
+- Reproduced baseline: `python3 docs/rpm/research/dr-bakeoff/checks/offline_audit.py` →
+  `AGGREGATE (searchable): 9/16 distinctive figures ORPHAN = 56%` (matches
+  `baseline-2026-05-30.txt` exactly).
+- Structural gate validation (zero research tokens): a Python harness that imports
+  `offline_audit.py`'s own `load_corpus`/`extract_figures`/`distinctive`/`in_corpus` and
+  simulates the new gate's kill action over the same searchable subset. Observed:
+  PRE 9/16 orphan (56%) → gate KILLS exactly the 9 orphans, SPARES all 7
+  literal-presence-Y figures → POST 0/7 shipped figures orphan (0%); **over-kill = 0**
+  (figures killed that the audit calls supported = 0, because the gate's kill predicate
+  *is* the audit's orphan predicate). This satisfies the validation gate (lowers the
+  offline unsupported-figure rate without raising over-kill / true-claim survival holds).
+- Confirmed only SKILL.md changed (`git diff --stat`) and no bats test references the
+  `validation/` artifacts, so the suite is unaffected.
+
+**Remaining risks / follow-ups.**
+- The verification above is **structural/offline**: it proves the gate's *definition*
+  matches the regression metric and would zero the orphan rate **if the pipeline obeys the
+  instructions**. It is **not** a full **Tier-2 live replay** (re-running the hardened
+  verify+synthesis over a tree's frozen `fetched/`), which is token-heavier and was **not
+  run** here per the cached-only / zero-new-token budget. Tier-2 replay over ≥1 VOC tree
+  (e.g. `voc-decline-era`) remains the promotion-grade confirmation that an LLM following
+  these gates actually drops ƒ134M/ƒ120M and keeps ƒ219M — recommend it as the next step.
+- The deterministic screen (and thus the gate's string-presence shortcut) is reliable only
+  for ≥3-digit/decimal figures; 2-digit cores still need the source-window read the gate
+  prose now mandates — correctness there depends on the model honoring that instruction,
+  not on a deterministic check.
+- Items #4 (perspective-diverse verification), #6 (CC-workflow handoff), #7 (Module B
+  injection) are out of this task's scope and remain TODO in the backlog table.
+
+## Tier-2 Replay Result (2026-05-30) — promotion gate PASSED
+
+The structural check above proved the gate's *definition* matches the regression
+metric; this replay proves an LLM *executes* it. Blind replay of the hardened
+Phase-4/5 gates over the frozen `voc-decline-era` corpus — the subagent built the
+figure-ledger from its own read of `fetched/` source windows, forbidden from opening
+`offline_audit.py` until its ledger was finalized. Evidence:
+`docs/rpm/research/dr-bakeoff/replay-2026-05-30/{voc-decline-era-ledger,voc-decline-era-replay}.md`.
+
+- **Recall 21/21** on unsupported figures the original shipped — including the **ƒ134M**
+  crux the original elevated to "most defensible debt at takeover", and **ƒ120M**.
+- **Over-kill 0/4** — every genuinely-sourced figure was SHIPPED (**ƒ219M** Gutenberg-
+  verbatim, ƒ15M, the 200/300 ship sentence, 10,000 toll). The **ƒ20M** Frankenstein
+  trap (digits present in `finance.md` but referent = Dutch foreign lending, not VOC
+  capital) was correctly KILLED by reading the window — discrimination, not over-kill.
+- **3/3 agreement** with the deterministic `offline_audit.py` on the figures it scores
+  (ƒ219M SHIP, ƒ134M/ƒ120M KILL); the replay additionally resolved the 22 figures the
+  grader defers to the LLM pass.
+- Orchestrator independently cross-checked: "debt of 219 million Dutch guilders" is
+  verbatim in `14-gutenberg-voc.html.md:120`; "134 million"/"120 million" absent as
+  figures (only coincidental bare-"134" digit-runs). Confirms the subagent, not just
+  trusts it.
+
+Validation gate (lower the unsupported-figure rate without raising over-kill) met
+**behaviorally**, not just structurally. Items #2/#3/#5 promotion-grade — committed.

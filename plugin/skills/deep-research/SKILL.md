@@ -62,7 +62,7 @@ docs/rpm/research/<topic-slug>/
 ├── websearch/          # One file per dimension
 ├── fetched/            # URL artifacts; PDFs saved as .pdf binaries
 ├── gaps/               # Follow-up results
-├── validation/         # adversarial.md + refuted.md (killed claims) + citation audit
+├── validation/         # adversarial.md + refuted.md (killed claims) + figure-ledger.md + citation audit
 └── findings/report.md
 ```
 
@@ -195,12 +195,44 @@ numbers live in `refuted.md` with the reason and may NOT appear as findings or f
 adjudications in the report (a killed-but-maybe-true number still surfaces in the
 report's *Could not verify* section, so the kill bias loses nothing).
 
+**Instrument every drop — no silent truncation (mandatory).** A claim dropped from
+verification must be *recorded*, never silently discarded. The native baseline shipped
+a report having dropped 47 of 72 candidate claims with no surfaced count — the failure
+this gate exists to prevent. As you run the kill-list, append every dropped/unverified
+claim to `validation/refuted.md`, one line each: the claim, its (attempted) citation,
+and the reason for the drop (`no-citation` / `frankenstein` / `tertiary-only` /
+`amateur-source` / `model-memory` / `contradicted` / `inconclusive`). At the end of
+Phase 4 write a one-line **drop tally** at the top of `refuted.md`, e.g.
+`DROPPED 9/16 quantitative claims (frankenstein 5, no-citation 2, contradicted 1, inconclusive 1)`,
+and carry that same tally into the Phase-5 final summary. A run that drops claims but
+reports a zero or absent drop count has failed this gate — surface what was discarded
+and why, every time.
+
 **Refuted is a deliverable, not a failure.** Surfacing what you could NOT verify is
 a rigor signal. When a demanded figure (e.g. an end-state debt total) has no source
 that survives verification, the correct answer is "no verified figure exists — here
 are the unverifiable candidates and their weak provenance", NOT picking a "most
 defensible" number. Declining to assert beats laundering a guess behind a confidence
 tag.
+
+**Number-provenance gate (mandatory) → `validation/figure-ledger.md`.** This is the
+kill-list rendered as an auditable artifact — the same orphan check the offline
+regression suite (`docs/rpm/research/dr-bakeoff/checks/offline_audit.py`) runs against
+shipped reports, performed *before* the report ships instead of after. Build a ledger
+table of **every distinctive quantitative figure** the report would assert — treat as
+distinctive any decimal or any integer of 3+ significant digits (2-digit cores like
+`43`/`62` match a large corpus by coincidence and must be confirmed by reading the
+source window, not by string presence alone). For each figure record four columns:
+`figure | cited artifact (fetched/NN-slug) | literal-presence: Y/N | verdict`. Set
+literal-presence Y only when the figure's digit-core actually appears in that fetched
+artifact's text (separator-insensitive: `1,234`≡`1234`; accept faithful unit/format
+variants such as `5.5`≡`5½`). **Verdict rule — kill the orphans:** any figure with
+literal-presence N (cited source does not contain the number → an "orphan" / Frankenstein
+citation) is KILLED to `refuted.md`; any figure resting solely on a tertiary,
+amateur/self-published, or model-memory source is KILLED. A figure ships **only** as a
+ledger row with literal-presence Y and a primary/specialist source. Record the ledger's
+orphan tally (`N/M figures orphaned`) — this is exactly the metric the offline audit
+reports, and the gate's job is to drive it to 0 in the shipped report.
 
 ## Phase 5: Synthesis & Report
 
@@ -223,6 +255,18 @@ clean, confident number for every ask is a red flag, not a strength.
 1. Deterministic URL liveness check (Phase 3 above) — drops fabricated URLs.
 2. Citation-audit sub-agent (foreground sonnet) — checks semantic claim-vs-source match (CiteAudit pattern, arXiv:2602.23452).
 3. Fix MISMATCHED claims; for UNSOURCED *qualitative* claims add a citation from artifacts or label "model knowledge — not verified" — UNSOURCED *quantitative* claims are killed to the refuted list, not labeled (Principle 9). Never fabricate URLs.
+4. **Post-synthesis figure-provenance assertion (hard gate).** Synthesis must not
+   introduce a figure that was not already a literal-presence-Y row in the Phase-4
+   `figure-ledger.md`. Re-extract every distinctive quantitative figure from the
+   *written* `report.md` (same distinctiveness rule as the ledger) and diff that set
+   against the ledger's surviving (Y-verdict) figures. **Assert `synth-introduced
+   figures = 0`:** any figure in the report that is absent from the surviving ledger —
+   a number synthesis conjured, rounded into existence, or pulled from memory while
+   writing — is a gate FAILURE. Do not ship it: either trace it to a fetched artifact
+   and add it as a new ledger row (literal-presence Y), or strike it from the report and
+   move it to `## Could not verify / refuted`. Record the assertion result
+   (`synth-introduced figures: 0/K` or the list of offenders) in `figure-ledger.md` and
+   carry the `0` into the final summary. The run is not done until this count is zero.
 
 **Final summary (mandatory).** End the run with a Key Findings
 summary in the chat — the user should not have to open the report
@@ -232,6 +276,10 @@ file to know what came back. Include:
   verified") and the source URL
 - Any contradictions or unresolved gaps surfaced by Phase 4
 - Citation-audit score from Phase 5's post-hoc defenses
+- **Verification ledger line (mandatory):** the Phase-4 drop tally (e.g.
+  `dropped 9/16 quantitative claims`), the figure-ledger orphan count, and the
+  post-synthesis assertion `synth-introduced figures: 0` — surfaced in chat so a
+  silent truncation is impossible to hide.
 - Path to the full `findings/report.md`
 
 ## Scaling Rules

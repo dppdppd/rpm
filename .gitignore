@@ -16,3 +16,6 @@ docs/rpm/~rpm-*
 
 # playwright MCP browser cache (transient)
 .playwright-mcp/
+
+# Python bytecode cache (eval-harness byproduct, e.g. dr-bakeoff/checks/)
+__pycache__/
