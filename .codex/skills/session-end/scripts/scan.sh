@@ -450,7 +450,7 @@ echo "=== overridden_skills ==="
 # replace the plugin default and survive plugin updates as forks.
 # Recommend migrating to additive amendments at docs/rpm/skills/<name>.md.
 OVERRIDE_COUNT=0
-RPM_SKILLS="next session-end audit backlog deep-research init-rpm version rpm"
+RPM_SKILLS="next session-end audit backlog research init-rpm version rpm"
 if [ -d ".claude/skills" ]; then
   for skill in $RPM_SKILLS; do
     if [ -f ".claude/skills/$skill/SKILL.md" ]; then
