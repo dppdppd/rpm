@@ -1,0 +1,18 @@
+PROJECT    SLUG                                 figs orph  orph% srch pdf?
+VOC        heren-eisen-package-shaping-1610-165   10   10   100%  LOW    0
+VOC        return-cargo-auctions-europe-demand-    2    2   100%    y    3
+VOC        voc-expedition-fleet-lifecycle-1602-    1    1   100%    y    3
+VOC        voc-decline-era-1680-1800               3    2    67%    y    0
+VOC        voc-asiatic-fleet-upkeep-1610-1650      7    4    57%    y    2
+VOC        voc-for-voc-tricktaker                  1    0     0%    y    3
+draftyard  graph-node-ui-camera-controls           1    0     0%    y    0
+draftyard  native-feeling-mobile-web-apps          1    0     0%    y    0
+----------------------------------------------------------------------------
+searchable trees: 7   low-search excluded: 1
+AGGREGATE (searchable): 9/16 distinctive figures ORPHAN = 56% deterministic lower-bound unsupported rate
+
+=== voc-decline-era validation (corpus 427748 chars, 0 unsearchable pdfs) ===
+distinctive figures: 3  orphan: 2
+orphans (grader flagged ƒ134M/ƒ62M as memory-sourced — expect 134/62 here):
+   ORPHAN  ƒ134M   (core 134)
+   ORPHAN  ƒ120M   (core 120)

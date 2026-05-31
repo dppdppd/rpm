@@ -13,3 +13,6 @@ opencode/package-lock.json
 
 # rpm session-state (transient, regenerated per session)
 docs/rpm/~rpm-*
+
+# playwright MCP browser cache (transient)
+.playwright-mcp/

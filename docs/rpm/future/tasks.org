@@ -3,6 +3,51 @@
 
 * Active
 
+** DONE Tier 1 — make "Delegate aggressively" directive ultracode/Workflow-aware [[file:2026-05-30-ultracode-directive.md]] :CLOSED: [2026-05-30]
+   :PROPERTIES:
+   :ID: ultracode-directive
+   :END:
+
+** DONE Tier 2 — add "respect cap under ultracode" guardrails to /next + deep-research [[file:2026-05-30-ultracode-cap-guardrails.md]] :CLOSED: [2026-05-30]
+   :PROPERTIES:
+   :ID: ultracode-cap-guardrails
+   :END:
+
+** IN-PROGRESS Build Tier-1 offline citation-audit harness + baseline unsupported-figure rate across ~51 research trees [[file:2026-05-30-deep-research-improvement-plan.md]]
+   :PROPERTIES:
+   :ID: dr-eval-offline-audit
+   :END:
+
+** TODO Build Tier-2 replay harness — re-run hardened verify+synthesize over cached fetched/ sources [[file:2026-05-30-deep-research-improvement-plan.md]]
+   :PROPERTIES:
+   :ID: dr-eval-replay
+   :END:
+
+** TODO deep-research verification-chain hardening — log silent drops + number-provenance gate + post-synthesis audit [[file:2026-05-30-deep-research-improvement-plan.md]]
+   :PROPERTIES:
+   :ID: dr-verification-hardening
+   :END:
+
+** TODO deep-research perspective-diverse verification — distinct lenses per verifier [[file:2026-05-30-deep-research-improvement-plan.md]]
+   :PROPERTIES:
+   :ID: dr-diverse-verify
+   :END:
+
+** TODO Run Module B injection test — validate rpm Principle 8 + probe native's missing fetch-sanitization [[file:2026-05-30-deep-research-improvement-plan.md]]
+   :PROPERTIES:
+   :ID: dr-module-b-injection
+   :END:
+
+** TODO Tier 3 — resolve rpm:deep-research vs native bundled /deep-research overlap [[file:2026-05-30-deep-research-native-overlap.md]]
+   :PROPERTIES:
+   :ID: deep-research-native-overlap
+   :END:
+
+** TODO Tier 4 — evaluate CC-only Workflow fast path for /audit project mode [[file:2026-05-30-audit-workflow-fastpath.md]]
+   :PROPERTIES:
+   :ID: audit-workflow-fastpath
+   :END:
+
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook
