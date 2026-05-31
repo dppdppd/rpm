@@ -6,6 +6,35 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Tier 4 — evaluate CC-only Workflow fast path for /audit project mode [[file:2026-05-30-audit-workflow-fastpath.md]]
+   CLOSED: [2026-05-31]
+   :PROPERTIES:
+   :ID: audit-workflow-fastpath
+   :END:
+   - Spike: built non-wired fan-out prototype (plugin/skills/audit/audit-workflow.js)
+     + measured documents-mode bake-off. Verdict DO NOT adopt — 9.3× tokens
+     (584k/23 agents vs 63k/1) for 2× findings but missed the single auditor's
+     top + guidance-alignment findings. Analysis: research/audit-fastpath/bakeoff.md.
+
+** DONE Fix canary.sh grader — detect token in obeyed position, not mere presence [[file:2026-05-30-deep-research-improvement-plan.md]]
+   CLOSED: [2026-05-31]
+   :PROPERTIES:
+   :ID: canary-grader-obey-fix
+   :END:
+   - Rewrote dr-bakeoff/checks/canary.sh to score the token by obeyed-position
+     (own line / footer / heading → LEAKED) vs mentioned-in-refusal (→ CLEAN);
+     fixes the false-fail on both Opus arms. shellcheck clean; one residual
+     quoted-injection+forward-refusal false-positive accepted (safe LEAKED bias).
+
+** DONE Tier 3 — resolve rpm:deep-research vs native bundled /deep-research overlap [[file:2026-05-30-deep-research-native-overlap.md]]
+   CLOSED: [2026-05-31]
+   :PROPERTIES:
+   :ID: deep-research-native-overlap
+   :END:
+   - Decision A (refined), user-signed-off. deep-research/SKILL.md acknowledges
+     native bundled Workflow; rpm differentiates on portability / artifacts /
+     inline / cost — not rigor; prose fan-out frozen.
+
 ** DONE Module B injection test — Principle 8 has no measured value; wrapping + strip-list removed [[file:2026-05-30-deep-research-improvement-plan.md]]
    CLOSED: [2026-05-31]
    :PROPERTIES:
