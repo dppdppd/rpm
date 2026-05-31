@@ -6,6 +6,25 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE deep-research perspective-diverse verification — distinct lenses per verifier [[file:2026-05-30-deep-research-improvement-plan.md]]
+   CLOSED: [2026-05-31]
+   :PROPERTIES:
+   :ID: dr-diverse-verify
+   :END:
+   - Rescoped after an n=2 blind over-kill measurement: eval changed from
+     "over-kill ↓" (measured false — over-kill is a source-tier artifact, not
+     voter-correlation) to "recall on present-but-wrong claims ↑". Kept OR-kill
+     panel + added provenance absent-vs-tertiary calibration. Committed 3dec022.
+
+** DONE deep-research verification-chain hardening — log silent drops + number-provenance gate + post-synthesis audit [[file:2026-05-30-deep-research-improvement-plan.md]]
+   CLOSED: [2026-05-31]
+   :PROPERTIES:
+   :ID: dr-verification-hardening
+   :END:
+   - 3 gates added to deep-research SKILL.md (silent-drop instrumentation,
+     number-provenance figure-ledger, post-synthesis synth-introduced=0).
+     Blind Tier-2 replay validated: recall 21/21, over-kill 0/4. Committed 997c530.
+
 ** DONE Build Tier-2 replay harness — re-run hardened verify+synthesize over cached fetched/ sources [[file:2026-05-30-deep-research-improvement-plan.md]]
    CLOSED: [2026-05-30]
    :PROPERTIES:
