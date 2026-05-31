@@ -173,7 +173,8 @@ Replace failures from priority list. Post-fetch: scan for better URLs.
 
 ## Phase 4: Gap Analysis & Validation
 
-Must produce: `$TOPIC/gaps/` file + `$TOPIC/validation/adversarial.md` + `$TOPIC/validation/refuted.md`.
+Must produce: `$TOPIC/gaps/` file + `$TOPIC/validation/adversarial.md` (the
+perspective-diverse lens panel — see below) + `$TOPIC/validation/refuted.md`.
 - Gap analysis: LOW-confidence findings, contradictions, thin dims
 - **Domain coverage check**: when surveying "the most-used X", explicitly verify region-specific + specialty + niche sources are represented (generic web search systematically over-weights globally popular ones).
 - Adversarial: 3+ searches seeking counter-evidence
@@ -194,6 +195,75 @@ number survives only if positively re-confirmed, never merely un-refuted. Killed
 numbers live in `refuted.md` with the reason and may NOT appear as findings or feed
 adjudications in the report (a killed-but-maybe-true number still surfaces in the
 report's *Could not verify* section, so the kill bias loses nothing).
+
+**Perspective-diverse verification — distinct lenses, not N identical skeptics
+(mandatory) → `validation/adversarial.md`.** The skeptical refutation pass above must
+not be run as N interchangeable refuters. Identical skeptics share one blind spot — they
+all miss the same failure mode, so stacking more of them adds cost without adding
+coverage. The panel instead runs a small **fixed set of distinct lenses**, each verifier
+adopting exactly one, so it catches *present-but-wrong* claims a single lens misses: a
+figure literally in a source but with the wrong referent, a claim contradicted by another
+source's ordering, a behavior mis-attributed to the wrong product. (Measured over n=2
+corpora: the methodology and alternative-hypothesis lenses each caught a referent-stretch
+AND a source-contradiction that the provenance, consistency, and recency lenses missed —
+panel recall 2/2 vs 1/2 for the weakest single lens. The benefit is **recall on
+wrong-but-sourced claims**, not over-kill reduction — the same two-corpus test showed
+over-kill tracks *source tier*, not voter correlation, so diversity does not lower it.)
+The lenses:
+
+- **Provenance / source-tier** — is the support primary/specialist vs
+  tertiary/amateur/model-memory? Frankenstein-citation check (cited source actually
+  contains the claim). This lens *is* the `figure-ledger.md` literal-presence + source-tier
+  columns — do not re-derive them; read that ledger and rule on its rows.
+
+- **Internal-consistency / cross-source** — does the claim conflict with another fetched
+  source, or with itself elsewhere in the corpus? Surfaces contradictions a single-source
+  re-read never sees.
+
+- **Methodology / unit / referent** — right units, right denominator, right definition,
+  and — critically — right *referent*. This is the lens a provenance-only skeptic misses:
+  a figure whose digits are literally present in a fetched source can still be wrong
+  because the source is talking about something else. (Tier-2 replay: **ƒ20M** — "20
+  million guilders" is literally in `finance(10)` but describes Dutch foreign sovereign
+  lending, not VOC capital drawdown. Provenance/literal-presence alone SHIPs it; the
+  referent lens KILLs it — one present-but-wrong failure mode a single-lens pass misses.)
+
+- **Recency / temporal validity** — is the figure current, and scoped to the date the
+  claim attaches it to? (Reuses the recency check above, applied per-claim.)
+
+- **Alternative-hypothesis** — actively seek a *competing* interpretation or counter-figure
+  (WebSearch for the rival number / reading), rather than only trying to refute the stated
+  one. Catches the claim that survives direct refutation only because no one looked for the
+  better answer.
+
+**Observable — the panel, not one skeptic, decides.** Each verifier records a row in
+`validation/adversarial.md`: `lens | claim (or figure) | verdict (kill/keep/flag) | note`.
+A claim's final kill/keep is a **function of the diverse panel**: KILL if *any* lens
+returns kill with a sourced reason (default-to-kill still holds — Principle 3). One
+calibration on the provenance lens keeps that OR-kill rule safe on weak-source runs:
+distinguish **absent** (claim in no fetched source → KILL, orphan) from
+**present-but-tertiary** (claim is in a source, but only a tertiary/amateur one). A
+*quantitative* present-but-tertiary claim still dies (Principle 3 + the number-provenance
+gate — a number on tertiary-only support is not publishable), but a *qualitative* one is a
+**FLAG for corroboration, not a unilateral veto** (Principle 9) — so the panel does not
+over-kill a true qualitative finding that only a weak source happens to carry. A figure
+keeps only after the provenance lens confirms its `figure-ledger.md` Y-row **and** the
+methodology lens confirms unit/referent. Killed claims flow to `refuted.md` with the
+killing lens named as (part of) the reason code, so the drop tally below shows *which lens*
+caught each drop — a panel that returns all-keep on a figure the ledger orphans, or that
+records only one lens, has failed this gate.
+
+**Lens count scales with the run (existing SIMPLE/COMPLEX rules — no new mode).**
+- **SIMPLE** (1–3 dims, no sub-agents): the single skeptical refutation pass **walks the
+  five lenses as a sequential checklist** in main session, writing one `adversarial.md` row
+  per lens per load-bearing claim. One pass, five lenses — not five passes.
+- **COMPLEX** (4+ dims / 3+ entities, sub-agents): assign **one lens per verifier
+  sub-agent** (clean-context sonnet), each given only its lens and the claim set, returning
+  its rows; main session merges them into `adversarial.md` and applies the panel rule. This
+  stays within the **max-4-concurrent** ceiling (Principle 2) — five lenses run as at most
+  four concurrent verifiers (e.g. fold recency into methodology, or batch the lightest two)
+  rather than scaling past the ceiling. Distinct lenses, not duplicated skeptics, are how
+  added verifiers buy coverage instead of correlated cost.
 
 **Instrument every drop — no silent truncation (mandatory).** A claim dropped from
 verification must be *recorded*, never silently discarded. The native baseline shipped
@@ -277,7 +347,9 @@ file to know what came back. Include:
 - Any contradictions or unresolved gaps surfaced by Phase 4
 - Citation-audit score from Phase 5's post-hoc defenses
 - **Verification ledger line (mandatory):** the Phase-4 drop tally (e.g.
-  `dropped 9/16 quantitative claims`), the figure-ledger orphan count, and the
+  `dropped 9/16 quantitative claims`), the figure-ledger orphan count, the
+  perspective-diverse panel outcome (lenses applied + any keep/kill the panel flipped
+  vs a single skeptic, e.g. `methodology lens killed ƒ20M — wrong referent`), and the
   post-synthesis assertion `synth-introduced figures: 0` — surfaced in chat so a
   silent truncation is impossible to hide.
 - Path to the full `findings/report.md`
