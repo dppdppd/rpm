@@ -1,0 +1,75 @@
+# Plan — v1/v2/native deep-research bake-off on a Dutch-primary-source VOC topic
+
+**Status: PLANNED — parked, execute later.** Marked next in `tasks.org`
+(`:ID: dr-v1-v2-native-dutch-bakeoff`). This is the rigorous (controlled)
+version; the cheap reuse-v1 variant was rejected for prompt asymmetry.
+
+Source: 2026-05-31 session. Closes the one real loose end in
+`2026-05-30-deep-research-improvement-plan.md` — the v1→v2 hardening was only
+ever validated by **offline Tier-2 replay over a frozen corpus**, never by a
+fresh end-to-end head-to-head against native on a NEW topic.
+
+## Goal
+Measure whether the v1→v2 citation/translation hardening **changes behavior**
+on a topic that *requires reading/translating Early-Modern-Dutch primary
+sources* — the surface most likely to produce mistranslation-as-fabrication
+(the qualitative-claim analogue of the ƒ20M wrong-referent trap) — and where
+native lands on the same probe.
+
+## Why rigorous, not cheap
+The 2026-05-30 bake-off was criticized **in its own scorecard** for prompt
+asymmetry (rpm specimen vs native ran different prompts → "do not read
+cell-by-cell"). Fix: all three arms answer ONE identical question. Cost: v1
+must run fresh too — 3 live runs, no free on-disk v1.
+
+## Arms
+- **v1** = deep-research SKILL.md *before* the 2026-05-30 citation hardening —
+  checkout the **old path** `plugin/skills/deep-research/SKILL.md` at the parent
+  of `2ba5fcc` (first hardening commit). No figure-ledger / kill-list /
+  lens-panel; Principle-8 `<<<UNTRUSTED>>>` wrapping still present. (Resolve
+  exact hash at run: `git log --oneline -- plugin/skills/deep-research/SKILL.md`.)
+- **v2** = current hardened SKILL.md at HEAD (post-rename path).
+- **native** = bundled `/deep-research` Workflow (CC-only, ~2.7M tok/run).
+
+## Candidate / grading corpus
+`/home/coder/projects/VOC/docs/research/voc-expedition-goals-chamber-assignments-1602-1700`
+— most Dutch-primary-dense tree in the 28-tree VOC corpus (1,734 Dutch-prose
+tokens / 17 of 21 fetched files; cites Nationaal Archief `1.04.02` invnrs
+13862/23/323/360/7015, the Generale Missiven, GLOBALISE). Its on-disk
+`findings/report.md` (created 2026-05-24, pre-hardening) is the v1-era reference
+specimen; its `fetched/` is the frozen grading corpus.
+
+**Caveat that shapes the design:** that report's HIGH-confidence claims lean on
+**English secondary** sources (vocwarfare.net, Warwick DB, the NA introduction
+PDF) that *describe* the archives; the Dutch primaries are cited more as
+provenance than as translated, claim-supporting text. So to actually stress
+translation, **add 2–3 Dutch-primary-only sub-questions** answerable *only* by
+translating a specific Generale Missiven passage or a named invnr.
+
+## Shared question (game-design tail stripped so native isn't handicapped)
+"What goals did the chambers / Heren XVII / Batavia / officers assign to VOC
+expeditions, 1602–1700, and through which issuing documents?" + 2–3
+Dutch-primary-only sub-questions (pin to a specific Generale Missiven entry / an
+invnr at run time).
+
+## Grading
+- Per load-bearing claim citing a Dutch primary: a clean-context Dutch-capable
+  sub-agent translates the cited source window, confirms support, **KILLs**
+  mistranslations / Frankensteins. Orchestrator cross-checks a sample by reading
+  the Dutch window directly (same protocol that hardened the Tier-2 replay:
+  ƒ219M verbatim-confirmed, ƒ20M referent-killed).
+- Metrics: unsupported-claim rate, translation-fidelity errors caught, figure
+  orphans (few — this tree is figure-light), over-kill (true-claim survival),
+  plus the observed cost / #agents / wall-clock / artifacts row from the
+  original scorecard.
+- Reuse `dr-bakeoff/checks/{url_liveness,offline_audit}` + a new
+  translation-fidelity check.
+
+## Output
+`docs/rpm/research/dr-bakeoff/runs/{v1,v2,native}/` + scorecard updated with a
+v1│v2│native column triplet. Verdict: does v2 beat v1 on Dutch-source fidelity,
+and how does it compare to native.
+
+## Cost gate
+2–3 live runs, ~3.5–4M tokens, ~30–60 min wall-clock. The "spend real tokens"
+step — unlike all the offline Tier-1/2 work. Run only when greenlit.
