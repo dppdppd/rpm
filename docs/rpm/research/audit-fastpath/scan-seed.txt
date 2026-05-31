@@ -1,0 +1,79 @@
+=== plugin ===
+version=2.20.0
+
+=== git ===
+modified=4
+untracked=2
+staged=0
+stashes=0
+
+=== agent_instructions ===
+file=CLAUDE.md
+lines=39
+status=ok
+
+=== claude_md ===
+lines=39
+status=ok
+
+=== not_implemented ===
+count=20
+match=./docs/rpm/future/2026-05-26-scan-version-and-excludes.md:10:2. **Walks `node_modules` / `.opencode` / `.venv`**: the NOT_IMPLEMENTED grep
+match=./docs/rpm/future/2026-05-26-scan-version-and-excludes.md:34:   to the NOT_IMPLEMENTED grep.
+match=./docs/rpm/future/2026-05-26-scan-version-and-excludes.md:49:the NOT_IMPLEMENTED grep so vendored trees can't blow scan output past the
+match=./docs/rpm/past/2026-04-08.md:158:     broken refs, CLAUDE.md size, NOT_IMPLEMENTED, tracker
+match=./docs/rpm/past/2026-04-08.md:175:real `NOT_IMPLEMENTED` stubs (9 matches are all meta-references
+match=./docs/rpm/past/2026-05-26.md:73:     build,target}` to NOT_IMPLEMENTED grep. Codex `version=unknown`
+match=./docs/rpm/present/status.md:50:- Backlog gap-mining sprint (v2.18.0–v2.18.2, 2026-05-26). Three releases in one day driven by transcript mining (Claude across 9 projects + 267 Codex sessions, 33 platform-tagged gaps, 8 prioritized fix tickets). **v2.18.0** bundled the slam-dunks: `context-monitor.sh` atomic counter (eliminates volta's 543+ stderr crash signature with `flock`-free defensive read + atomic mv write), `scan.sh` unified plugin-root resolver chain + `--exclude-dir={node_modules,.opencode,.venv,…}` on NOT_IMPLEMENTED grep (fixes Codex `version=unknown` and the .opencode/node_modules 3.6MB output blow-up), `/backlog` + `/next` SKILL.md `TRIGGER` blocks (mirrors `/deep-research`'s description shape) for natural-language verb discoverability, Stop-hook backfill for `task: (unassigned)` (uses commit subject with conventional-prefix strip, or basenames) + session-start `top_actionable` fallback chain, auditor `Phase 0: Noun cross-check` (extract high-impact nouns from CLAUDE.md/status.md, grep against code excluding docs/, tag findings as `doc-stale`/`doc-orphan`/`code-undocumented`, surface doc-orphans first), `/next` F1-F4 (WATCH keyword in `#+TODO:`, today-date dispatch field, `is-pre-completed.sh` skip helper, no-ops counter), codex SessionStart context mirror (tee + EXIT-trap writes `docs/rpm/~rpm-context.md`; AGENTS.md `# include` makes it discoverable in Codex), and review-ready/status `agent_id` pairing fix (drop `agent_id` from `(target, agent_id)` join — workers default to `worker-unknown` while orchestrator records dispatch IDs, join never matched). bats 132 → 175. **v2.18.1**: `/init-rpm` Phase 4a — unified `repair.sh` helper covers two stale-config migrations: `.gitignore` missing `docs/rpm/~rpm-*` wildcard (with opt-in collapse of accumulated per-file entries; this repo had 10 of them) and `AGENTS.md` missing `# include: docs/rpm/~rpm-context.md` (frontmatter-aware prepend). Wired into Repeat-run verification mode. 12 new bats. Codex mirror byte-identical via `translate-skill-codex.py` (which itself was patched mid-publish when the `/next` TRIGGER block sync revealed a hardcoded-description drift). Dogfooded — `.gitignore` here is now 1 wildcard line. **v2.18.2**: CI fix for the previous two. `auditor-phase-0.bats` + `no-placeholder-paths.bats` hard-referenced `$REPO_ROOT/codex/...` paths that resolve in the monorepo but break on the subtree-split plugin remote (no codex/ sibling). 7 failing tests on v2.18.0 + v2.18.1 CI; v2.18.2 lifts the `require_codex_port_layout` pattern from `codex-port.bats` and conditionally skips codex assertions. Verified by simulating subtree layout (`cp -r plugin /tmp/rpm-ci-sim && bash tests/run.sh` → 187/187) before publishing. GitHub Actions confirmed green on v2.18.2.
+match=./docs/rpm/reviews/2026-04-09-plan.md:190:  check, broken-ref scan, CLAUDE.md line count, NOT_IMPLEMENTED grep,
+match=./plugin/skills/audit/project-mode.md:36:- `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
+match=./plugin/skills/audit/SKILL.md:42:    agent instructions size, NOT_IMPLEMENTED, broken refs,
+match=./plugin/skills/session-end/scripts/scan.sh:117:# Count and sample NOT_IMPLEMENTED references across common source types.
+match=./plugin/skills/session-end/scripts/scan.sh:120:NI_OUT=$(grep -rn NOT_IMPLEMENTED \
+match=./plugin/skills/session-end/SKILL.md:53:`NOT_IMPLEMENTED` hits; `broken_refs.count > 0`, unlisted specs,
+match=./plugin/agents/auditor.md:98:   - Deferred work consistency (`grep NOT_IMPLEMENTED` vs doc claims)
+match=./codex/.codex/skills/audit/SKILL.md:39:    agent instructions size, NOT_IMPLEMENTED, broken refs,
+match=./codex/.codex/skills/audit/references/auditor.md:98:   - Deferred work consistency (`grep NOT_IMPLEMENTED` vs doc claims)
+match=./codex/.codex/skills/audit/project-mode.md:36:- `grep -rn NOT_IMPLEMENTED` across the project's source tree (tune path to layout)
+match=./codex/.codex/skills/session-end/SKILL.md:51:`NOT_IMPLEMENTED` hits; `broken_refs.count > 0`, unlisted specs,
+match=./codex/.codex/skills/session-end/scripts/scan.sh:117:# Count and sample NOT_IMPLEMENTED references across common source types.
+match=./codex/.codex/skills/session-end/scripts/scan.sh:120:NI_OUT=$(grep -rn NOT_IMPLEMENTED \
+
+=== broken_refs ===
+count=0
+
+=== daily_log ===
+today=2026-05-31
+latest=2026-05-31
+days_since=0
+commits_since=0
+today_exists=true
+
+=== session_marker ===
+exists=true
+
+=== specs_inventory ===
+total=0
+listed=0
+unlisted=0
+
+=== pm_docs_staleness ===
+count=0
+
+=== task_deps ===
+ids=55
+with_deps=0
+status=ok
+
+=== migration ===
+count=0
+
+=== overridden_skills ===
+count=0
+
+=== learnings_capture ===
+file=docs/rpm/~rpm-learnings.jsonl
+entries=3
+excerpt=Root cause looks like I'm re-emitting tool batches across turns (queued calls firing late) 
+excerpt=One honest correction: I logged the dispatch with a placeholder agent ID before the real one came back 
+excerpt=QUESTION: Accept the fix as-is, or send it back to also handle forward-referencing refusals? 
