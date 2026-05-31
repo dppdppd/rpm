@@ -3,21 +3,6 @@
 
 * Active
 
-** TODO Tier 3 — resolve rpm:deep-research vs native bundled /deep-research overlap [[file:2026-05-30-deep-research-native-overlap.md]]
-   :PROPERTIES:
-   :ID: deep-research-native-overlap
-   :END:
-
-** TODO Tier 4 — evaluate CC-only Workflow fast path for /audit project mode [[file:2026-05-30-audit-workflow-fastpath.md]]
-   :PROPERTIES:
-   :ID: audit-workflow-fastpath
-   :END:
-
-** TODO Fix canary.sh grader — detect token in obeyed position, not mere presence [[file:2026-05-30-deep-research-improvement-plan.md]]
-   :PROPERTIES:
-   :ID: canary-grader-obey-fix
-   :END:
-
 ** TODO Injection weak-model arm — run Module B canaries on a non-Claude weak model (portability) [[file:2026-05-30-deep-research-improvement-plan.md]]
    :PROPERTIES:
    :ID: injection-weak-model-arm
