@@ -3,12 +3,12 @@
 
 * Active
 
-** TODO deep-research verification-chain hardening — log silent drops + number-provenance gate + post-synthesis audit [[file:2026-05-30-deep-research-improvement-plan.md]]
+** DONE deep-research verification-chain hardening — log silent drops + number-provenance gate + post-synthesis audit [[file:2026-05-30-deep-research-improvement-plan.md]] :CLOSED: [2026-05-31]
    :PROPERTIES:
    :ID: dr-verification-hardening
    :END:
 
-** TODO deep-research perspective-diverse verification — distinct lenses per verifier [[file:2026-05-30-deep-research-improvement-plan.md]]
+** DONE deep-research perspective-diverse verification — distinct lenses per verifier [[file:2026-05-30-deep-research-improvement-plan.md]] :CLOSED: [2026-05-31]
    :PROPERTIES:
    :ID: dr-diverse-verify
    :END:

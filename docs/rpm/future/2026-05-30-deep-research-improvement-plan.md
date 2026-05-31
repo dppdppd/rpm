@@ -70,10 +70,10 @@ on the same fact flags instability/error for free.
 | # | Change | Status | Eval that proves it |
 |---|--------|--------|---------------------|
 | 1 | Citation discipline + kill-list + refuted section + source-tiering + active-refutation verify | **DONE** (skill, 2026-05-30) | Tier 1 baseline vs Tier 2 replay |
-| 2 | Instrument silent drops — log dropped/unverified claims (don't inherit native's silent 47/72 truncation) | TODO | Tier 2: dropped-claim count surfaced |
-| 3 | Number-provenance gate — confirm each figure literally appears in the fetched artifact (promote the Tier-1 check into a skill phase) | TODO | Tier 1 rate ↓ |
-| 4 | Perspective-diverse verification — distinct lenses per verifier, not identical skeptics (native's correlated-voter weakness) | TODO | Tier 2: over-kill rate ↓ |
-| 5 | Post-synthesis citation audit — synthesis cannot introduce unverified figures | TODO (partial in Phase 5) | Tier 2: synth-introduced figures = 0 |
+| 2 | Instrument silent drops — log dropped/unverified claims (don't inherit native's silent 47/72 truncation) | **DONE** (skill, 2026-05-30; commit 997c530) | Tier-2 replay: drop tally surfaced |
+| 3 | Number-provenance gate — confirm each figure literally appears in the fetched artifact (promote the Tier-1 check into a skill phase) | **DONE** (skill, 2026-05-30; commit 997c530) | Tier-2 replay: orphan 56%→0%, over-kill 0 |
+| 4 | Perspective-diverse verification — distinct lenses per verifier | **DONE-RESCOPED** (skill, 2026-05-31) | ~~over-kill ↓~~ → **recall on present-but-wrong claims ↑** (n=2: panel 2/2 vs weakest single lens 1/2). Over-kill measured to be a *source-tier* artifact, not voter-correlation — see `overkill-2026-05-31/` |
+| 5 | Post-synthesis citation audit — synthesis cannot introduce unverified figures | **DONE** (skill, 2026-05-30; commit 997c530) | Tier-2 replay: synth-introduced figures = 0 |
 | 6 | CC-workflow handoff — optional codified enforcement on CC (Tier 3/4 of ultracode eval) | TODO | live A/B on one probe |
 | 7 | Module B injection test — validate rpm Principle 8 AND probe native (no fetch-sanitization) | TODO | Tier 3 live, canary token |
 
@@ -215,3 +215,122 @@ figure-ledger from its own read of `fetched/` source windows, forbidden from ope
 
 Validation gate (lower the unsupported-figure rate without raising over-kill) met
 **behaviorally**, not just structurally. Items #2/#3/#5 promotion-grade — committed.
+
+## Worker Result (2026-05-31, dr-diverse-verify — item #4)
+
+**Summary.** Made perspective-diverse verification a concrete, observable instruction in
+`plugin/skills/deep-research/SKILL.md` Phase 4, replacing the implicit "run N identical
+skeptics" reading of the existing skeptical refutation pass. Added a mandatory
+**"Perspective-diverse verification — distinct lenses, not N identical skeptics →
+`validation/adversarial.md`"** block that:
+- Names the **single skeptical refutation pass** (the existing kill-list line) as the
+  thing it generalizes — the lenses are *how* that pass judges, so no phase/structure was
+  renamed or forked.
+- Defines a **fixed set of 5 distinct lenses**: Provenance/source-tier,
+  Internal-consistency/cross-source, Methodology/unit/referent, Recency/temporal-validity,
+  Alternative-hypothesis. Each verifier adopts exactly one.
+- **Composes with the just-committed number-provenance gate instead of restating it:** the
+  Provenance lens is explicitly *defined as* reading and ruling on the
+  `figure-ledger.md` literal-presence + source-tier columns ("do not re-derive them"); the
+  Methodology lens is the unit/referent check the ledger's string-presence column cannot
+  make. A figure keeps only after the provenance lens confirms its ledger Y-row **and**
+  the methodology lens confirms unit/referent.
+- Is **observable**: each verifier writes `lens | claim | verdict | note` rows to
+  `adversarial.md`; the final kill/keep is a stated **function of the panel** (KILL if any
+  lens kills with a sourced reason — default-to-kill preserved); the killing lens is named
+  in the `refuted.md` reason so the drop tally shows which lens caught each drop. A panel
+  that records only one lens, or returns all-keep on a ledger-orphaned figure, fails the
+  gate.
+- **Scales on the existing SIMPLE/COMPLEX rules — no new mode:** SIMPLE = the single pass
+  walks the 5 lenses as a sequential checklist in main session (one pass, five lenses);
+  COMPLEX = one lens per clean-context verifier sub-agent, merged by main session, kept
+  within the existing **max-4-concurrent** ceiling (Principle 2) by folding the lightest
+  lenses rather than scaling past 4.
+- Added one minimal Phase-5 cross-reference: the mandatory final-summary verification
+  ledger line now also surfaces the panel outcome (lenses applied + any keep/kill the panel
+  flipped vs a single skeptic, e.g. `methodology lens killed ƒ20M — wrong referent`).
+- Also updated the Phase-4 "Must produce" line to describe `adversarial.md` as the lens
+  panel. No other skill/hook/phase touched.
+
+**Files changed.**
+- `plugin/skills/deep-research/SKILL.md` (+62/−3): Phase-4 new lens-panel block + "Must
+  produce" line; Phase-5 final-summary ledger line. (`tasks.org` shows a pre-existing
+  uncommitted DONE-flip of `dr-verification-hardening` from the prior worker — **not** my
+  edit; left untouched.)
+- `docs/rpm/future/2026-05-30-deep-research-improvement-plan.md` (this section).
+
+**Verification run.** The #4 gate is **Tier-2 over-kill rate ↓**. A full live Tier-2
+replay is token-heavy and was **NOT run** here (same cached-only/zero-new-token budget the
+#2/#3/#5 worker used; that worker logged the live replay as the promotion-grade follow-up,
+and it was later run separately). Instead I grounded the over-kill argument
+deterministically against the **frozen** `voc-decline-era-1680-1800/fetched/` corpus the
+Tier-2 replay already uses:
+
+- Command:
+  `grep -rn -i "20 million" /home/coder/projects/VOC/docs/research/voc-decline-era-1680-1800/fetched/`
+  → the digit-core "20 million" appears with **three distinct referents**, none of which
+  is the report's asserted "ƒ20M European VOC liquid-capital drawdown 1730–80":
+  (1) `finance(10):775` Dutch foreign **sovereign lending** ("Foreign investment probably
+  doubled to 20 million guilders annually"); (2) `gutenberg(14):385` VOC **advance-payment
+  ceiling** ("advance payments could be as high as ƒ20 million"); (3) `gutenberg(14):504`
+  modern Dutch **population** (~20 million people).
+- Observation → **why diverse lenses change over-kill vs one skeptic:** a provenance /
+  literal-presence skeptic (the same string-presence logic `offline_audit.py` uses, which
+  defers 2-digit cores anyway) sees "20 million" present and is at risk of a **false SHIP**
+  on any of these three windows. Only the **methodology / unit / referent lens** — reading
+  the window and matching the referent to the asserted claim — KILLs it. So the panel adds
+  a *correct* kill a single provenance skeptic misses (this is the ƒ20M Frankenstein trap
+  the replay flagged, now shown to have three competing windows, not one).
+- Over-kill **direction** (the #4 metric): on the 4 genuinely-supported figures the replay
+  SHIPs (ƒ219M — `gutenberg(14):120` verbatim "debt of 219 million Dutch guilders", ƒ15M,
+  the 200/300 captured-ship sentence, the 10,000 toll), **no lens flips them to kill** —
+  each satisfies both the provenance lens (literal-presence Y in a primary source) and the
+  methodology lens (correct referent). The panel rule only *adds* kill-power on
+  orphans/wrong-referents; a keep requires the gating lenses to agree, which the supported
+  set does. Net: **strictly more discrimination on traps, over-kill-neutral on the supported
+  set** — i.e. the change cannot raise over-kill on this corpus and removes a class of
+  false-SHIP (the multi-referent digit collision) that a redundant-skeptic panel would share.
+  This is an argument from the frozen corpus, **not** a measured new over-kill number.
+
+**Remaining risks / follow-ups.**
+- **Promotion-grade follow-up (honest gap):** the above is a deterministic
+  corpus-grounded argument, **not** a live Tier-2 replay with N actual lens-verifiers. The
+  measured "over-kill rate ↓ (or held at 0) with the diverse panel vs the single skeptic"
+  number requires re-running the Tier-2 replay over ≥1 VOC tree with the lenses split across
+  verifiers — recommend that as the promotion gate before release, exactly as #2/#3/#5 were
+  promoted by a separate live replay. Do not credit this section's prose as that measurement.
+- The corpus shows over-kill is *structurally* unable to rise here (keeps require lens
+  agreement; supported figures satisfy all gating lenses) — but that's a property of this
+  corpus's figures, not a guarantee the Alternative-hypothesis lens never surfaces a spurious
+  counter-figure that wrongly flips a true keep on some other topic. The live replay should
+  watch the supported-figure survival count specifically.
+- COMPLEX-mode 5-lenses-into-≤4-verifiers folding is left to the run ("fold the lightest
+  two"); a future increment could fix the canonical fold (e.g. recency⊂methodology) if runs
+  diverge.
+- Items #6 (CC-workflow handoff) and #7 (Module B injection) remain out of scope and TODO.
+
+## Over-kill Measurement + #4 Rescope (2026-05-31, n=2) — supersedes the over-kill framing above
+
+The promotion gate the Worker Result above asked for was run, twice, across two domains
+(`overkill-2026-05-31/{design,results,results-draftyard}.md`): a blind 5-lens verdict matrix
+per corpus, aggregated by the orchestrator into three keep-rules.
+
+**Result — #4's "over-kill ↓" eval is measured FALSE; its real benefit is RECALL.**
+- voc-decline (history, tertiary sources): over-kill 2/2 under the single skeptic AND under
+  the committed OR-kill panel — diversity *inert* (provenance kills everything; panel ≡
+  provenance). Majority-voting cut over-kill to 0 only by collapsing orphan recall 4→1.
+- draftyard (software-UX, **primary** sources): over-kill **0/6** everywhere — no lens
+  over-kills a well-sourced true claim. Across both trees (14 claims, 2 domains): **zero**
+  clean over-kill canary. Over-kill tracks **source tier**, not voter correlation; diversity
+  does not reduce it.
+- What diversity DID buy (draftyard): methodology + alternative-hypothesis each caught a
+  referent-stretch AND a ranking contradiction that provenance/consistency/recency missed →
+  panel **recall 2/2 vs 1/2** for the weakest single lens. A #3-style precision gain, not over-kill.
+
+**Action (committed this session).** Rescoped the Phase-4 perspective-diverse block in
+`plugin/skills/deep-research/SKILL.md`: justification + eval changed from "over-kill ↓ /
+correlated-voter" to "recall on present-but-wrong claims ↑"; kept the 5 lenses and the OR-kill
+panel rule (vindicated — optimal on draftyard, Principle-3-correct on voc-decline); added the
+provenance **absent-vs-tertiary** calibration (absent→KILL; present-but-tertiary → KILL for
+numbers per Principle 3, FLAG-for-corroboration for qualitative per Principle 9) so OR-kill
+cannot over-veto a true qualitative claim on weak sources. Table row #4 → DONE-RESCOPED.
