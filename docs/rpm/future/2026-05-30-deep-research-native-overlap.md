@@ -102,3 +102,55 @@ findings/adjudications, not presented as "most defensible."
 
 Artifacts: `docs/rpm/research/dr-bakeoff/` (scorecard.md, runs/{rpm,native}/,
 checks/, bakeoff/).
+
+---
+
+## Worker Result
+
+**Worker:** worker-unknown
+**Date:** 2026-05-31
+**Status logged:** needs-review
+
+### Summary
+
+Executed the two refined action steps (decision A, refined; user-approved
+2026-05-31). Added one concise `## rpm vs native /deep-research` subsection to
+the skill, placed between "Project Amendments" and "Offer gate (before Phase
+0)". It (1) acknowledges the native bundled CC `/deep-research` Workflow and
+gives handoff guidance for when MAXIMUM verification depth matters and cost /
+CC-lock-in are acceptable, cross-referencing the Tier-4 fast-path; and (2)
+states rpm's differentiation plainly — portability / durable artifacts / inline
+delivery / cost-governance — and explicitly that rpm is **not** "more rigorous"
+(citation parity per the 2026-05-30 bake-off). The new block also freezes the
+hand-rolled fan-out: "Keep the fan-out protocol below stable; do not grow it to
+chase depth."
+
+Edit was surgical (one new H2, ~14 added lines). No existing guidance removed.
+
+### Files changed
+
+- `plugin/skills/deep-research/SKILL.md` — added `## rpm vs native
+  /deep-research` section after "Project Amendments".
+
+### Verification run
+
+- Re-read the edited region. Confirmed intact: injection defenses (Principle 8 +
+  Phase-3 untrusted-data note), citation rigor (Principles 3/9, Phase-4
+  kill-list / figure-ledger / perspective-diverse panel), write-once convention
+  (Principle 7 + Phase 5), and multi-runtime portability framing.
+- No fan-out / protocol prose expanded; freeze statement present in the new
+  block.
+- Voice/formatting match the surrounding skill (em-dashes, bold key terms,
+  `## H2` section style).
+- No build/test toolchain applies to a SKILL.md prose edit; the bats suite +
+  shellcheck cover hooks, not skill bodies.
+
+### Remaining risks / follow-ups
+
+- **Step 3 (citation-discipline hardening** — demote unverifiable figures out of
+  findings, adopt native's refute-uncited-claims behavior**) is a SEPARATE open
+  backlog item.** Not touched here, per scope.
+- Tier-4 fast-path (direct native handoff on CC) is cross-referenced in the
+  SKILL.md but not implemented; remains a future item.
+- tasks.org keyword/status intentionally left unchanged — the orchestrator and
+  /session-end own status reconciliation.
