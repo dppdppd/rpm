@@ -3,26 +3,6 @@
 
 * Active
 
-** DONE Tier 1 — make "Delegate aggressively" directive ultracode/Workflow-aware [[file:2026-05-30-ultracode-directive.md]] :CLOSED: [2026-05-30]
-   :PROPERTIES:
-   :ID: ultracode-directive
-   :END:
-
-** DONE Tier 2 — add "respect cap under ultracode" guardrails to /next + deep-research [[file:2026-05-30-ultracode-cap-guardrails.md]] :CLOSED: [2026-05-30]
-   :PROPERTIES:
-   :ID: ultracode-cap-guardrails
-   :END:
-
-** DONE Build Tier-1 offline citation-audit harness + baseline unsupported-figure rate across ~51 research trees [[file:2026-05-30-deep-research-improvement-plan.md]] :CLOSED: [2026-05-30]
-   :PROPERTIES:
-   :ID: dr-eval-offline-audit
-   :END:
-
-** DONE Build Tier-2 replay harness — re-run hardened verify+synthesize over cached fetched/ sources [[file:2026-05-30-deep-research-improvement-plan.md]] :CLOSED: [2026-05-30]
-   :PROPERTIES:
-   :ID: dr-eval-replay
-   :END:
-
 ** TODO deep-research verification-chain hardening — log silent drops + number-provenance gate + post-synthesis audit [[file:2026-05-30-deep-research-improvement-plan.md]]
    :PROPERTIES:
    :ID: dr-verification-hardening

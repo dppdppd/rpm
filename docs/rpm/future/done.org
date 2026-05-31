@@ -6,6 +6,30 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Build Tier-2 replay harness — re-run hardened verify+synthesize over cached fetched/ sources [[file:2026-05-30-deep-research-improvement-plan.md]]
+   CLOSED: [2026-05-30]
+   :PROPERTIES:
+   :ID: dr-eval-replay
+   :END:
+
+** DONE Build Tier-1 offline citation-audit harness + baseline unsupported-figure rate across ~51 research trees [[file:2026-05-30-deep-research-improvement-plan.md]]
+   CLOSED: [2026-05-30]
+   :PROPERTIES:
+   :ID: dr-eval-offline-audit
+   :END:
+
+** DONE Tier 2 — add "respect cap under ultracode" guardrails to /next + deep-research [[file:2026-05-30-ultracode-cap-guardrails.md]]
+   CLOSED: [2026-05-30]
+   :PROPERTIES:
+   :ID: ultracode-cap-guardrails
+   :END:
+
+** DONE Tier 1 — make "Delegate aggressively" directive ultracode/Workflow-aware [[file:2026-05-30-ultracode-directive.md]]
+   CLOSED: [2026-05-30]
+   :PROPERTIES:
+   :ID: ultracode-directive
+   :END:
+
 ** DONE /next preflight delegation: run token-heavy phases via background agents, keep orchestrator context lean [[file:2026-05-28-next-preflight-delegation.md]]
    CLOSED: [2026-05-28]
    :PROPERTIES:
