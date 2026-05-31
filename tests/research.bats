@@ -25,11 +25,11 @@ assert_pdf_guidance() {
   [ "$status" -eq 0 ]
 }
 
-@test "deep-research preserves PDFs as binary artifacts" {
+@test "research preserves PDFs as binary artifacts" {
   local root plugin_skill codex_skill
   root=$(repo_root)
-  plugin_skill="$(plugin_root)/skills/deep-research/SKILL.md"
-  codex_skill="$root/codex/.codex/skills/deep-research/SKILL.md"
+  plugin_skill="$(plugin_root)/skills/research/SKILL.md"
+  codex_skill="$root/codex/.codex/skills/research/SKILL.md"
 
   assert_pdf_guidance "$plugin_skill"
 

@@ -1,6 +1,6 @@
 ---
 name: rpm
-description: Explain the rpm plugin and list its commands. Use when the user asks what rpm is, how /rpm works, which rpm commands are available, or needs an overview of the session-lifecycle / audit / deep-research surface.
+description: Explain the rpm plugin and list its commands. Use when the user asks what rpm is, how /rpm works, which rpm commands are available, or needs an overview of the session-lifecycle / audit / research surface.
 argument-hint: "[version | ?]"
 ---
 
@@ -56,7 +56,7 @@ recommend. You do NOT write feature code.
 
 | Skill | What you do |
 |---|---|
-| `deep-research` | Multi-agent research — auto-triggers on questions needing external knowledge |
+| `research` | Multi-agent research — auto-triggers on questions needing external knowledge |
 | `backlog` | Also auto-triggers on "add a task", "what's on my backlog", etc. |
 
 **Workflow:** `init-rpm` (once) -> work (you auto-load context) -> `session-end` -> repeat.
@@ -81,7 +81,7 @@ deeper analysis: `/audit documents` (doc scan) or
 `/audit project` (full consultant review with competitive
 research).
 
-**Research:** The `deep-research` skill auto-triggers when the
+**Research:** The `research` skill auto-triggers when the
 developer or an audit needs external knowledge.
 
 ## Governing Principles
