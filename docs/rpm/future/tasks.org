@@ -13,12 +13,12 @@
    :ID: ultracode-cap-guardrails
    :END:
 
-** IN-PROGRESS Build Tier-1 offline citation-audit harness + baseline unsupported-figure rate across ~51 research trees [[file:2026-05-30-deep-research-improvement-plan.md]]
+** DONE Build Tier-1 offline citation-audit harness + baseline unsupported-figure rate across ~51 research trees [[file:2026-05-30-deep-research-improvement-plan.md]] :CLOSED: [2026-05-30]
    :PROPERTIES:
    :ID: dr-eval-offline-audit
    :END:
 
-** TODO Build Tier-2 replay harness — re-run hardened verify+synthesize over cached fetched/ sources [[file:2026-05-30-deep-research-improvement-plan.md]]
+** DONE Build Tier-2 replay harness — re-run hardened verify+synthesize over cached fetched/ sources [[file:2026-05-30-deep-research-improvement-plan.md]] :CLOSED: [2026-05-30]
    :PROPERTIES:
    :ID: dr-eval-replay
    :END:
