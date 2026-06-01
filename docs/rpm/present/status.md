@@ -2,8 +2,8 @@
 
 ## Project Status
 - **Current phase**: Active development
-- **Last updated**: 2026-05-31
-- **Version**: 2.20.0
+- **Last updated**: 2026-06-01
+- **Version**: 2.21.0
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -11,7 +11,7 @@
 - Session-start task menu (hierarchical, interactive)
 - Session continuity across /clear and resume (source field detection)
 - Audit system (quick, documents, project) with 8 analysis dimensions
-- Deep research skill
+- Research skill (multi-agent; renamed from deep-research in v2.21.0)
 - /tasks skill for mid-session backlog management
 - Learning capture pipeline (Stop hook + "Key finding:" contract)
 - PostCompact compact_summary for better continuity after compaction
@@ -55,6 +55,8 @@
 - deep-research Module B injection investigation — **Principle 8 ditched** (2026-05-31, in-tree, unreleased). A measured study (2 models × 2 surfaces, ~46 blind trials, ground-truth logs) found rpm's Principle-8 "treat as data" fetch-wrapping + injection-vector strip-list reduce injection in **0 of 4 contexts**: redundant on a frontier model (Opus resists everything wrapped or not), **ineffective** on a weak model in synthesis (Haiku appends the injected token 3/3 wrapped = 3/3 raw), and no measurable agentic difference (Haiku 0/13 P8 vs 1/13 native = noise; 0/10 both arms at n=10). Removed both from `deep-research/SKILL.md` (Principle 8 → documentation line; Phase-3 "Fetch & sanitize" → "Fetch"; figure-ledger gates untouched; suite green 206). Started from a user challenge — *CSS concealment is irrelevant to an LLM; the bigger risk is prompt injection* — confirmed: real defense lives in the model/runtime, not skill prose. Reusable two-model/two-surface canary harness added under `dr-bakeoff/canary/`. Backlog #7 closed; follow-ups filed (`canary-grader-obey-fix`, `injection-weak-model-arm`); Tier 3/4 remain.
 
 - Tier 3 resolution + canary grader fix + Tier-4 audit fan-out spike (2026-05-31, in-tree, unreleased). **Tier 3** (decision A): `deep-research/SKILL.md` acknowledges the native bundled `/deep-research` Workflow and differentiates rpm on portability / durable artifacts / inline / cost-governance — explicitly *not* rigor (the bake-off found native matched it); prose fan-out frozen. **canary-grader-obey-fix**: `dr-bakeoff/checks/canary.sh` now scores the injection token by obeyed-position vs mentioned-in-refusal (was false-failing honest refusals on literal presence). **Tier-4 spike**: prototyped a CC-only fan-out `/audit` (`plugin/skills/audit/audit-workflow.js`, **non-wired**) and ran a measured bake-off (`docs/rpm/research/audit-fastpath/bakeoff.md`) — fan-out cost 9.3× tokens (584k/23 agents vs 63k/1) for 2× findings but no coverage win (missed the single auditor's top + guidance-alignment findings) → **verdict: do not adopt as default**; portable single-auditor path unchanged. Surfaced 14 real doc-drift findings (left unfixed per user). Follow-up `injection-weak-model-arm` needs a non-Claude runtime.
+
+- **`deep-research` skill renamed → `research`; v2.21.0 (2026-06-01).** Broke the name collision with Claude Code's native bundled `/deep-research` Workflow and repositioned the skill on its actual edge (portability / durable artifacts / inline / cost-governance, explicitly not rigor). Hard rename, no alias; trigger description intact so "research X" still auto-fires. `skills/deep-research/` → `skills/research/` + SKILL.md identity refs (native `/deep-research` mentions preserved), `research.bats`, `/rpm` command list, `audit/project-mode`, `scan.sh` `RPM_SKILLS`, `auditor.md`, `tips.txt`, `CLAUDE.md`, 5 memory files. Both ports regenerated from `plugin/`; dropped the stale codex `deep-research` manual override (205 vs 372 lines) so codex `research` auto-translates like every other skill. bats 206/206. Published via `publish-all.sh` (dev + CC `master` + opencode + codex + tag `v2.21.0`). Also parked the rigorous v1/v2/native Dutch-primary-source bake-off (`docs/rpm/future/2026-05-31-dr-v1-v2-native-bakeoff.md`) as the top backlog TODO — the fresh end-to-end head-to-head the offline Tier-2 replay never covered.
 
 ## Active Specs
 
