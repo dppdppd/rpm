@@ -117,14 +117,27 @@ to fit a glance.
 
 1. Read `docs/rpm/future/tasks.org` to see existing parent headings
    and task structure.
-2. Ask which parent heading the task belongs under (suggest one if
-   obvious). If no headings exist, create one. When creating or
-   editing a `* Parent` that carries a `Goal:` / `Success:` line,
-   state the success metric as a **demonstrable test** (not a
-   gap-list or vague description) and ensure the goal's chain
-   terminates in a **verify/sign-off** task — file that terminus
-   now if it's missing, with the build gap-tasks as its
-   `:BLOCKED_BY:` deps. Don't leave a goal defined only by its
+2. Determine the parent heading:
+   - If an existing heading fits, suggest it (or ask when ambiguous).
+   - If none fits, **create a new `* Parent` group**. When the new
+     group names a coherent objective (a deliverable, capability, or
+     area of work with a demonstrable done-state), **propose a
+     `Goal:` body line for it** — don't silently create a goalless
+     group. State the proposed goal as a **demonstrable test** (a
+     pass/fail artifact that PROVES it met — "N cases pass
+     end-to-end vs reference", "trace 38/38" — not a gap-list or a
+     vague description like "launch ready"). The user accepts,
+     edits, or declines; on accept, write it as a `Goal:` body line
+     directly under the `* Parent`. **Skip the proposal** for pure
+     status bands (`Active`, `Blocked`) or catch-all buckets
+     (`Misc`, `Maintenance`, `Ideas`) where a success metric doesn't
+     apply.
+
+   For any `* Parent` that carries a `Goal:` / `Success:` line (new
+   or existing), keep the metric a **demonstrable test** and ensure
+   the goal's chain terminates in a **verify/sign-off** task — file
+   that terminus now if it's missing, with the build gap-tasks as
+   its `:BLOCKED_BY:` deps. Don't leave a goal defined only by its
    build gaps.
 3. Add as `** TODO <one-sentence description>
    [[file:YYYY-MM-DD-slug.md]]` followed by the standard
@@ -138,7 +151,19 @@ to fit a glance.
 5. If the task has obvious dependencies on existing tasks, add
    `:BLOCKED_BY: <other-slug>` inside the drawer (still
    structured metadata, not body).
-6. Confirm: print the new entry and its location.
+6. **Research offer (when warranted).** If the task crosses into a
+   domain or technology new to the project, hinges on external or
+   factual unknowns (APIs, libraries, standards, landscape/competitor
+   facts, best practices), or is a selection/evaluation/comparison
+   ("X vs Y", "which approach"), **offer to run the `research` skill
+   (`rpm:research`) on it first** — upfront research de-risks a
+   new-domain task before build effort is committed, and its saved
+   report (`docs/rpm/research/<slug>/`) can be linked from the detail
+   file. Offer only; don't auto-run (matches the research skill's own
+   Offer gate). Skip the offer for internal/mechanical work fully
+   scoped by the existing codebase (refactors, bugfixes, renames,
+   doc/test edits) or when the domain knowledge is already in hand.
+7. Confirm: print the new entry and its location.
 
 ---
 
