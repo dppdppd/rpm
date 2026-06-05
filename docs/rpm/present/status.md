@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-06-05
-- **Version**: 2.22.0
+- **Version**: 2.23.0
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
