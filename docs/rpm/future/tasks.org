@@ -3,14 +3,6 @@
 
 * Active
 
-** DONE Port goal-seeking discipline into rpm:next — file the PROOF step, not just gaps :CLOSED: [2026-06-05] [[file:2026-06-05-next-goal-seeking-weakness.md]]
-   :PROPERTIES:
-   :ID: next-goal-seeking-proof-step
-   :END:
-   rpm:next grinds gap-tasks but never derives a goal's demonstrable DoD + terminal
-   sign-off, so it gets "lost in the weeds" (Volta playable-parity miss 2026-06-05).
-   Generalize Volta's amendment Step 1.0 into plugin/skills/next + backlog hygiene.
-
 ** TODO v1/v2/native deep-research bake-off on a Dutch-primary-source VOC topic [[file:2026-05-31-dr-v1-v2-native-bakeoff.md]]
    :PROPERTIES:
    :ID: dr-v1-v2-native-dutch-bakeoff

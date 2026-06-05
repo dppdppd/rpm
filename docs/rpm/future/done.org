@@ -6,6 +6,14 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Port goal-seeking discipline into rpm:next — file the PROOF step, not just gaps [[file:2026-06-05-next-goal-seeking-weakness.md]]
+   CLOSED: [2026-06-05]
+   :PROPERTIES:
+   :ID: next-goal-seeking-proof-step
+   :END:
+   Generalized Volta's amendment Step 1.0 upstream: next/SKILL.md Task Selection
+   step 4 (demonstrable DoD + terminal verify/sign-off before grinding gaps) +
+   backlog Review demonstrable-goals hygiene. Released v2.22.0.
 ** DONE Tier 4 — evaluate CC-only Workflow fast path for /audit project mode [[file:2026-05-30-audit-workflow-fastpath.md]]
    CLOSED: [2026-05-31]
    :PROPERTIES:
