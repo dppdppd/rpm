@@ -139,15 +139,37 @@ After preflight, recompute `in-flight`.
    `## Worker Result` — log `drift-fix: pre-completed-todo: <id>`
    and continue to the next task instead of dispatching.
 
-4. **Goal-aligned dispatch.** Before picking the topmost actionable
-   task, score it against its `*` parent's `Goal:` line. The task
-   should either (a) close a stated success-metric gap or
-   (b) unblock a critical-path item. Side-quest tasks that don't
-   move the goal are deprioritized in favor of goal-aligned ones,
-   even when topmost in file order. If NO actionable task in any
-   parent moves a goal, that's a **gap** — file a new
-   research/triage/scoping task on the gap before dispatching
-   anything else, instead of idling.
+4. **Goal-seeking — file the PROOF step, don't just grind gaps.**
+   Before dispatching toward any `*` parent goal that is NOT MET,
+   reason **backward** from the goal — don't just pick the topmost
+   gap-task. Confirm both:
+   1. the goal's definition-of-done is a **DEMONSTRATION** — a
+      test/artifact that PROVES it met (e.g. "N representative cases
+      pass end-to-end vs reference", "trace 38/38"), not a
+      gap-checklist or a vague description ("launch ready");
+   2. a terminal **VERIFY / SIGN-OFF** task exists whose completion
+      DEMONSTRATES the goal met, with the gap-tasks as its
+      `:BLOCKED_BY:` deps.
+
+   If either is missing, **filing it is the dispatch** — file the
+   demonstrable DoD and/or the verify/sign-off task (decompose
+   backward: demonstrable DoD → verify/sign-off closer → the
+   gap-tasks it depends on) before grinding any gap-closer. This is
+   higher leverage than any gap-closer: a gap-closer only nudges a
+   NOT-MET goal; only the demonstration flips it to MET. Closing
+   every coded gap is necessary but not sufficient — without a
+   terminal proof the orchestrator gets "lost in the weeds,"
+   reporting progress while the actual capability is never verified.
+
+   Only once the chain terminates in a demonstrable proof, pick the
+   topmost actionable task by **goal-aligned dispatch:** score it
+   against its `*` parent's `Goal:` line. The task should either
+   (a) close a stated success-metric gap or (b) unblock a
+   critical-path item. Side-quest tasks that don't move the goal are
+   deprioritized in favor of goal-aligned ones, even when topmost in
+   file order. If NO actionable task in any parent moves a goal,
+   that's a **gap** — file a new research/triage/scoping task on the
+   gap before dispatching anything else, instead of idling.
 
 5. If there is a clear next task, dispatch a worker using the contract
    below and log `actionable-backlog`. Workers must persist their own

@@ -120,7 +120,14 @@ to fit a glance.
 1. Read `docs/rpm/future/tasks.org` to see existing parent headings
    and task structure.
 2. Ask which parent heading the task belongs under (suggest one if
-   obvious). If no headings exist, create one.
+   obvious). If no headings exist, create one. When creating or
+   editing a `* Parent` that carries a `Goal:` / `Success:` line,
+   state the success metric as a **demonstrable test** (not a
+   gap-list or vague description) and ensure the goal's chain
+   terminates in a **verify/sign-off** task — file that terminus
+   now if it's missing, with the build gap-tasks as its
+   `:BLOCKED_BY:` deps. Don't leave a goal defined only by its
+   build gaps.
 3. Add as `** TODO <one-sentence description>
    [[file:YYYY-MM-DD-slug.md]]` followed by the standard
    `:PROPERTIES: / :ID: <slug> / :END:` drawer, at the bottom of
@@ -167,6 +174,16 @@ to fit a glance.
    - **Scope:** any tasks too large for one session (~35 min)?
      Suggest decomposition.
    - **Duplicates:** overlapping tasks?
+   - **Demonstrable goals:** for any `* Parent` carrying a `Goal:` /
+     `Success:` line, that metric must be a **demonstrable test** (a
+     pass/fail artifact that PROVES it met — "N cases pass end-to-end
+     vs reference", "trace 38/38"), not a gap-checklist or a vague
+     description ("launch ready"). Every `[NOT MET]` goal's task chain
+     must **terminate in a verify/sign-off task** (with the build
+     gap-tasks as its `:BLOCKED_BY:` deps), not merely list build
+     gaps. Flag goals whose `Success:` is a gap-list/description or
+     whose chain has no terminal proof task. A metric reconcile/split
+     must add the "prove it" terminus in the **same** edit.
    - **Order:** work is sorted top-to-bottom by execution order
      (when it needs to get done)? Anything that should happen sooner
      than what's currently above it?

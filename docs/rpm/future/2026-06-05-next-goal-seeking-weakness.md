@@ -79,3 +79,22 @@ must add the "prove it" terminus in the same edit.
   vague description rather than a demonstrable test.
 - Volta's amendment Step 1.0 can then be trimmed to only project-specific notes
   (the general rule lives upstream).
+
+## Done (2026-06-05)
+
+- `plugin/skills/next/SKILL.md` — strengthened Task Selection step 4 into
+  "Goal-seeking — file the PROOF step, don't just grind gaps": before
+  dispatching toward a NOT-MET goal, demand (1) a demonstrable definition-of-done
+  and (2) a terminal verify/sign-off task; if either is missing, filing it IS the
+  dispatch (decompose backward), then fall through to the existing goal-aligned
+  dispatch. No renumber — Output Format's "step 4" reference stays valid.
+- `plugin/skills/backlog/SKILL.md` — added a **Demonstrable goals** check to
+  Review (flag any `* Parent` whose `Goal:`/`Success:` is a gap-list/vague
+  description, or whose `[NOT MET]` chain has no terminal proof task; reconcile
+  must add the "prove it" terminus in the same edit) and the same hygiene to Add
+  when a parent goal is created/edited.
+- Synced to the codex port via `scripts/sync-codex.sh` (next + backlog). Opencode
+  carries only the `rpm` skill, so nothing to mirror there.
+- Verified: `bash plugin/tests/run.sh` → 206/206 pass.
+- Follow-up (external, not in this repo): trim Volta's amendment Step 1.0 to
+  project-specifics now that the general rule lives upstream.

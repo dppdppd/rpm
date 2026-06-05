@@ -3,7 +3,7 @@
 
 * Active
 
-** TODO Port goal-seeking discipline into rpm:next — file the PROOF step, not just gaps [[file:2026-06-05-next-goal-seeking-weakness.md]]
+** DONE Port goal-seeking discipline into rpm:next — file the PROOF step, not just gaps :CLOSED: [2026-06-05] [[file:2026-06-05-next-goal-seeking-weakness.md]]
    :PROPERTIES:
    :ID: next-goal-seeking-proof-step
    :END:
