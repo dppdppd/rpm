@@ -149,6 +149,14 @@ def codex_next_body(body: str) -> str:
     ]
     for old, new in replacements:
         body = body.replace(old, new)
+
+    # Robust catch-alls. The exact-sentence rewrites above break whenever the
+    # shared SKILL body is restructured; these token-level passes keep newly
+    # added /loop and loop-mode phrasing on the Codex idiom regardless.
+    body = body.replace("`/loop /next`", "`do rpm:next until blocked`")
+    body = body.replace("- **Loop** —", "- **Autonomous directive** —")
+    body = body.replace("Loop mode", "Autonomous directive mode")
+    body = body.replace("loop mode", "autonomous directive mode")
     return body
 
 
@@ -178,19 +186,21 @@ def translate(src: str) -> str:
             skill_name = line.split(":", 1)[1].strip().strip('"').strip("'")
         if key_match and key_match.group(1) == "description" and skill_name == "next":
             line = (
-                "description: One-step rpm orchestrator. Runs preflight maintenance, "
-                "then either starts the next obvious backlog action or asks for "
-                "clarification when direct use leaves no clear next task. Designed "
-                "for Codex directives such as `do rpm:next until blocked` — never "
-                "loops internally. In autonomous directive mode it never waits for "
-                "input; it dispatches only unambiguous work and otherwise idles or "
-                "exhausts after 3 idle ticks. TRIGGER on terse forward-motion "
-                "prompts — phrasings like \"next\", \"next?\", \"next.\", "
-                "\"next task\", \"what's next\", \"do next\", \"go next\", "
-                "\"keep going\", \"continue\" (when the prior turn was rpm work) "
-                "all qualify and must route through this skill instead of being "
-                "answered inline from the SessionStart preview. Use whenever the "
-                "user wants the session to autonomously work the rpm backlog."
+                "description: One-step rpm orchestrator, or a bounded internal "
+                "sequence when given a count or scope. Runs preflight maintenance, "
+                "then starts the next obvious backlog action (or, in direct use, "
+                "asks for clarification when nothing is clearly next). With no "
+                "argument it runs one step; with `N`, `blocked`, `all`, or a group "
+                "name it runs several steps itself — one worker at a time, skipping "
+                "the heavy preflight between steps. It never fans out and never "
+                "waits for input mid-sequence; it also runs under a Codex directive "
+                "such as `do rpm:next until blocked`. TRIGGER on terse "
+                "forward-motion prompts — phrasings like \"next\", \"next?\", "
+                "\"next.\", \"next task\", \"what's next\", \"do next\", "
+                "\"go next\", \"keep going\", \"continue\" (when the prior turn was "
+                "rpm work) all qualify and must route through this skill instead of "
+                "being answered inline from the SessionStart preview. Use whenever "
+                "the user wants the session to autonomously work the rpm backlog."
             )
         out.append(line)
         i += 1

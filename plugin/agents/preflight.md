@@ -27,6 +27,18 @@ of delegating to you.
 ## Inputs (from the dispatch prompt)
 
 - `mode`: `direct` or `loop`.
+- `phases` (optional, default `full`):
+  - `full` — run all three phases below (the default and only behavior
+    before this input existed).
+  - `review-only` — skip Phase 1 (mechanical drift) and Phase 2
+    (guidance contradictions) entirely; run **only** Phase 3 (worker
+    review). The orchestrator uses this on a lite `/loop /next` tick
+    when a worker result is pending but a full preflight already ran
+    recently — it keeps the worker's diff out of the orchestrator's
+    context without re-paying for the drift scan and contradiction
+    check. In `review-only`, report `drift-fixes: none`,
+    `drift-decisions: none`, and `contradictions: 0` without running
+    those phases.
 - `scan_script`: absolute path to session-end `scan.sh`.
 - `contradiction_script`: absolute path to `contradiction-check.sh`.
 - `review_ready_script`: absolute path to `review-ready.sh`.
@@ -38,11 +50,14 @@ of delegating to you.
 - `today`: `YYYY-MM-DD` — use this exact value for any dated artifact;
   do not infer the date.
 
-Run the three phases in order. Log each decision yourself via
+Run the phases in order — all three when `phases` is `full`, only
+Phase 3 when `phases` is `review-only`. Log each decision yourself via
 `log_script` (the orchestrator will NOT re-log them). Do real work;
 keep edits limited to obvious mechanical fixes.
 
 ## Phase 1 — mechanical drift
+
+> Skip this phase entirely when `phases` is `review-only`.
 
 Run `bash <scan_script>`. Treat as actionable drift:
 `broken_refs.count > 0`, `claude_md.status` warn/critical, stale rpm
@@ -64,6 +79,8 @@ do not guess — surface it under `drift-decisions` and let the
 orchestrator route it to the user.
 
 ## Phase 2 — guidance contradictions
+
+> Skip this phase entirely when `phases` is `review-only`.
 
 Run `bash <contradiction_script> check`:
 
