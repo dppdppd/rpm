@@ -24,7 +24,7 @@ Print this exact list and stop:
 /audit documents — scan docs, agent instructions, memory, session drift
 /audit project   — full review with competitive research and plan
 /backlog         — manage rpm backlog (add, list, review, postpone, done)
-/next            — one-step orchestrator (loop-friendly: /loop /next)
+/next            — one step, or a sequence: /next N | blocked | all | <group>
 /next status     — view in-flight subagents, recent decisions, idle streak
 /rpm             — what is rpm, how it works, governing principles
 /rpm ?           — this list
@@ -52,7 +52,7 @@ recommend. You do NOT write feature code.
 | `/audit documents` | Scan docs, agent instructions, memory, session drift via `rpm:auditor` |
 | `/audit project` | Full review — code, architecture, competitive research, plan file |
 | `/backlog` | Manage the **rpm backlog** (long-term, `tasks.org`) — add, list, review, postpone, complete. Distinct from Claude's native `TaskCreate` list (session-scoped). |
-| `/next` | One-step orchestrator — picks one action per turn from a priority list (drift-fix → actionable backlog → idle), dispatches subagents in background, terminates loop after 3 idle ticks. Wrap with `/loop /next` for unattended execution. |
+| `/next` | Orchestrator. With no argument: one action per turn from a priority list (drift-fix → actionable backlog → idle), background worker, loop-friendly via `/loop /next`, terminates after 3 idle ticks. With `N` / `blocked` / `all` / a group name: runs a bounded internal sequence — one worker at a time, heavy preflight only at the start and end. |
 
 | Skill | What you do |
 |---|---|
