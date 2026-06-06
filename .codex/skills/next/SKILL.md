@@ -1,18 +1,24 @@
 ---
 name: next
-description: One-step rpm orchestrator. Runs preflight maintenance, then either starts the next obvious backlog action or asks for clarification when direct use leaves no clear next task. Designed for Codex directives such as `do rpm:next until blocked` — never loops internally. In autonomous directive mode it never waits for input; it dispatches only unambiguous work and otherwise idles or exhausts after 3 idle ticks. TRIGGER on terse forward-motion prompts — phrasings like "next", "next?", "next.", "next task", "what's next", "do next", "go next", "keep going", "continue" (when the prior turn was rpm work) all qualify and must route through this skill instead of being answered inline from the SessionStart preview. Use whenever the user wants the session to autonomously work the rpm backlog.
+description: One-step rpm orchestrator, or a bounded internal sequence when given a count or scope. Runs preflight maintenance, then starts the next obvious backlog action (or, in direct use, asks for clarification when nothing is clearly next). With no argument it runs one step; with `N`, `blocked`, `all`, or a group name it runs several steps itself — one worker at a time, skipping the heavy preflight between steps. It never fans out and never waits for input mid-sequence; it also runs under a Codex directive such as `do rpm:next until blocked`. TRIGGER on terse forward-motion prompts — phrasings like "next", "next?", "next.", "next task", "what's next", "do next", "go next", "keep going", "continue" (when the prior turn was rpm work) all qualify and must route through this skill instead of being answered inline from the SessionStart preview. Use whenever the user wants the session to autonomously work the rpm backlog.
 ---
 
 # rpm:next
 
-Single-step orchestrator that handles preflight maintenance, then tries
-to move the backlog forward. A normal direct `rpm:next` turn should end by
+Orchestrator that handles preflight maintenance, then tries to move the
+backlog forward. With **no argument** a direct `/next` turn ends by
 either starting the next obvious backlog action or asking the user to
-clarify what should be next. An autonomous Codex directive must not
-expect user input; it dispatches only unambiguous work and otherwise
-idles until the loop-exhausted guard stops it. **Never loops internally.** For
-self-paced execution, use a directive such as
-`do rpm:next until blocked`.
+clarify what should be next; a looped `/next` turn must not expect user
+input, dispatches only unambiguous work, and otherwise idles until the
+loop-exhausted guard stops it.
+
+When given a **count or scope** (`N`, `blocked`, `all`, or a group
+name), `/next` runs a **bounded internal sequence** instead: it works
+several backlog items in one turn, one worker at a time, skipping the
+heavy preflight between steps (see **Sequencing**). Even then it never
+fans out — sequencing adds *depth*, not parallel *width* — and it never
+waits for user input mid-sequence. `do rpm:next until blocked` still works for the
+no-argument form and benefits from the same preflight cadence.
 
 ## Project Amendments
 
@@ -26,36 +32,133 @@ on conflict, this SKILL.md wins.
 
 ## Routing
 
-If `$ARGUMENTS` is `status`, run the status formatter and stop:
+Parse `$ARGUMENTS` into a first token and an optional second token:
 
-!`bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/status.sh`
+- **empty** → run one orchestrator step (the single-step flow below).
+- **`status`** → run the status formatter and stop:
 
-Render the script's output verbatim. Do not interpret, summarize, or
-add commentary — the user wants the raw view.
+  !`bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/status.sh`
 
-If `$ARGUMENTS` is empty, continue with the orchestrator below.
+  Render the output verbatim. Do not interpret, summarize, or add
+  commentary — the user wants the raw view.
+- **integer `N` (≥ 1)** → run a sequence of up to N cycles (see
+  **Sequencing**). `N = 1` is identical to the single-step flow.
+- **`blocked`** → run a sequence until a task needs the user, or no
+  actionable task remains.
+- **`all`** → run a sequence until no actionable task remains, skipping
+  tasks that need the user and continuing with the rest.
+- **anything else** → treat the first token as a `* Parent` **group
+  name** in `docs/rpm/future/tasks.org` (match the heading text exactly,
+  then case-insensitively). An optional second token scopes the run
+  within that group: `N`, `all`, or `blocked` (default: drain the group
+  until it has no actionable task or one needs the user). If no parent
+  matches, print the usage block below and stop.
 
-If `$ARGUMENTS` is anything else, print:
+Reserved first tokens (`status`, `blocked`, `all`, and any integer) are
+never interpreted as group names.
+
+Usage block (print only when the argument is unrecognized):
 
 ```
-rpm:next     — one orchestrator step; for autonomous mode, ask `do rpm:next until blocked`
-rpm:next status — show in-flight subagents, recent decisions, idle streak, daily counters
+/next               — one orchestrator step
+/next N             — up to N steps (one worker each); heavy preflight only at start + end
+/next blocked       — run until a task needs you, or nothing is actionable
+/next all           — run everything actionable, skipping tasks that need you
+/next <group> [N]   — work only that backlog group (drain it, or N steps)
+/next status        — in-flight subagents, recent decisions, idle streak, counters
+(`do rpm:next until blocked` still wraps the one-step form for unattended runs)
 ```
-
-and stop.
 
 ## Mode
 
-Infer autonomous directive mode when the current invocation is visibly
-part of a Codex directive such as `do rpm:next until blocked`, an
-unattended dynamic run, or repeated automatic invocation.
-Otherwise treat it as direct interactive mode.
+There are three modes:
 
-- **Direct mode** may ask one concise clarification question when no
-  obvious next backlog action can be started safely.
-- **Autonomous directive mode** must not ask for input. If there is no
-  unambiguous action, log `idle` with the reason and stop. After 3
-  consecutive idle ticks, emit `loop-exhausted`.
+- **Direct (single-step)** — no argument, run interactively. May ask one
+  concise clarification question when no obvious next backlog action can
+  be started safely.
+- **Autonomous directive** — this invocation is visibly part of `do rpm:next until blocked`, an
+  unattended dynamic loop, or repeated automatic invocation. Must not ask
+  for input. If there is no unambiguous action, log `idle` with the
+  reason and stop; after 3 consecutive idle ticks, emit `loop-exhausted`.
+- **Sequence** — `/next` was given a count or scope (`N` / `blocked` /
+  `all` / `<group>`). Runs a bounded internal loop (see **Sequencing**).
+  Like autonomous directive mode it never asks for input mid-sequence; it stops at the
+  argument's termination condition or the safety ceiling.
+
+## Sequencing
+
+Triggered by a count or scope argument. A sequence runs cycles **in the
+foreground, strictly one worker at a time** — never in parallel. The
+one-worker-at-a-time ceiling from **Concurrency** still holds; a sequence
+adds depth, not width.
+
+1. **Full preflight once, at the start.** Run the delegated preflight
+   (Preflight step 2) with `phases=full`, act on its report, and log a
+   marker:
+
+   ```bash
+   bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/log-decision.sh preflight-full "" "sequence start"
+   ```
+
+2. **Cycle loop.** Repeat until a termination condition (below) or the
+   safety ceiling:
+   - **a. Cheap inline gate.** Check the termination conditions and the
+     outstanding-user-blocker rule (Preflight step 1). **Do not** run the
+     drift scan, the contradiction check, or the preflight subagent
+     here — that overhead is exactly what a sequence exists to avoid.
+   - **b. Task Selection.** Recompute in-flight, walk the tree,
+     goal-aligned dispatch, apply the group filter if scoped, and run the
+     `is-pre-completed.sh` skip check.
+   - **c. Dispatch ONE worker** using the Worker Contract, **in the
+     foreground** — await its terse result, do not background it. Log
+     `actionable-backlog`.
+   - **d. Review inline.** Evaluate the returned result, mark the backlog
+     entry DONE (or append changes-requested notes to the detail file),
+     then log `review-result` and a paired `backlog-result`. Lean on the
+     worker's terse report (it also persisted the full result to the
+     detail file) to keep orchestrator context lean.
+
+3. **Full preflight once, at the end.** After the loop stops, run the
+   delegated preflight again with `phases=full` — it catches any drift
+   the workers introduced — and log a second `preflight-full` marker
+   (`"sequence end"`).
+
+4. Emit the **sequence summary** (see Output Format).
+
+### Termination
+
+- **`N`** — stop after N completed cycles.
+- **`blocked`** — stop the moment a cycle would need user input (the top
+  candidate's only next move is a question), or when no actionable task
+  remains.
+- **`all`** — stop only when no actionable task remains. If a cycle's top
+  candidate needs user input, skip it (leave it as-is) and continue with
+  the next actionable task; collect skipped items for the summary.
+- **`<group>`** — restrict Task Selection to the matched `* Parent`;
+  terminate per the second token (`N` / `all` / `blocked`, default
+  drain-until-empty-or-blocked).
+- **Safety ceiling.** `blocked`, `all`, and unbounded group runs stop
+  after at most **25 cycles** in one invocation. On hitting it, stop and
+  report `ceiling reached — run again to continue`. An explicit `N` above
+  25 is honored, still cycle-by-cycle; the ceiling only bounds the
+  open-ended forms.
+
+### Preflight cadence (autonomous directive mode)
+
+Outside a sequence, `do rpm:next until blocked` repeats the single-step flow across
+separate turns. To avoid re-paying the full preflight every tick, run
+`bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/preflight-due.sh` at the top of a loop
+tick:
+
+- **`full`** → run the delegated preflight with `phases=full` and log a
+  `preflight-full` marker (this happens when there is no prior marker,
+  the last one is stale, or a guidance input changed).
+- **`lite`** → skip the drift scan and contradiction check. Do the inline
+  blocker check, then run `review-ready.sh`; **only if** a worker result
+  is pending, dispatch the preflight subagent with `phases=review-only`
+  to review it. Then continue to Task Selection.
+
+Direct single-step `/next` (no argument) always runs a full preflight.
 
 ## Orchestrator Flow
 
@@ -64,6 +167,10 @@ first, in order, and continue to task selection when the preflight item
 was resolved locally. Stop only when continuing would be unsafe, when a
 direct-mode user question is required, or when autonomous directive mode has no
 unambiguous next action.
+
+This section describes a single step. A **Sequence** (see **Sequencing**)
+runs the full preflight once at the start and once at the end; each
+in-between cycle skips the preflight and goes straight to Task Selection.
 
 ### Preflight
 
@@ -83,6 +190,9 @@ unambiguous next action.
    context, not this one. Resolve each value before sending — pass real
    paths, not literals:
    - `mode=` `direct` or `loop` (this turn's mode)
+   - `phases=` `full` (default — all three phases) or `review-only`
+     (Phase 3 worker review only; used on a `lite` loop tick that has a
+     pending worker result, per **Preflight cadence**)
    - `scan_script=${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/session-end/scripts/scan.sh`
    - `contradiction_script=${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/contradiction-check.sh`
    - `review_ready_script=${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/review-ready.sh`
@@ -124,7 +234,10 @@ After preflight, recompute `in-flight`.
    just the recurring/triage sub-task you most recently dispatched.
    Each `*` parent should carry a `Goal:` body line stating the
    measurable success metric for that tier; tasks are evaluated
-   against it (see "Goal-aligned dispatch" below).
+   against it (see "Goal-aligned dispatch" below). **When the run is
+   scoped to a group** (the `<group>` argument), restrict the walk to
+   tasks under the matched `* Parent` only — other parents are out of
+   scope for both selection and termination.
 
 3. The clear next task is the topmost TODO or IN-PROGRESS entry
    whose `:BLOCKED_BY:` deps all resolve to DONE or CANCELLED, as
@@ -231,6 +344,23 @@ verbatim-ish (its `drift-fixes`, `contradictions`, and `review` lines) —
 that summary IS the preflight view; do not re-derive it by re-running
 the scans or re-reading the diff.
 
+### Sequence output
+
+For a sequence, do not print the four-line block per cycle. Emit one
+short line per cycle as it completes, then a final summary:
+
+```
+sequence: <arg>  (cycles: <done>/<limit>, done: <X>, changes-requested: <C>, skipped-needs-user: <S>)
+preflight: full@start, full@end
+  1. <task-id> → <approved | changes-requested | skipped>
+  2. <task-id> → ...
+stopped: <count reached | nothing actionable | task needs you | ceiling reached — run again to continue>
+next: <hint>
+```
+
+The two `preflight-full` runs are the only preflight entries — do not
+report a preflight per cycle.
+
 ## Logging
 
 Use the helper script — never hand-format JSONL:
@@ -264,6 +394,13 @@ Log with the appropriate kind:
 - `idle` — empty `<target>`, short `<rationale>`.
 - `loop-exhausted` — empty `<target>`, fixed `<rationale>` like
   `3 idle ticks`.
+- `preflight-full` — empty `<target>`, short `<rationale>` (e.g.
+  `sequence start`, `sequence end`, `loop tick`). Marks that a full
+  preflight ran. `preflight-due.sh` reads the most recent one to decide
+  whether a later loop tick can go `lite`. It is ignored by the
+  decisions view and the idle-streak count (status.sh and the Idle
+  Terminal filter only track terminal decisions), so it never resets the
+  loop-exhausted guard.
 - `backlog-result` — when a `<task-notification>` arrives for a prior
   `actionable-backlog` dispatch, log it: pass the same `<target>` and
   `<agent-id>` plus a `<status>` of
@@ -368,14 +505,17 @@ not rely on the worker's own logging — it didn't reach that step.
 
 ## Concurrency — one worker at a time
 
-`rpm:next` itself is a single orchestrator turn. It may do several
-preflight actions inline, but it dispatches at most one new
-`actionable-backlog` worker. The subagent runs in background, but only
-ONE may be in-flight at a time. Full depth, multi-game verified before
-merge.
+A no-argument `/next` is a single orchestrator turn that dispatches at
+most one new `actionable-backlog` worker in the background; the next turn
+reviews it. A **sequence** (`N` / `blocked` / `all` / `<group>`)
+dispatches workers one after another in the **foreground**, waiting for
+each to finish before starting the next. Either way, **only ONE worker is
+ever in-flight at a time** — sequencing adds depth, never width. Full
+depth, verified before merge.
 
-If `<N>` >= 1 after preflight, do not dispatch another worker. Output
-`action: idle` with `next: waiting on in-flight worker`.
+For the no-argument form: if `<N>` >= 1 after preflight, do not dispatch
+another worker. Output `action: idle` with `next: waiting on in-flight
+worker`.
 
 Rationale (2026-05-04 audit): saturating to 4 produced an 8.4%
 dispatch hit rate (107 dispatches -> 9 shipped fixes) because (a)
@@ -387,7 +527,8 @@ with corpus-wide verification trades throughput for hit rate.
 This ceiling is deliberate and overrides any default to fan out —
 including ultracode / automatic Workflow orchestration. Do not raise
 `/next` concurrency to chase throughput; the hit-rate math above is the
-reason.
+reason. A sequence does not violate this: it is still single-threaded,
+raising depth (more items, one at a time) rather than concurrency.
 
 ## What this skill does NOT do
 
@@ -440,6 +581,29 @@ next: USER ATTENTION needed for: choose next backlog item
 
 Reviewed worker <id> for `sync-codex-scripts`; approved.
 Which backlog item should rpm start next?
+```
+
+Sequence run (`/next 3`):
+
+```
+sequence: 3  (cycles: 3/3, done: 3, changes-requested: 0, skipped-needs-user: 0)
+preflight: full@start, full@end
+  1. sync-codex-scripts → approved
+  2. fix-broken-ref     → approved
+  3. update-readme      → approved
+stopped: count reached
+next: backlog top is now `dutch-bakeoff` (needs a scope decision)
+```
+
+Sequence run that stops early (`/next blocked`):
+
+```
+sequence: blocked  (cycles: 2, done: 2, changes-requested: 0, skipped-needs-user: 0)
+preflight: full@start, full@end
+  1. fix-broken-ref → approved
+  2. sync-codex     → approved
+stopped: task needs you
+next: USER ATTENTION needed for: `dutch-bakeoff` scope (v1/v2/native?)
 ```
 
 ## Codex Experimental Worker Wake
