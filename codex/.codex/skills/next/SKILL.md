@@ -1,6 +1,6 @@
 ---
 name: next
-description: One-step rpm orchestrator, or a bounded internal sequence when given a count or scope. Runs preflight maintenance, then starts the next obvious backlog action (or, in direct use, asks for clarification when nothing is clearly next). With no argument it runs one step; with `N`, `blocked`, `all`, or a group name it runs several steps itself — one worker at a time, skipping the heavy preflight between steps. It never fans out and never waits for input mid-sequence; it also runs under a Codex directive such as `do rpm:next until blocked`. TRIGGER on terse forward-motion prompts — phrasings like "next", "next?", "next.", "next task", "what's next", "do next", "go next", "keep going", "continue" (when the prior turn was rpm work) all qualify and must route through this skill instead of being answered inline from the SessionStart preview. Use whenever the user wants the session to autonomously work the rpm backlog.
+description: One-step rpm orchestrator, or a bounded internal sequence when given a count or scope. Runs preflight maintenance, then starts the next obvious backlog action (or, in direct use, asks for clarification when nothing is clearly next). With no argument it runs one step; with `N`, `blocked`, `all`, or a group name it runs several steps itself — one worker at a time, skipping the heavy preflight between steps, and is the recommended way to work several backlog items at once — cheaper than driving `rpm:next` from an external loop. It never fans out and never waits for input mid-sequence. TRIGGER on terse forward-motion prompts — phrasings like "next", "next?", "next.", "next task", "what's next", "do next", "go next", "keep going", "continue" (when the prior turn was rpm work) all qualify and must route through this skill instead of being answered inline from the SessionStart preview. Use whenever the user wants the session to autonomously work the rpm backlog.
 ---
 
 # rpm:next
@@ -17,8 +17,12 @@ name), `/next` runs a **bounded internal sequence** instead: it works
 several backlog items in one turn, one worker at a time, skipping the
 heavy preflight between steps (see **Sequencing**). Even then it never
 fans out — sequencing adds *depth*, not parallel *width* — and it never
-waits for user input mid-sequence. `do rpm:next until blocked` still works for the
-no-argument form and benefits from the same preflight cadence.
+waits for user input mid-sequence. **For an attended multi-step push,
+reach for a sequence first** — it is cheaper than an external loop (heavy
+preflight only at the start and end, not every tick) and stays in one
+turn. `do rpm:next until blocked` still works and remains the right tool for genuinely
+unattended or scheduled runs that span many turns; it benefits from the
+same preflight cadence.
 
 ## Project Amendments
 
@@ -66,7 +70,7 @@ Usage block (print only when the argument is unrecognized):
 /next all           — run everything actionable, skipping tasks that need you
 /next <group> [N]   — work only that backlog group (drain it, or N steps)
 /next status        — in-flight subagents, recent decisions, idle streak, counters
-(`do rpm:next until blocked` still wraps the one-step form for unattended runs)
+(prefer the sequence forms above; `do rpm:next until blocked` still wraps the one-step form for unattended, multi-turn runs)
 ```
 
 ## Mode
@@ -361,6 +365,39 @@ next: <hint>
 The two `preflight-full` runs are the only preflight entries — do not
 report a preflight per cycle.
 
+### Cheaper-path tip (once per run)
+
+Interior sequencing is cheaper than driving `/next` from an external
+`do rpm:next until blocked`: a sequence pays the heavy preflight only at its start and
+end, while a loop re-checks it every tick. To steer users toward the
+cheaper path **without nagging**, emit a one-time tip.
+
+On a **Autonomous directive mode** tick, append one extra line to the output —
+
+```
+tip: /next all runs this in one cheaper turn (skips per-tick preflight)
+```
+
+— if and only if **both** hold:
+
+1. there are **≥ 2 actionable backlog tasks** this turn (an interior
+   sequence would batch more than one — a single-task backlog gains
+   nothing from sequencing), and
+2. no `nudge` marker appears in
+   `docs/rpm/~rpm-orchestrator-log.jsonl` after the most recent
+   `loop-exhausted` entry (or anywhere in the log, if there is none).
+
+When you emit it, log the marker so it does not repeat this run:
+
+```bash
+bash ${RPM_PLUGIN_ROOT:-${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex}/skills/next/scripts/log-decision.sh nudge "" "suggested /next all"
+```
+
+This fires **at most once per loop run**. It never blocks, never gates
+dispatch, and never repeats — under-suggesting is preferred to nagging
+(soft suggestion only, per rpm's recommend-not-force stance). Direct and
+Sequence modes never emit it.
+
 ## Logging
 
 Use the helper script — never hand-format JSONL:
@@ -401,6 +438,11 @@ Log with the appropriate kind:
   decisions view and the idle-streak count (status.sh and the Idle
   Terminal filter only track terminal decisions), so it never resets the
   loop-exhausted guard.
+- `nudge` — empty `<target>`, short `<rationale>` like
+  `suggested /next all`. Marks that the one-time Autonomous directive mode cheaper-path
+  tip fired (see **Cheaper-path tip**). Like `preflight-full`, it is
+  ignored by the decisions view and the idle-streak count, so it never
+  resets the loop-exhausted guard.
 - `backlog-result` — when a `<task-notification>` arrives for a prior
   `actionable-backlog` dispatch, log it: pass the same `<target>` and
   `<agent-id>` plus a `<status>` of
