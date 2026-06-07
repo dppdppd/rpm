@@ -73,3 +73,26 @@ and how does it compare to native.
 ## Cost gate
 2–3 live runs, ~3.5–4M tokens, ~30–60 min wall-clock. The "spend real tokens"
 step — unlike all the offline Tier-1/2 work. Run only when greenlit.
+
+## Progress (2026-06-07) — v1 + v2 DONE, native pending
+
+Greenlit and run. **v1 and v2 are complete and graded**; the **native arm**
+is handed off to a fresh session (this session ran out of context budget for
+the ~2.7M-token native Workflow run).
+
+- Sub-questions pinned (3 Dutch-primary-only probes, each with a built-in
+  mistranslation trap) → `runs/2026-06-07-triplet/sub-questions.md` (public +
+  private key).
+- v1 (`24d8ab0` pre-hardening) and v2 (HEAD hardened) ran as background
+  subagents on the identical question, graded blind against the held-out key +
+  frozen corpus → `runs/2026-06-07-triplet/{v1,v2}/report.md`,
+  `grading/{v1,v2}-grading.md`, `scorecard.md`.
+- **Primary finding:** on this Dutch-primary probe the v1→v2 hardening showed
+  **no fidelity gain and one false-confidence regression** — on Sub-Q2 v2
+  mis-extracted the Banda casualties from the same primary and fabricated an
+  officer ("Captain Vogel"), which its figure-ledger/kill-list certified as
+  HIGH-confidence/zero-orphan; v1 got them right. Caveat n=1. Full table +
+  caveats in `scorecard.md`.
+- **Native arm next:** see `runs/2026-06-07-triplet/NATIVE-ARM-TODO.md` —
+  self-contained: run the real bundled `/deep-research`, grade it the same way,
+  fill the 3rd scorecard column, then mark this item DONE.

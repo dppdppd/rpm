@@ -1,0 +1,698 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<link rel="canonical" href="https://www.vocsite.nl/geschiedenis/octrooi1602/">
+		<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 	<meta http-equiv="cache-control" content="max-age=5400" />  -->
+	
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+
+	<title>De VOCsite : octrooi van 1602</title>
+
+	<link type="image/ico" rel="icon" href="/favicon.ico" />
+	
+	<link type="text/css" href="/css/responsive2.css" rel="stylesheet" />
+    <link type="text/css" href="/js/cookieconsent/cookieconsent.min.css" rel="stylesheet" />
+
+	<script type="text/javascript" nonce="" src="/js/jquery-3.4.1.min.js"></script>
+
+	<!-- tbv searchbox -->
+	<link rel="stylesheet" type="text/css" href="/css/searchbox.css">
+    <script type="text/javascript" nonce="" src="/js/searchbox.js"></script>
+    
+    <!-- tbv superfish menu -->
+ 	<link rel="stylesheet" type="text/css" href="/css/superfish/superfish.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="/css/superfish/superfish-theme-vocsite.css" media="screen">
+    <script async type="text/javascript" nonce="" src="/js/superfish/hoverIntent.min.js"></script>
+	<script async type="text/javascript" nonce="" src="/js/superfish/superfish.min.js"></script>
+	
+	<script type="text/javascript" nonce="" src="/js/hamburger.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="/css/vocsite2.css" />
+ 
+    <script async type="text/javascript" nonce="">
+    $(document).ready(function() {
+      $('ul.sf-menu').superfish({
+		  	delay:       1000,                            // one second delay on mouseout
+			animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation
+			speed:       'fast',                          // faster animation speed
+			autoArrows:  false								// disable generation of arrow mark-up
+	  });
+    });
+    </script>
+
+	<!-- Matomo -->
+<script type="text/javascript" nonce="">
+  var _paq = window._paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://stats.vocsite.nl/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+  
+</head>
+<body>
+
+<div class="header">
+	<div class="header-inner">
+		<div id="logo"> <a href="/"><img src="https://www.vocsite.nl/images/layout/vocsite.png" alt="Homepage" align="middle" /></a> </div>
+		<div id="navcontainer">
+    		<div id="navigation">
+  <ul class="sf-menu" id="nav">
+    <li><span>Home</span>
+    	<ul>
+        	<li><a href="https://www.vocsite.nl/index.php">Home</a></li>
+        	<li><a href="https://www.vocsite.nl/informatie.php">Informatie</a></li>
+            <li><a href="https://www.vocsite.nl/privacybeleid.php">Privacybeleid</a></li>
+        	<li><a href="https://www.vocsite.nl/sitemap.php">Sitemap</a></li>
+        </ul>
+    </li>
+    <li><span>Geschiedenis</span>
+      <ul>
+        <li><a href="https://www.vocsite.nl/geschiedenis/voorcompagnieen/">Voorcompagnieën</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/organisatie/">Organisatie van de VOC</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/octrooi1602/">Octrooi van 1602</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/navigatie/">Navigatie 17e/18e eeuw</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/gouverneurs-generaal/">Gouverneurs-Generaal</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/functies/">Functies en rangen</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/engelseoorlogen/">VOC en Engelse Oorlogen</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/concurrenten/">Concurrenten van de VOC</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/nedaus1.php">Australi&euml; en de VOC</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/slavernij/">Slavernij en slavenhandel</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/tijdbalk/">Tijdbalk 17e en 18e eeuw</a></li>
+      </ul>
+    </li>
+    <li><span>Handelsposten</span>
+      <ul>
+      	<li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/">Introductie</a></li>
+      	<li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/forten/">Lijst forten</a></li>
+        <li><span>Westelijke gebieden</span>
+          <ul>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/kaap/">Kaap de Goede Hoop</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/mozambique/">Mozambique</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/mauritius/">Mauritius</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/mocha/">Arabië</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/perzie/">Perzi&euml;</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/suratte/">Suratte</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/malabar/">Malabar</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/ceylon/">Ceylon</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/coromandel/">Coromandel</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/bengalen/">Bengalen</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/arakan/">Arakan en Birma</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/siam/">Siam (Thailand)</a></li>
+            <li> <a href="https://www.vocsite.nl/geschiedenis/handelsposten/malakka/">Malakka</a></li>
+          </ul>
+        </li>
+        <li><span>Indische archipel</span>
+          <ul>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/palembang/">Palembang en Jambi</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/sumatraw/">Sumatra's Westkust</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/bantam/">Bantam en Lampong</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/batavia/">Batavia</a>
+            <ul>
+     		<li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/onrust/">Onrust</a></li>
+     		<li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/onrust/">Kuiper</a></li>
+            </ul>
+            </li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/cheribon/">Cheribon</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/javano/">Java's Noord-Oostkust</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/moluccos/">Moluccos (Ternaten)</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/amboina/">Amboina</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/banda/">Banda</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/timor/">Timor/Solor</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/pontiana/">Pontianak</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/bandjarmasin/">Bandjarmasin</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/makassar/">Makassar</a></li>
+          </ul>
+        </li>
+        <li><span>Noordoostelijke gebied</span>
+          <ul>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/cambodja/">Cambodja</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/tonkin/">Tonkin en Quinam</a></li>
+            <li><a href="https://www.vocsite.nl/geschiedenis/handelsposten/china/">China</a></li>
+            <li> <a href="https://www.vocsite.nl/geschiedenis/handelsposten/formosa/">Formosa (Taiwan)</a></li>
+            <li> <a href="https://www.vocsite.nl/geschiedenis/handelsposten/japan/">Japan</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><span>Schepen</span>
+      <ul>
+        <li><a href="https://www.vocsite.nl/schepen/">Introductie</a></li>
+        <li><a href="https://www.vocsite.nl/schepen/scheepstypen/">Scheepstypen</a></li>
+        <li><a href="https://www.vocsite.nl/schepen/bewapening/">Bewapening 17e eeuw</a></li>
+        <li id="database"><a href="https://www.vocsite.nl/schepen/lijst/">Database van schepen</a></li>
+        <li><a href="https://www.vocsite.nl/schepen/vergaan/">Vergaan en vermist</a></li>
+        <li><a href="https://www.vocsite.nl/schepen/zoeken.php">Zoeken</a></li>
+      </ul>
+    </li>
+    <li><span>Woordenlijsten</span>
+      <ul>
+        <li><a href="https://www.vocsite.nl/woordenlijst/">Scheepsbouw</a></li>
+        <li><a href="https://www.vocsite.nl/woordenlijst/tuigage/">Zeilen en tuigage</a></li>
+        <li><a href="https://www.vocsite.nl/woordenlijst/po/">Personeel en Organisatie</a></li>
+        <li><a href="https://www.vocsite.nl/woordenlijst/navigatie/">Navigatie</a></li>
+        <li><a href="https://www.vocsite.nl/woordenlijst/producten/">Producten</a></li>
+        <li><a href="https://www.vocsite.nl/woordenlijst/geo/">Geografische namen</a></li>
+        <li><a href="https://www.vocsite.nl/woordenlijst/witsen/">Nicolaas Witsen</a></li>
+        <li><a href="https://www.vocsite.nl/woordenlijst/zoeken/">Zoeken in woordenlijsten</a></li>
+      </ul>
+    </li>
+    <li><span>Boeken</span>
+      <ul>
+        <li><a href="https://www.vocsite.nl/boeken/">Alle rubrieken</a></li>
+        <li><a href="https://www.vocsite.nl/boeken/geschiedenis/">Geschiedenis</a></li>
+        <li><a href="https://www.vocsite.nl/boeken/handelsposten/">Handelsposten</a></li>
+        <li><a href="https://www.vocsite.nl/boeken/schepen/">Schepen</a></li>
+        <li><a href="https://www.vocsite.nl/boeken/jeugd/">Jeugdboeken</a></li>
+        <li><a href="https://www.vocsite.nl/boeken/english/">Books in English</a></li>
+        <li><a href="https://www.vocsite.nl/boeken/nieuw/">Recent verschenen</a></li>
+      </ul>
+    </li>
+    <li><a href="https://www.vocsite.nl/links/">Links</a></li>
+  </ul>
+</div>
+<!-- einde navigation --> 
+    		<div class="sb_container">
+        	    <form method="get" action="https://www.vocsite.nl/zoeken/index.php" class="searchbox">
+            	    <input type="hidden" name="type" value="and" />
+            	    <input type="hidden" name="results" value="20" />
+            	    <input type="hidden" name="search" value="1" />
+            	    <input type="text" name="query_t" class="searchbox-input" placeholder="Zoeken......" name="search" onkeyup="buttonUp();" id="query" required>
+            	    <input type="image" src="https://www.vocsite.nl/images/layout/icon-search_back.png" value="Submit" alt="Submit" class="searchbox-submit">
+            	    <span class="searchbox-icon"><img src="https://www.vocsite.nl/images/layout/icon-search_32x32.png" /></span>
+        	    </form>
+    		</div> <!-- einde sb_container -->
+    	</div> <!-- einde navcontainer -->
+	</div>
+	<div id="prntlogo"><img src="/images/vocsite_url.png" /></div></div>
+
+<div class="content">
+
+<div class="row">
+
+	<div class="col-3">
+		<div class="sidebar_left">
+  			<!--sphider_noindex-->
+<div class="submenu">
+	<h4>Geschiedenis</h4>
+	<ul>
+		<li><a href="https://www.vocsite.nl/geschiedenis/voorcompagnieen/">Voorcompagnieën</a></li>
+		<li><a href="https://www.vocsite.nl/geschiedenis/organisatie/">Organisatie van de VOC</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/octrooi1602/">Octrooi van 1602</a></li>
+		<li><a href="https://www.vocsite.nl/geschiedenis/navigatie/">Navigatie in 17e en 18e eeuw</a></li>
+		<li><a href="https://www.vocsite.nl/geschiedenis/gouverneurs-generaal/">Gouverneurs-Generaal</a></li>
+		<li><a href="https://www.vocsite.nl/geschiedenis/functies/">Functies en rangen</a></li>
+		<li><a href="https://www.vocsite.nl/geschiedenis/engelseoorlogen/">VOC en Engelse Oorlogen</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/concurrenten/">Concurrenten van de VOC</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/nedaus1.php">Australië en de VOC</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/slavernij/">Slavernij en slavenhandel</a></li>
+        <li><a href="https://www.vocsite.nl/geschiedenis/tijdbalk/">Tijdbalk</a></li>
+	</ul>
+</div>
+<!--/sphider_noindex-->  		</div>
+  	</div>
+  
+	<div class="col-9">
+  
+            <h1>Octrooi verleend aan de VOC in 1602</h1>
+            <p>Hieronder staat de volledige tekst van het door de Staten Generaal 
+              aan de Verenigde Oostindische Compagnie (VOC) verleende octrooi 
+              zoals deze door Fran&ccedil;ois Valentijn in zijn werk &quot;Oud 
+              en Nieuw oost-Indi&euml;n&quot; in 1724 is weergegeven. De oorspronkelijke tekst uit 1602 is door Valentijn &quot;hertaald&quot; naar het Nederlands van zijn tijd. Bovendien heeft hij de oorspronkelijke tekst leesbaarder gemaakt door artikelnummers toe te voegen. Scans van het originele manuscript uit 1602 zijn door het Nationaal Archief beschikbaar gesteld op hun website <a href="http://www.gahetna.nl/collectie/archief/inventaris/gahetnascans/eadid/1.04.02/unitid/1/aantal/20/node/c01%3A0.c02%3A0.c03%3A0/level/file" target="_blank">gahetna.nl</a>.</p>
+            <p>&nbsp;</p>
+            <p><em>DE Staaten Generaal der Vereenigde Nederlanden, allen den genen 
+              die dezen tegenwoordigen zullen worden vertoont, </em>saluit<em>.<br />
+              Doen te weten: Aangezien de welstand der vereenigde Nederlanden 
+              principaalyk is bestaande in de navigatie, handeling en commercie, 
+              die uit de zelve landen van alle oude tyden gedreven, en van tyd 
+              tot tyd loffelyk vermeerdert zyn, niet alleen met de nabuurige koninkryken, 
+              en landschappen, maar ook met de gene die verder van deze landen 
+              in Europa, Asia, ende Africa, gelegen zyn, ende dat beneffens de 
+              zelve in de naaste thien jaaren herwaarts by eenige principale kooplieden 
+              der voorschreve landen, liefhebbers van de navigatie, handeling 
+              en commercie, op vreemde landen, in compagnie binnen de stadt Amsterdam 
+              opgeregt met groote kosten, moeite en perykelen, by de hand genomen 
+              is die zeer loffelyke navigatie, handeling, en traffique op de Oostindi&euml;n: 
+              daar van de apparentie goed en groot bevonden zynde, waren onlangs 
+              daar na by verscheide andere kooplieden, zoo in Zeeland, op de Maas, 
+              als in 't Noorderquartier ende Westvriesland, mede gelyke compagnien 
+              opgericht, ende de voorscheve navigatie, handeling, ende commercie 
+              dadelyk by der hand genomen: 't welk by Ons geconsidereert, ende 
+              rypelyk overwogen wezende, hoe veel de vereenigde Landen, ende de 
+              goede ingezetenen der zelve daar aan gelegen was, dat de zelve navigatie, 
+              handeling en commercie, onder een goede generale ordre, politie, 
+              correspondentie, ende gemeenschap, beleyt, onderhouden, en vermeerdert 
+              werde, hadden goedgevonden daar toe de Bewindhebbers der voorschreve 
+              Compagnie voor ons te beschryven, ende de zelve te proponeren, dat 
+              eerlijk, dienstig en profytig, niet alleen voor de vereenigde Landen, 
+              maar ook voor allen den genen, die deze loffelyke handeling by de 
+              hand genomen hadden, ende daar inne waren participerende, zoude 
+              wezen, dat de zelve Compagnie vereenigt, ende de voorschreve handeling 
+              onder een vaste ende zekere eenigheid, ordre, ende politie, zoude 
+              mogen gemeen gehouden, gedreven, ende vermeerdert werden, voor alle 
+              de ingezetenen der vereenigde Landen, die daar in zouden believen 
+              te participeren: het welk by de Gedeputeerden der zelve Compagnie 
+              wel verstaan, ende overzulks, na verscheide communicatien, deliberatien, 
+              inductien ende rapporten, tot vereeniging gebragt zynde, hebben 
+              wy na rype beraadslaging, daaropgehouden, tot bevordering van den 
+              welstant der vereenigde Landen, eensamentlyk het profyt van alle 
+              de ingezetenen der zelve, de voorschreve vereeniging geaggre&euml;ert 
+              ende bevestigt, aggreeeren ende bevestigen by dezen, uit souveraine 
+              magt ende authoriteit, ook met vaste wetenschap, onder de pointen, 
+              vryheden ende voordeelen, hier naar verklaart. Als in den eersten. 
+    </em> </p>
+            <p>I.<br />
+              Dat in deze equipagie, tot dienst ende profyt van deze Compagnie, 
+              de kamer van de Bewindhebbers, binnen Amsterdam zal hebben te bevorderen 
+              ende te bezorgen de helft, de kamer van Zeeland een vierdepart, 
+              ende de kameren op de Maaze, Noordholland, ende Wefftvriesland, 
+            elk een agtstepart.</p>
+            <p>I I.<br />
+              Dat, zoo dikwils als het van nooden zyn zal een generale Vergadering 
+              ofte Collegie uit de voorschreve kameren te houden, die gehouden 
+              zal werden van 17 persoonen, daar in uit de kamer van Amsterdam 
+              zullen compareren 8, uit Zeeland 4, uit de Maaze 2, ende van gelyken 
+              uit Noordholland 2; wel verstaande, dat de zeventiende persoon by 
+              beurten van die van Zeeland, Maaze ende Noordholland, zal 
+              werden in de Vergadering gebragt by de meeste stemmen; van welke 
+              persoonen alle zaaken, deze vereenigde Compagnien aangaande, zullen 
+            verhandelt worden.</p>
+            <p>I I I.<br />
+              't Voorschreve Collegie, als het beschreven zal worden, zal te zamen 
+              komen, om te resolveren, wanneer men zal equiperen, met hoeveel 
+              schepen, waar men die zal zenden, ende andere dingen, den handel 
+              betreffende: ende zullen de resolutien van 't voorschreven Collegie 
+              by de voorschreve kameren van Amsterdam, Zeeland, Maaze ende Noordholland 
+            geeffectueert, ende in 't werk gestelt worden.</p>
+            <p>I V.<br />
+              De Convocatie ende Vergadering van 't voorsz Collegie zal gehouden 
+              worden de eerste 6 jaaren binnen Amsterdam, ende 2 jaaren daar na 
+            in Zeeland, ende zoo voorts gedurende deze vereeniging.</p>
+            <p>V.<br />
+              De Bewindhebbers, die van wegen deze vereenigde Compagnie van huis 
+              zullen reizen, daar toe gecommitteert zynde, 't zy om in het voorschreve 
+              Collegie te vergaderen, of in eenige andere besoignes, zullen voor 
+              haare daggelden hebben tot de onkosten 4 gulden, de schuit en de 
+              wagenvragten daar in niet begrepen ; welverstaande, dat hier in 
+              niet begrepen en zyn, die van de eene stadt in de andere reizen, 
+              om de respective kameren te frequenteren als regeerders der zelve, 
+            de welke geen reisgelden nog daggelden en zullen genieten.</p>
+            <p>V I.<br />
+              Of 't gebeurde, dat in 't Collegie eenige swaarwigtige zaaken voorvielen, 
+              daar in de Collegianten niet wel en konden verdragen, ofte accorderen, 
+              ofte daar zy haar zelfs in zouden beswaart vinden, om malkanderen 
+              te overstemmen, dat het zelve zal gelaaten worden tot onze verklaring 
+              ende decisie, ende 't gene dien aangaande goedgevonden zal worden, 
+            zal agtervolgt, ende nagekomen worden.</p>
+            <p>V I I.<br />
+              De vereeniging ende Compagnie zal beginnen ende aanvang nemen met 
+              dezen jaare 1602. ende zal geduuren tot den tyd van 21 Jaaren agtervolgende, 
+              mits dat men t'elken 10 jaaren een generaal slot van rekening zal 
+              maaken, ende zal elk een t'einde die jaaren vrystaan, te mogen daar 
+              uitscheiden, ende zyn geld na hem nemen, welverstaande dat van de 
+              tegenwoordige equipagie ende uitreeding van deze schepen, die binnen 
+            dezen jaare zullen uitvaaren, byzonder rekening gedaan zal worden.</p>
+            <p>V I I I.<br />
+              Ende zullen de onkosten die by de participanten van de eerste rekening 
+              in Oostindien, ofte in de engte van Magellanes, daar deze Compagnie 
+              getraffiqueert zal hebben, zullen wezen gedaan, ende die de participanten 
+              van de volgende rekening te baat zullen mogen komen, ofte tot voordeel 
+              strekken, die van de tweede rekening dragen ende gelden de helft, 
+              ofte zoo veel min als het Collegie van de zeventhienen zal bevinden 
+            in redelykheid te behooren.</p>
+            <p>I X.<br />
+              Ingevalle eenige participanten, van deze aanstaande reizegeen genoegen 
+              hebbende aan deze vereeniging, haar geld na hen begeerende te nemen, 
+              ofte de beloofde somme opzeggen, 't zelve mogen doen, mits dat men 
+              herlieden geven zal ten advenant van zeven ende een half ten 100, 
+            ofte meer, na dat hen toegezegt is.</p>
+            <p>X.<br />
+              Alle ingezetenen van deze Landen zullen mogen in deze Compagnie 
+              participeren met zoo weinig ende veel penningen, als het hen gelieven 
+              zal: dan of het gebeurde, dat 'er meer penningen waren aangeboden 
+              ofte gepresenteert, dan de navigatie wel zoude vereischen, zullen 
+              die gene, die in de Compagnie hebben meer als 30000 gulden, moeten 
+              na rato ende proportie hun capitaal minderen, omme anderen plaats 
+            te geven.</p>
+            <p>X I.<br />
+              Ende zullen de Ingezetenen by openbaare affixie van biljetten, ter 
+              plaatze daar men gewoonlyk is biljetten te affigeren, binnen den 
+              tyd van een maand na dato dezer gewaarschouwt worden, dat zy binnen 
+              den tyd van vyf maanden, ingaande primo April eerstkomende, in deze 
+              Compagnie zullen worden geadmitteert., ende haare penningen, die 
+              zy zullen willen inleggen, mogen opbrengen in 3 termynen, te weten 
+              ongevaarlyk een derdepart tot de toerusting voor den jaare 1603. 
+              nog een derdepart voor de equipagie van den jaare 1604. ende 't 
+              resterende derdepart voor de uitreeding van den jaare 1605. een 
+              maand daar naar dat zy daar van, van de Bewindhebbers zullen zyn 
+              vermaand; gelyke waarschouwing zal worden gedaan in de maand Maart, 
+              voor de equipagie van de eerste 11 jaaren van dezen Octroye, te 
+            weten in den Jaare 1612.</p>
+            <p>X I I.<br />
+              De schepen ; die van de reize wederkeeren, zullen wederom inkomen 
+              ter plaatze daar zy uitgezeilt zyn, ende of door fortuin van weder 
+              ofte wind die schepen, in het eene quartier uitgaande, aanquamen 
+              in het ander, als die van Amsterdam, of van het Noorderquartier 
+              in Zeeland of op de Maaze, ofte die van Zeeland in Holland, dat 
+              niettemin elke kamer het bewind en de administratie van haare uitgezondene 
+              schepen ende koopmanschappen zal behouden, mits dat van de Bewindhebbers 
+              van de zelve kamer gehouden zullen zyn, haar zelfs in persoon ter 
+              plaatze te laaten vinden, daar de schepen ende koopmanschappen aangekomen 
+              zyn, ende geenige Facteurs daarover in zullen mogen stellen ; maar 
+              ingevalle haar zelfs niet gelegen ware te reizen, dat zy als dan 
+              de Bewindhebberen van de kamer, daar de schepen gearriveert zyn, 
+            tot d'administratie zullen committeren.</p>
+            <p>X I I I.<br />
+              Als d'een of d'andere kamer speceryen, ofte andere koopmanschappen 
+              van Indi&euml;n aangekregen heeft, ende andere kameren geen en hebben, 
+              of nog geen en hebben ingekregen, dat in zulken gevalle die kamer, 
+              die geprovideert is, de andere kameren op haar verzoek na gelegenheid 
+              van de zaak zal provideren, ende elke maal meer zenden, als zy uitverkogt 
+            zullen hebben.</p>
+            <p>X I V.<br />
+              Dat men de rekening van de eguipagie ende uitrusting van de schepen, 
+              met de dependentie van dien, zal doen 3 maanden na het vertrek van 
+              de schepen, ende een maand daar na copye aan de respective kameren 
+              zenden: ende van de retouren zullen de kameren, zoo dikwils zy dies 
+              verzogt worden, staat aan malkanderen overzenden, ende de rekening 
+              daar van zal men zoo haast sluiten, als doenlyk is, ende de generale 
+              rekening na de 10 jaaren zal geschieden in 't openbaar, mits datter 
+              alvoren biljetten aangeslagen zullen worden, om elk een te waarschouwen, 
+            die over de auditie der zelve zal begeeren te komen.</p>
+            <p>X V.<br />
+              Ende zullen die kameren gehouden wezen, aan de Provintien of Steden, 
+              der welker ingezetenen in deze Compagnie ingelegt zullen hebben 
+              50000 guld., of daar boven, over te zenden, zoo wanneer daar retouren 
+              zullen komen, staat van de ingenomen cargasoenen, als ook staat 
+              van de penningen gemaakt van de verkogte koopmanschappen, by zoo 
+            verre zy van de Provintien ofte Steden zulks te doen verzogt worden.</p>
+            <p>X V I.<br />
+              Ende zoo eenige Provintien goedvonden eenen Agent te stellen, de 
+              welke de penningen uit de inwoonders van de respective Provintien 
+              verzamelde, om die in een masse te leggen, ende van de retouren 
+              ende inkomsten betaling te vorderen, zal die kamer, daar zoodanigen 
+              Agent de penningen ingebragt heeft, den zeven moeten toelaaten acces 
+              in de voorsz kamer, om aldaar geinformeert te mogen worden van den 
+              staat van den uitgeven ende inkomen, mitsgaders de uitschulden ende 
+              inschulden, van den comptoire, behoudens dat die penningen, by den 
+              voorsz Agent ingebragt, zullen monteren ter somme van 50000 guld., 
+            ofte daar boven.</p>
+            <p>X V I I.<br />
+              Als 'er van de retouren 5 ten 100. in kasse zal wezen, zal men aan 
+            de Participanten uitdeeling doen.</p>
+            <p>X V I I I.<br />
+              Ende zullen de respective kameren bedient worden by de tegenwoordige 
+              Bewindhebbers, als namelyk, de kamer van Amsterdam by <em>Gerard 
+              Bikker</em>, <em>Reinier Paauw</em>, <em>Pieter Dirksz Hasselaar</em>, 
+              <em>Jaques de Felaar</em>, <em>Jan Jansz Carel</em>, <em>Bernard 
+              Berewyns</em>, <em>Johan Poppe</em>, <em>Hans Hunger</em>, <em>Hendrik 
+              Buik</em>, <em>Louis de la Becque</em>, <em>Dirk van Os</em>, <em>Fran&ccedil;ois 
+              van Hove</em>, <em>Ellert Lucasz</em>, <em>Isaac le Meer</em>, <em>Siwert 
+              Pietersz Hem</em>, <em>Gerard Reynst</em>, <em>Marcus Vogelaar</em>, 
+              <em>Jan Harmensz</em>, <em>Geurt Dirksz</em>, <em>Huibregt Wagtmans</em>, 
+              <em>Leonard Ray</em>, <em>Albert Simonsz Jonkhein</em>, ende <em>Arent 
+            ten Grootenhuize</em>.</p>
+            <p>XIX.<br />
+              De kamer van Zeeland by <em>Adriaan Henriksz ten Haaf</em>, <em>Jacob 
+              Boreel</em>, <em>Jan Lambrechtsz Coele</em>, <em>Jarob Pietersz 
+              de Waard</em>, <em>Cornelis Meuninks</em>, <em>Adriaan Bommenee</em>, 
+              <em>Laurens Bacx</em>, <em>Everhart Bekker</em>, <em>Aarnout le 
+              Clercq</em>, <em>Aarnout Verhoeven</em>, <em>Gerard van Schoonhoven</em>, 
+              <em>Nicolaas Pietersz</em>, <em>Balthasar van Vlierden</em>, ende 
+            <em>Balthasar de Moucheron</em>.</p>
+            <p>X X.<br />
+              De kamer van Delft by <em>Jan Jansz Lodestein</em>, <em>Arent Jacobsz 
+              Lodestein</em>, <em>Dirk Bruinsz van der Dussen</em>, <em>Gerard 
+              Dirksz Meerman</em>, <em>Cornelis Adriaansz Bogaard</em>, <em>Michiel 
+              Jansz Sasbout</em>, <em>Willem Joosten Dedel</em>, <em>Dirk Gerritsz 
+              Meerman</em>, <em>Jan Raad</em>, <em>Jacob Sandersz Balbiaan</em>, 
+            <em>Henrik Otte</em>, ende <em>Jaspar Meerman</em>.</p>
+            <p>X X I.<br />
+              De kamer van Rotterdam by <em>Fob Pietersz van der Meyden</em>, 
+              <em>Willem Jansz Frank</em>, <em>Gerrit Huigens</em>, <em>Pieter 
+              Leonardsz Busch</em>, <em>Johan van der Veecken</em>, <em>Willem 
+              Jansz van Loon</em>, <em>Jan Jacobsz Mus</em>, <em>Adriaan Spierink</em>, 
+            <em>Cornelis Matelief de Jonge</em>.</p>
+            <p>X X I I.<br />
+              De kamer tot Hoorn by <em>Claas Jacobsz Syms</em>, <em>Cornelis 
+              Cornelisz Veen</em>, <em>Willem Pietersz Crap</em>, <em>Pieter Jansz 
+            Liorne</em>.</p>
+            <p>X X I I I.<br />
+              Ende de kamer tot Enkhuizen by <em>Lucas Gerritsz</em>, <em>Willem 
+              Cornelisz de Jonge</em>, <em>Jan Pietersz Schram</em>, <em>Henrik 
+              Gruyter</em>, <em>Jan Laurisz van Loofen</em>, <em>Dirk Dirksz Peller</em>, 
+              <em>Gysbregt van Berenstein</em>, <em>Barthout Jansz Steenhuizen</em>, 
+              <em>Jacob Jacobsz Hinloopen</em>, <em>Fran&ccedil;ois du Gardyn</em>, 
+            ende <em>Willem Brasser</em>.</p>
+            <p>X X I V.<br />
+              Eenige van de voorsz Bewindhebbers komende aflyvig te worden, ofte 
+              anderzins uit den dienst te scheiden, zal die plaats onvoorzien 
+              mogen blyven, ende niemant in de afgestorvene of uitgescheiden plaats 
+              moeten gesurrogeert worden, 't en ware die van de zelve kamer anders 
+              goedvonden, tot dat de Bewindhebberen der respective kameren gekomen 
+            zullen wezen op 't navolgend getal.</p>
+            <p>XXV.<br />
+              De kamer van Amsterdam op 20 persoonen, die van Zeeland op 12, die 
+              van Delft op 7, die van Rotterdam op 7, die van Enkhuizen mede op 
+            7, ende die van Hoorn op gelyk getal.</p>
+            <p>X X V I.<br />
+              Maar yemant van 't voorschreve getal komende te sterven, ofte ook 
+              anders uit den dienst te geraken, zullen de andere Bewindhebbers 
+              van de kamer, daar zulks gevalt, binnen den tyd van 2 ofte uiterlyk 
+              3 maanden nomineren drie bequame gequalificeerde persoonen, ende 
+              de zelve de Heeren Staaten van de Provintie, daar het Collegie resideert, 
+              of den genen, by henluiden daar toe te committeren, voordragen, 
+              om een daar uit in de plaats van den overleden, of die uit den dienst 
+            anderzins is geraakt, gekoren te worden, na de ordre daar opgenomen.</p>
+            <p>X X V I I.<br />
+              De Bewindhebbers zullen op eere, eed, en vromigheid, solemnelyk 
+              beloven, dat zy zich in haare administratie wel en getrouwelyk zullen 
+              dragen, goede ende deugdelyke rekening houden ende doen, ende de 
+              meeste van de Participanten niet meer voordeels doen, in het opbeuren 
+              van de penningen, tot de uitreeding noodig, ende uitdeeling van 
+            de retouren, als de minste.</p>
+            <p>X X V I I I.<br />
+              Ende die na dezen tot Bewindhebbers zullen worden gekoren; zullen 
+              van hun eigen in de Compagnie moeten resiqueren, elk ten minsten 
+              1000 ponden vlaams, dan de Bewindhebbers tot Hoorn ende Enkhuizen 
+            zullen mogen volstaan, mits inleggende ten minsten 500 gelyke ponden.</p>
+            <p>XXIX.<br />
+              Zullen voorts genieten voor provis&iuml;e van uitreedinge 1 ten 
+              100., en ook zoo veel van de retouren, welke provisie zal verdeelt 
+              worden, de kamer van Amsterdam de helft, de kamer van Zeeland een 
+              vierde part, ende de kamer van de Maaze ende Noordholland elk een 
+              agtste part, zonder reguart te nemen of d'een ofte d'ander meer 
+            ofte min penningen inbrengt, ofte speceryen als zyn contingent verkoopt.</p>
+            <p>XXX.<br />
+              Met verstande, dat de Bewindhebberen niet zullen mogen tot laste 
+              van de Compagnie te brengen, eenige provisie van penningen voor 
+              de Compagnie te ligten, ofte de waaren te beneficieren, nogte iemant 
+              anders committeren tot laste van de Compagnie, omme de uitreeding 
+            te bevorderen, ende de waaren, daar toe noodig, te koopen.</p>
+            <p>X X X I.<br />
+              Ende dat den Boekhouder, Cassier, ende dienaar, ofte kamerbode, 
+              zal gesalariseert worden van de Bewindhebberen van elke respective 
+            kamer, zonder zulks te mogen brengen tot last van de Participanten.</p>
+            <p>X X X I I.<br />
+              Of 't gebeurde, dat onder d'een ofte d'ander kamer yemant van de 
+              Bewindhebbers in zulken staat geraakte, dat hy niet en konde voldoen, 
+              't geen hem zyne administratie aangaande betrouwt ware, ende daar 
+              door eenige schade mogt komen; zal zulks wezen tot laste van de 
+              penningen, onder de zelve kamer resorterende, ende niet tot schade 
+              van de generale masse; dies zullen de penningen, welke de Bewindhebbers 
+            in deze Compagnie hebben specialyk verbonden zyn voor haare administratie.</p>
+            <p>X X X I I I.<br />
+              De Bewindhebbers van de respective kameren zullen responderen voor 
+            haare Cassiers.</p>
+            <p>X X X I V.<br />
+              Ende op dat het voornemen van deze Compagnie met meerder vrugt mag 
+              uitgevoert worden, tot welstand der geunieerde Provintien, conservatie 
+              ende augmentatie der neering, mitsgaders tot profyt van de Compagnie, 
+              zoo hebben wy de voorsz Compagnie geoctroyeert ende geaccordeert, 
+              octroyeren ende accorderen mits dezen, dat niemant, van wat qualiteit 
+              ofte conditie die zy, anders dan die van de voorsz Compagnie uit 
+              deze vereenigde Landen zal mogen vaaren, binnen den tyd van 21 jaaren 
+              eerstkomende, beginnende met dezen jaare 1602. incluis, Beoosten 
+              de kaap de Bonne Esperance, ofte door de straat van Magellanes, 
+              op de verbeurte van de schepen en goederen, blyvende in haar geheel 
+              de concessien voor dezen gegeven aan eenige Compagnie, omme te vaaren 
+              door de voorsz straat van Magellanes, behoudelyk datze hare schepen 
+              uit deze Landen zullen afzenden binnen 4 jaaren na dato dezes, op 
+            pene van te verliezen 't effect van de voorsz concessie.</p>
+            <p>X X X V.<br />
+              Item, dat die van de voorsz Compagnie zullen vermogen Beoosten de 
+              kaap de Bonne Esperance, mitsgaders in ende door de engte van Magellanes, 
+              met de Princen ende Potentaten verbintenis te maaken, ende contracten 
+              op den naam van de Staaten Generaal van de vereenigde Nederlanden, 
+              ofte Hooge Overheden der zelve, mitsgaders aldaar eenige fortressen 
+              ende verzekertheden te bouwen, gouverneurs, volk van oorlog, ende 
+              officiers van justitie, ende tot andere noodelyke diensten, tot 
+              conservatie van de plaatzen, onderhouding van goede ordening, politie, 
+              en justitie, eenzamelyk tot vordering ende nering te stellen, behoudelyk 
+              dat de voorsz gouverneurs, officiers, volk van justitie, en volk 
+              van oorlog, zullen eed van getrouwigheid doen aan de Staaten Generaal, 
+              ofte de Hooge Overigheid voorsz, ende aan de Compagnie, zoo veel 
+              de nering ende traffycque aangaat, ende die zullen de voorsz gouverneurs 
+              ende officiers van justitie afstellen, by zoo verre zy bevinden 
+              dat de zelve hen qualyk ende ontrouwelyk dragen, met dien verstande, 
+              dat zy lieden de voorsz gouverneurs ofte officiers niet en zullen 
+              beletten herwaarts over te komen, om haare doleantien ofte klagten, 
+              zoo zy eenige meenen te hebben, aan ons te doen, ende dat die van 
+              de Compagnie t'elker wederkomst van de schepen gehouden zullen wezen 
+              de Heeren Staaten Generaal te informeren van de gouverneurs, ende 
+              officieren, die zy in de voorsz plaatzen zullen hebben gesteld, 
+              omme haare commissie als dan geaggre&euml;ert ende geconfirmeert 
+            te worden.</p>
+            <p>X X X V I.<br />
+              Ende zoo die van de voorsz Compagnie op eenige plaatzen bedrogen 
+              en qualyk gehandelt worden, of dat in 't vertrouwen van eenige penningen 
+              of koopmanschappen de zelve, zonder restitutie ofte betaling daar 
+              van te genieten, gehouden wierden, dat zy die schade naar gelegenheid 
+              der zaake, na dat zy best vermogen zullen, doen repareren, door 
+              alzulke middelen, als men gevoegelyk zal konnen: Behoudelyk dat 
+              de schepen hier te lande wederkomende, zy rapport zullen doen van 
+              de gelegenheid van de zaak, aan 't Collegie van de Admiraliteit, 
+              in 't quartier daar die zullen aankomen, met verstande, dat die 
+              van 't voorsz Collegie eenige verklaaring doen, daar by die van 
+              deze Compagnie haar vinden beswaart, zy lieden daar van aan ons 
+              zullen mogen provoceren, ende zullen de goederen onder behoorlyke 
+              inventaris gebeneficeert worden, by die van de Compagnie, 't en 
+              ware iemant anders dan den Fiscaal hem party maakte, ende de ingebragte 
+              goederen reclameerde, in welken gevalle de voorsz goederen geadministreert 
+              zullen worden, gelyk van de sententie van die van de Admiraliteit 
+            verklaart zal worden te behooren.</p>
+            <p>X X X V I I<br />
+              Of het gebeurde, dat die schepen van Spangien, Portugal, of onderwegen 
+              vyanden, die schepen van deze Compagnie vyandelyk aantasten, ende 
+              in 't vegten eenige der vyanden schepen verovert wierden, dat de 
+              zelve veroverde schepen ende goederen zullen verdeelt worden na 
+              de ordre van den Landen, te weten het Land ende Admiraal genietende 
+              daar van haare geregtigheid, mits dat vooren afgetroken zal worden 
+              die schade, die de Compagnie in die rescontre zal geleden hebben, 
+              ende zullen die van de respective Admiraliteiten, daar de schepen 
+              zullen aankomen, de kennisse nemen van de deugdelykheid van den 
+              prinse, blyvende pendentelyk de administratie van de goederen by 
+              die van de Compagnie onder behoorlyke inventaris, zoo vooren gezegt 
+            is, ende den gegraveerden by sententie vrygehouden te provoceren.</p>
+            <p>X X X V I I I.<br />
+              Dat de speceryen, Chinesche zyde, ende kattoene lywaten, die by 
+              de Compagnie uit Oostindi&euml;n zullen worden gebragt, in 't inkomen 
+              nogte uitgaan, niet meer zullen worden belast, als die nu belast 
+              zyn, volgende de lyst ende de generale verklaaring, nopende de goederen 
+            in dezelve gespecificeert, ende in 't einde van dien gestelt.</p>
+            <p>X X X I X.<br />
+              Dat men geen schepen, geschut nogte ammunitie van deze Compagnie 
+              zal mogen nemen tot dienst van den Lande, dan met consent van de 
+            Compagnie.</p>
+            <p>X L.<br />
+              Item, dat de speceryen van de Compagnie zullen verkogt worden op 
+            eenerlei gewigt, in de swaarte van die van Amsterdam.</p>
+            <p>X L I.<br />
+              Dat die van de Compagnie in de respective kameren zullen vermogen 
+              haare speceryen te overslaan, het zy binnen scheepsboord ofte inde 
+              pakhuizen, ende dat zonder daar van eenige accys, impost, ofte waaggeld 
+              te betalen, mits dat die speceryen op haar voorsz gewigt niet zullen 
+              worden getransporteert, maar verkogt zynde, gewogen zullen worden, 
+              ende 't regt van de waag betalen zullen, gelyk andere goederen, 
+              de waag subject zynde, zoo dikmaal als die zullen verkogt, ofte 
+            verlevert worden.</p>
+            <p>X L I I.<br />
+              Item, dat men geen Bewindhebbers haare persoonen ofte goederen zal 
+              mogen belasten ofte bekommeren, om van de zelve te hebben rekening 
+              van haare administratie in de voorsz Compagnie, nog ter cause van 
+              gagie van eenige commizen, schippers, stuurluiden, ende bootsgezellen, 
+              ofte andere persoonen ten dienste der Compagnie aangenomen; maar 
+              die dezen aangaande iet tegen haar zal willen pretenderen, zal gehouden 
+            zyn de zelve te trekken voor haare ordinaris Rechters.</p>
+            <p>X L I I I.<br />
+              Dat de provoosten van de Compagnie zullen mogen apprehenderen aan 
+              Land het scheepsvolk, dat hem in dienst heeft begeven, ende de geapprehendeerde 
+              t'schepe mogen brengen, het zy in wat steden, plaatzen, of jurisdictie 
+              van dien, de zelve zouden mogen bevonden worden, mits dat de voorsz 
+              provoosten daar toe te vooren zullen aanspreken den Officier ende 
+            Borgermeester van de stadt ende plaats.</p>
+            <p>X L I V.<br />
+              Ende tot erkentenis ende recognitie van dezen Octroye, ende 't gene 
+              voorsz is, zullen die van de voorsz Compagnie aan ons betalen de 
+              somme van 25000 ponden, tot 40 grooten Vlaams 't stuk, die wy inleggen 
+              in de equipagie van de eerste 10 jaaren ende rekening, daar van 
+              tot profyt van de Generaliteit genoten ende gedragen zal winst ende 
+              risicque, gelyk alle andere Participanten in deze Compagnie zullen 
+            genieten ende dragen.</p>
+            <p>X L V.<br />
+              Ende wanneer eenige schepen van de reize zullen wederkeeren, zullen 
+              de generaals ofte commandeurs over de vloote, schip ofte schepen, 
+              gehouden wezen in 't aankomen te doen rapport van haare reize, ende 
+            daar van schriftelyk relaas, zoo zulks vereischt word, over te geven.</p>
+            <p>X L V I.<br />
+              Alle welke poincten, voordeelen, ende vryheden, hier boven verhaalt, 
+              Wy geordonneert hebben, ende ordonneren mitsdezen dat agtervolgt 
+              ende onderhouden zullen worden by allen ende eenen iegelyken van 
+              de onderzaten ende ingezetenen der vereenigde Landen, zonder daar 
+              tegens, directelyk ofte indirectelyk, nog binnen de vereenigde Landen, 
+              nog daar buiten, te doen ofte doen doen, in eeniger manieren, op 
+              pene van daar over als beletteren van het gemeene beste der Landen 
+              ende overtreders van onze ordonnantie ende bevelen, aan lyf ende 
+              goed gestraft te worden: Ontbieden daarom ende bevelen wel expresselyk 
+              aan alle Gouverneurs, Justicieren, Officieren, Magistraaten ende 
+              inwoonders der vereenigde Landen, dat zy die voorsz Bewindhebbers 
+              rustelyk, ende vredelyk laaten genieten, ende gebruiken het volkomen 
+              effect van dezen Octroye, Consent ende Privilegie, cesserende alle 
+              contradictien ende empeschementen ter contrarie, want wy 't zelve 
+            ten dienste van den Lande bevonden hebben alzoo te behooren.</p>
+            <p><em>Gegeven onder onzen Zegel ende Signature van onze Greffier, 
+              in 's Gravenhage den 20<sup>den</sup>  Maart des jaars 1602.</em></p>
+            
+<p class="paragraafkop_bronnen">Bron</p>
+<p class="bron">[1]&nbsp;Valentijn, François, 2002. <b>Oud en Nieuw oost-Indiën, deel I</b>. - Franeker: Uitgeverij Van Wijnen, 2002. (Valentijn : beschryving van Oost-Indiën) [nl]</p>
+
+	</div> <!-- col-9 -->
+  
+</div> <!-- row -->
+
+</div> <!-- content -->
+
+<div class="footer">
+	<p class='copyright'>&copy;2026 de VOCsite</p></div>
+
+<script type="text/javascript" nonce="" src="/js/cookieconsent/cookieconsent.min.js"></script>
+<script type="text/javascript" nonce="">
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+  "palette": {
+  "popup": {
+  "background": "rgba(3, 3, 3, 0.84)",
+  "text": "#FFFFFF"
+  },
+  "button": {
+  "background": "transparent",
+  "text": "#FFFFFF",
+  "border": "#FFFFFF"
+  }
+  },
+  "position": "bottom",
+  "type": "info",
+  "content": {
+  "message": "Deze website gebruikt cookies om de website optimaal te laten functioneren en voor analytische doeleinden. Er worden geen advertenties op deze website getoond.<br />Door op \"OK\" te klikken of door gebruik te maken van deze website gaat u hiermee akkoord.",
+  "dismiss": "OK",
+	"deny": "Cookies niet toestaan",
+	"link": "Meer informatie",
+  "href": "/privacybeleid.php"
+  }
+})});
+
+</script>
+
+</body>
+</html>
