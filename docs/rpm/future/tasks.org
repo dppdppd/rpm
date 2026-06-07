@@ -3,7 +3,7 @@
 
 * Active
 
-** TODO v1/v2/native deep-research bake-off on a Dutch-primary-source VOC topic [[file:2026-05-31-dr-v1-v2-native-bakeoff.md]]
+** DONE v1/v2/native deep-research bake-off on a Dutch-primary-source VOC topic [[file:2026-05-31-dr-v1-v2-native-bakeoff.md]]
    :PROPERTIES:
    :ID: dr-v1-v2-native-dutch-bakeoff
    :END:

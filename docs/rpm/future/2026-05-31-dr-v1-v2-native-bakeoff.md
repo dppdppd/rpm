@@ -1,8 +1,8 @@
 # Plan — v1/v2/native deep-research bake-off on a Dutch-primary-source VOC topic
 
-**Status: PLANNED — parked, execute later.** Marked next in `tasks.org`
-(`:ID: dr-v1-v2-native-dutch-bakeoff`). This is the rigorous (controlled)
-version; the cheap reuse-v1 variant was rejected for prompt asymmetry.
+**Status: DONE (2026-06-07).** All three arms run and graded; 3-column
+scorecard finalized. See `## Worker Result` at the bottom. This was the rigorous
+(controlled) version; the cheap reuse-v1 variant was rejected for prompt asymmetry.
 
 Source: 2026-05-31 session. Closes the one real loose end in
 `2026-05-30-deep-research-improvement-plan.md` — the v1→v2 hardening was only
@@ -93,6 +93,37 @@ the ~2.7M-token native Workflow run).
   officer ("Captain Vogel"), which its figure-ledger/kill-list certified as
   HIGH-confidence/zero-orphan; v1 got them right. Caveat n=1. Full table +
   caveats in `scorecard.md`.
-- **Native arm next:** see `runs/2026-06-07-triplet/NATIVE-ARM-TODO.md` —
-  self-contained: run the real bundled `/deep-research`, grade it the same way,
-  fill the 3rd scorecard column, then mark this item DONE.
+- **Native arm DONE (fresh session):** ran the real bundled `/deep-research`
+  Workflow on the identical question, graded it the same blind way, filled the
+  3rd scorecard column. See `## Worker Result` below.
+
+## Worker Result (2026-06-07 — native arm + finalize)
+
+Ran the **native** arm: the bundled `/deep-research` skill (a native Claude Code
+Workflow — Scope → Search → Verify → Synthesize, 3-vote adversarial verification),
+given ONLY the verbatim question (no key, no corpus, no bake-off framing). It
+researched live from the open web and independently re-found the authoritative
+Nationaal Archief / DBNL / Wikisource primaries. Persisted to
+`runs/2026-06-07-triplet/native/report.md`; graded blind against the held-out key +
+frozen corpus by an independent Dutch-fidelity subagent →
+`grading/native-grading.md`; native column filled in `scorecard.md`.
+
+**Native scale/cost:** 103 agents · ~2.32M subagent tokens · 757 tool-uses · ~27 min.
+
+**Native fidelity (grader):** Sub-Q1 CORRECT, Sub-Q2a CORRECT (De Ros +
+standard-bearer named — *no fabrication*, vs v2's invented "Captain Vogel"),
+Sub-Q2b left UNRESOLVED by design (surfaced both the "captured" and "died" readings,
+refused to assert), Sub-Q3 CORRECT (both traps avoided; "from Amsterdam" refuted
+0-3). Translation-fidelity errors **0**; unsupported **0/10**; figure orphans 0;
+over-kill 0 (its verifier *killed* the two wrong claims); live-URL 17/18 (one ANRI
+403, self-disclosed); ~21 load-bearing claims / 21 citations.
+
+**3-column verdict:** On Dutch-source fidelity, **native is the strongest arm — but
+at ~20× the token cost** (~2.32M vs v1 ~98k / v2 ~115k). It is the only arm that
+delivered no wrong answer on Sub-Q2. The bake-off's actual question — did the v1→v2
+hardening help? — answers **no**: the kill-list/figure-ledger neither beat v1 nor
+caught the Sub-Q2 wrong-referent trap (it certified v2's fabrication as
+HIGH-confidence/zero-orphan). The mechanism that *did* catch the traps is native's
+**independent adversarial multi-vote verification**, not literal-presence
+self-certification. Lesson: reserve adversarial verification for high-stakes
+primary-source claims; it is expensive. n=1 probe, one topic — directional.

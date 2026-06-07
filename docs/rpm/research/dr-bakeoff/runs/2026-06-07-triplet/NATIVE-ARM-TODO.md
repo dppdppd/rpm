@@ -1,5 +1,11 @@
 # TODO (fresh session) — native arm of the v1│v2│native VOC bake-off
 
+> **✅ DONE 2026-06-07.** Native ran (103 agents / ~2.32M tok / ~27 min), graded,
+> 3-column scorecard finalized. See `native/report.md`, `grading/native-grading.md`,
+> `scorecard.md`. Backlog item `dr-v1-v2-native-dutch-bakeoff` marked DONE. The steps
+> below are kept as the protocol record.
+
+
 **Status:** v1 + v2 are DONE and graded (see `scorecard.md` in this dir). Only the **native arm**
 remains. Run it in a FRESH session (this one ran out of context budget for a ~2.7M-token native
 run). Do these two steps, then finalize.
