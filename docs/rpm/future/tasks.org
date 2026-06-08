@@ -13,7 +13,7 @@
    :ID: injection-weak-model-arm
    :END:
 
-** TODO Tune rpm-research workflow from VOC bake-off — lower maxVerify default + flag suppresses kill-and-replace [[file:2026-06-08-rpm-research-workflow-tuning.md]]
+** DONE Tune rpm-research workflow from VOC bake-off — lower maxVerify default + flag suppresses kill-and-replace [[file:2026-06-08-rpm-research-workflow-tuning.md]] :CLOSED: [2026-06-08]
    :PROPERTIES:
    :ID: rpm-research-workflow-tuning
    :END:
