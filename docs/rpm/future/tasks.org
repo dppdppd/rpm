@@ -18,6 +18,11 @@
    :ID: rpm-research-workflow-tuning
    :END:
 
+** DONE Round-2 tune rpm-research workflow — contested calibration + fetch coverage + cost guard [[file:2026-06-08-rpm-research-workflow-round2.md]] :CLOSED: [2026-06-08]
+   :PROPERTIES:
+   :ID: rpm-research-workflow-round2
+   :END:
+
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook
