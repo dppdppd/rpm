@@ -33,10 +33,19 @@ const TOPIC_DIR = A.topicDir || 'docs/rpm/research/untitled'
 if (!QUESTION) throw new Error('rpm-research: args.question is required')
 
 const MAX_FETCH = 15
-// Safety cap on independent verification fan-out (4 lenses each => up to 4x agents).
-// Protects against a search agent marking a pathological number of findings load-bearing.
-// Overridable by the skill via args.maxVerify; the cap drop is always logged (no silent truncation).
-const MAX_VERIFY = A.maxVerify || 30
+
+// The four independent verification lenses. Defined up here (not only in Phase 4) so the
+// verifier-agent budget below can be derived from the lens count.
+const LENSES = ['provenance', 'cross-source', 'referent', 'alt-hypothesis']
+
+// Cost ceiling for the verification panel. Fan-out = (claims verified) x (lenses), so the real
+// cost driver is verifier AGENTS, not claims. Budget by agents and derive the claim cap — bounding
+// the worst case no matter how many findings get marked load-bearing. The VOC bake-off ran the old
+// default (30 claims x 4 lenses = 120 verifiers, ~5.4M tokens — heavier than the native arm); the
+// tighter default keeps the panel near native while still verifying the highest-confidence claims.
+// Override per run via args.maxVerifyAgents or args.maxVerify; the cap drop is always logged.
+const MAX_VERIFY_AGENTS = A.maxVerifyAgents || 48
+const MAX_VERIFY = A.maxVerify || Math.max(1, Math.floor(MAX_VERIFY_AGENTS / LENSES.length))
 
 const SCOPE_SCHEMA = {
   type: 'object',
@@ -236,8 +245,9 @@ const loadBearing = [...loadBearingAll]
   .slice(0, MAX_VERIFY)
 if (loadBearingAll.length > loadBearing.length)
   log(
-    `verify cap: ${loadBearingAll.length} load-bearing claims, verifying top ${loadBearing.length} ` +
-      `by confidence; ${loadBearingAll.length - loadBearing.length} NOT independently verified ` +
+    `verify cap: ${loadBearingAll.length} load-bearing claims -> verifying top ${loadBearing.length} ` +
+      `by confidence (${loadBearing.length * LENSES.length} verifier agents; budget ${MAX_VERIFY_AGENTS}); ` +
+      `${loadBearingAll.length - loadBearing.length} NOT independently verified ` +
       `(synthesis must tag these lower-confidence)`,
   )
 
@@ -250,8 +260,13 @@ const lensPrompt = (lens, c) => {
     (c.namedPrimarySource ? `QUESTION PINS THIS TO: ${c.namedPrimarySource}\n` : '') +
     `\nFetched artifacts available:\n${fetchedManifest}\n\nYOUR LENS — `
   const tail =
-    `\n\nReturn verdict (kill/keep/flag), a one-line sourced reason, and — if you KILL and find a ` +
-    `better-sourced rival reading for the same fact — betterSourceRival {reading,url,confidence}.`
+    `\n\nVERDICT RULES: KEEP if you positively re-confirm it from authority. KILL if it is clearly ` +
+    `wrong or unsupported (a determinable correct reading differs). FLAG — not kill — if the fact is ` +
+    `GENUINELY CONTESTED: two defensible readings of the same source, or an editorial gloss vs. the ` +
+    `literal text. Killing one side then asserting the other over-states an ambiguous span; a flagged ` +
+    `claim is reported as contested (both readings surfaced), never asserted at HIGH.\n` +
+    `Return verdict (kill/keep/flag), a one-line sourced reason, and — if you KILL or FLAG and find a ` +
+    `better-sourced rival / the other defensible reading — betterSourceRival {reading,url,confidence}.`
   if (lens === 'provenance')
     return (
       head +
@@ -275,8 +290,9 @@ const lensPrompt = (lens, c) => {
       head +
       `METHODOLOGY / UNIT / REFERENT: right unit, magnitude, and — critically — right REFERENT. A ` +
       `value literally present can still be wrong because the source means something else (wrong ` +
-      `event, wrong entity, euphemism, editorial gloss). If the referent is wrong or genuinely ` +
-      `contested but stated as settled HIGH, KILL.` +
+      `event, wrong entity, euphemism, editorial gloss). KILL a clearly wrong referent (a determinable ` +
+      `correct reading differs); FLAG one that is genuinely contested — e.g. the literal text vs. an ` +
+      `editorial gloss, both defensible — yet stated as settled HIGH.` +
       tail
     )
   // alt-hypothesis
@@ -289,20 +305,27 @@ const lensPrompt = (lens, c) => {
   )
 }
 
-const LENSES = ['provenance', 'cross-source', 'referent', 'alt-hypothesis']
-
 const decide = (c, votes) => {
   const kills = votes.filter((v) => v.verdict === 'kill')
+  const flags = votes.filter((v) => v.verdict === 'flag')
   const rival = votes.map((v) => v.betterSourceRival).find(Boolean) || null
-  let decision = 'kept'
-  if (kills.length) decision = rival ? 'replaced' : 'killed'
-  else if (votes.some((v) => v.verdict === 'flag')) decision = 'flagged'
+  // CONTESTED when a lens flags genuine ambiguity (two defensible readings / literal-vs-gloss).
+  // We do NOT adopt a rival at HIGH on a contested claim — that over-asserts an ambiguous span (the
+  // VOC Sub-Q2b failure). Synthesis surfaces both readings and declines. Lenses are instructed to
+  // FLAG ambiguity but KILL clear wrongness, so a wrong-referent claim (Q2a) is still cleanly
+  // replaced (kills, not flags), not softened into "contested".
+  const contested = flags.length > 0
+  let decision
+  if (contested) decision = 'contested'
+  else if (kills.length) decision = rival ? 'replaced' : 'killed'
+  else decision = 'kept'
   return {
     claim: c.claim,
     statedSource: c.url,
     namedPrimarySource: c.namedPrimarySource || null,
     decision,
     rival,
+    contested,
     votes: votes.map((v) => ({ lens: v.lens, verdict: v.verdict, reason: v.reason })),
   }
 }
@@ -324,9 +347,10 @@ const verified = (
 
 const killed = verified.filter((v) => v.decision === 'killed')
 const replaced = verified.filter((v) => v.decision === 'replaced')
+const contested = verified.filter((v) => v.decision === 'contested')
 log(
   `verify done: ${verified.length} claims — ${killed.length} killed, ${replaced.length} replaced, ` +
-    `${verified.filter((v) => v.decision === 'kept' || v.decision === 'flagged').length} survive`,
+    `${contested.length} contested, ${verified.filter((v) => v.decision === 'kept').length} kept`,
 )
 
 // ---------------------------------------------------------------------------
@@ -343,14 +367,17 @@ const report = (await agent(
     `- Write the report ONCE. Every load-bearing claim carries a confidence tag + source URL.\n` +
     `- KILL-AND-REPLACE: for any claim with decision "replaced", assert the rival reading (with its ` +
     `source) instead of the original; the killed original goes only to refuted.md.\n` +
-    `- "killed" claims (no rival) and "flagged" claims go to a "## Could not verify / refuted" section ` +
-    `— never assert them as findings.\n` +
+    `- CONTESTED (decision "contested"): the lenses found the claim genuinely ambiguous. Do NOT pick a ` +
+    `side or assert it at HIGH — present BOTH readings (the original and the rival, each with its ` +
+    `source), labelled contested/ambiguous at MEDIUM-or-lower, like a careful analyst declining to ` +
+    `settle it. This is a finding, not a hole.\n` +
+    `- "killed" claims (no rival) go to a "## Could not verify / refuted" section — never asserted.\n` +
     `- Before writing any load-bearing claim, Read the relevant fetched/ artifact window to confirm it.\n\n` +
     `VERIFICATION LEDGER (JSON):\n${JSON.stringify(verified)}\n\n` +
     `CONTRADICTIONS surfaced in search:\n${JSON.stringify(contradictions)}\n\n` +
     `FETCHED ARTIFACTS:\n${fetchedManifest}\n\n` +
     `Return summary (3-6 sentences), reportPath, keyFindings[] (each with confidence + source), and ` +
-    `droppedTally (e.g. "killed 3, replaced 1 of N load-bearing claims").`,
+    `droppedTally (e.g. "killed 3, replaced 1, contested 2 of N load-bearing claims").`,
   { schema: REPORT_SCHEMA, label: 'synthesize', phase: 'Synthesize' },
 )) || {}
 
@@ -367,6 +394,7 @@ return {
     loadBearingClaims: loadBearing.length,
     killed: killed.length,
     replaced: replaced.length,
+    contested: contested.length,
     panel: 'independent per-lens (collapse-proof)',
   },
 }
