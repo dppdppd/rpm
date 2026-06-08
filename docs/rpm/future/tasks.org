@@ -17,3 +17,8 @@
    :PROPERTIES:
    :ID: phase3-retry-hardening
    :END:
+
+** WATCH Codex native agent/subagent support — when it lands, port the research fan-out to Codex [[file:2026-06-08-codex-agent-support-watch.md]]
+   :PROPERTIES:
+   :ID: codex-agent-support-watch
+   :END:
