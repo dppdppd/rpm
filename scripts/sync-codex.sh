@@ -81,7 +81,9 @@ for skill_dir in "$SRC"/skills/*/; do
   # Mirror same-directory skill support docs/resources (for example
   # audit/findings-menu.md and audit/project-mode.md). SKILL.md itself
   # is translated above; scripts/ is handled separately.
-  find "$skill_dir" -maxdepth 1 -type f ! -name 'SKILL.md' -print0 \
+  # Workflows are a Claude-Code-only accelerator (no Workflow tool on Codex;
+  # the skill body self-gates to prose), so never mirror *.workflow.js.
+  find "$skill_dir" -maxdepth 1 -type f ! -name 'SKILL.md' ! -name '*.workflow.js' -print0 \
     | while IFS= read -r -d '' support_file; do
         cp "$support_file" "$DST/skills/$name/$(basename "$support_file")"
       done

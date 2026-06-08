@@ -28,6 +28,9 @@ cp -a "$SRC/.claude-plugin" "$DST/.claude-plugin"
 # fields opencode doesn't recognize are silently ignored per docs.
 rm -rf "$DST/skills"
 cp -a "$SRC/skills" "$DST/skills"
+# Workflows are a Claude-Code-only accelerator; opencode has no Workflow tool
+# and the research SKILL.md self-gates to prose, so drop the CC-only script.
+find "$DST/skills" -name '*.workflow.js' -delete
 
 # Slash-command surface: rpm's entry points (/backlog, /session-end,
 # etc.) are slash-commands in spirit. opencode's commands support

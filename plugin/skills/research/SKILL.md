@@ -85,6 +85,7 @@ docs/rpm/research/<topic-slug>/
 
 - Verify WebSearch + Bash permissions
 - Live fetch test: `curl -sL -m 60 "https://addyosmani.com/blog/" | head -c 1000`
+- **Fan-out capability check:** confirm the `Agent` tool is actually available. It is ABSENT when this skill is itself running inside a sub-agent (sub-agents cannot spawn sub-agents). Record the result — Phase 4's independent verification panel depends on it; without fan-out the panel degrades to self-certification (see Phase 4's no-collapse rule).
 - Scan existing research for matches
 - Clarify scope (1-3 questions if ambiguous)
 
@@ -106,6 +107,33 @@ as a numbered set so the user can edit by reference (e.g. "drop 3,
 add a fourth on X"). Do not launch agents on assumed scope, even if
 the original prompt seemed unambiguous — the user's mental model of
 the decomposition is what should drive the run.
+
+## Claude Code fast path — the rpm-research Workflow (Phases 2–5)
+
+On **Claude Code** the `Workflow` tool is available. After the Offer gate and the Phase-1
+scope-confirmation gate, run Phases 2–5 as the bundled **rpm-research Workflow** instead of inline
+prose. The workflow dispatches the Phase-4 verification panel as **genuinely independent agents**
+(one per lens), so it is structurally collapse-proof — it cannot degrade into the single-context
+self-certification that shipped a confident fabrication in the 2026-06-07 bake-off (see
+`docs/rpm/research/dr-bakeoff/runs/2026-06-07-triplet/experiments/v2-unnested-verify.md`). This
+path is Claude-Code-only; if the `Workflow` tool is NOT available (opencode/codex, or workflows
+disabled) skip this section and run the prose Phases 2–5 below (with their no-collapse guardrail).
+
+Steps:
+1. Do Phase 0 (setup) and Phase 1 (scope + the **mandatory** confirmation gate) as written. The
+   workflow cannot pause for input, so the dimension list MUST be confirmed with the user first.
+2. Compute the topic dir `docs/rpm/research/<slug>` (slug from the question).
+3. Launch the workflow by scriptPath — it ships in this plugin at
+   `<plugin-root>/skills/research/rpm-research.workflow.js` (resolve `<plugin-root>` from
+   `$CLAUDE_PLUGIN_ROOT`, or locate `rpm-research.workflow.js` under the rpm plugin dir):
+   `Workflow({ scriptPath: "<…>/skills/research/rpm-research.workflow.js", args: { question, topicDir, dimensions } })`
+   — `question` verbatim, `dimensions` the confirmed list (`{key, question, namedPrimarySource}` items).
+4. The workflow runs Search → Fetch → independent Verify panel → Synthesize, writing durable
+   artifacts under the topic dir (`fetched/`, `validation/{adversarial,refuted}.md`,
+   `findings/report.md`). It runs in the background and notifies on completion.
+5. On completion deliver the **Final summary** (the Phase-5 rules below still apply) from the
+   workflow's return — Key Findings with confidence + source, the drop/replace tally, and the path
+   to `findings/report.md`. Do NOT then re-run Phases 2–5 in prose.
 
 ## Phase 2: Parallel Discovery
 
@@ -191,6 +219,26 @@ perspective-diverse lens panel — see below) + `$TOPIC/validation/refuted.md`.
 - Recency check: findings >18mo still current?
 - Citation pre-audit: source URLs exist and match?
 
+**Independent verification is the load-bearing control — never run the panel collapsed
+(mandatory).** The diverse panel below only works when its lenses are *genuinely independent*
+acts — a fresh search for the rival reading, a check against a *different* source — not a re-read
+of the cited source. The provenance lens alone is **circular**: literal-presence in the cited
+source passes a confident *wrong-source* answer. So any load-bearing primary-source claim must be
+ruled on by the **cross-source** and **alternative-hypothesis** lenses run independently — even on
+a SIMPLE run. If this skill cannot fan out (the Phase-0 check found no `Agent` tool, e.g. it is
+itself running inside a sub-agent), a "panel" run in one context is not verification: the same
+context that picked a source also rules on it, and rubber-stamps. (Measured 2026-06-07 triplet
+bake-off: run collapsed, the protocol certified an off-corpus answer — wrong casualties, a
+fabricated officer, an inverted referent — at HIGH confidence with a zero-orphan figure-ledger;
+the *identical* lenses re-run as independent agents killed all three. See
+`docs/rpm/research/dr-bakeoff/runs/2026-06-07-triplet/experiments/v2-unnested-verify.md`.) When
+fan-out is unavailable: do **not** assert any load-bearing primary-source claim at HIGH, and do
+**not** write `adversarial.md` rows implying an independent panel ran. Cap such claims at MEDIUM
+labelled `single-context — not independently verified`, send genuinely contested ones to
+`refuted.md` / *Could not verify*, tell the user the run was un-fanned-out, and recommend
+re-running with fan-out available or handing off to the native `/deep-research` Workflow (on CC).
+The panel is the control; a collapsed panel is the failure mode this gate exists to stop.
+
 **Quantitative kill-list (mandatory) → `validation/refuted.md`.** Extract every
 load-bearing number (figures, rates, dates, magnitudes). For each, open the cited
 `fetched/` artifact and confirm the number is actually present. **KILL** any number
@@ -225,6 +273,15 @@ The lenses:
   tertiary/amateur/model-memory? Frankenstein-citation check (cited source actually
   contains the claim). This lens *is* the `figure-ledger.md` literal-presence + source-tier
   columns — do not re-derive them; read that ledger and rule on its rows.
+  **Source-authority binding:** when the question names a specific source (an archive inv. nr., a
+  particular edition, a dated document), the citation must resolve to THAT document or the most
+  authoritative rendering of it — literal-presence in *a* primary is not enough, it must be the
+  *right* primary. A figure/quote drawn from a *substitute* edition (a different compilation, an
+  OCR of another printing) is flagged `referent unverified against named source` and may not ship
+  at HIGH until cross-checked against the named source. And **read the full cited window, not just
+  the line you quoted** — the correct value often sits a few lines away (2026-06-07: the real
+  "Capt. De Ros, 9 dead / 35 wounded" sat in the *same* dispatch a collapsed run quoted only for
+  "Vogel survived").
 
 - **Internal-consistency / cross-source** — does the claim conflict with another fetched
   source, or with itself elsewhere in the corpus? Surfaces contradictions a single-source
@@ -294,6 +351,16 @@ that survives verification, the correct answer is "no verified figure exists —
 are the unverifiable candidates and their weak provenance", NOT picking a "most
 defensible" number. Declining to assert beats laundering a guess behind a confidence
 tag.
+
+**Kill-and-replace, not just kill.** When the cross-source or alternative-hypothesis lens kills a
+claim *and* in doing so positively confirms a **better-sourced rival** reading (a stronger source
+for the same fact), synthesis adopts the rival — with its source and confidence — instead of
+leaving a "could not verify" hole. The killed original still goes to `refuted.md`; the report
+carries the *corrected* answer. Replace only when the rival is positively confirmed on a stronger
+source; absent that, the claim stays "could not verify". This is what separates "refused to be
+wrong" from "got it right" — in the 2026-06-07 test the independent panel both killed the
+fabricated casualties *and* surfaced the authoritative 9-dead / De-Ros figures; a kill-only
+protocol would have shipped a hole where the correct answer was already in hand.
 
 **Number-provenance gate (mandatory) → `validation/figure-ledger.md`.** This is the
 kill-list rendered as an auditable artifact — the same orphan check the offline
