@@ -13,6 +13,11 @@
    :ID: injection-weak-model-arm
    :END:
 
+** TODO Tune rpm-research workflow from VOC bake-off — lower maxVerify default + flag suppresses kill-and-replace [[file:2026-06-08-rpm-research-workflow-tuning.md]]
+   :PROPERTIES:
+   :ID: rpm-research-workflow-tuning
+   :END:
+
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
    :PROPERTIES:
    :ID: pivot-capture-hook
