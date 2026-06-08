@@ -6,6 +6,18 @@ Parent-heading structure mirrors tasks.org so archived entries stay
 grouped with their original category.
 
 * Active
+** DONE Round-2 tune rpm-research workflow — contested calibration + fetch coverage + cost guard [[file:2026-06-08-rpm-research-workflow-round2.md]] :CLOSED: [2026-06-08]
+   :PROPERTIES:
+   :ID: rpm-research-workflow-round2
+   :END:
+** DONE Tune rpm-research workflow from VOC bake-off — lower maxVerify default + flag suppresses kill-and-replace [[file:2026-06-08-rpm-research-workflow-tuning.md]] :CLOSED: [2026-06-08]
+   :PROPERTIES:
+   :ID: rpm-research-workflow-tuning
+   :END:
+** DONE v1/v2/native deep-research bake-off on a Dutch-primary-source VOC topic [[file:2026-05-31-dr-v1-v2-native-bakeoff.md]] :CLOSED: [2026-06-07]
+   :PROPERTIES:
+   :ID: dr-v1-v2-native-dutch-bakeoff
+   :END:
 ** DONE Port goal-seeking discipline into rpm:next — file the PROOF step, not just gaps [[file:2026-06-05-next-goal-seeking-weakness.md]]
    CLOSED: [2026-06-05]
    :PROPERTIES:

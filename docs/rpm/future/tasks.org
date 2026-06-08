@@ -3,24 +3,9 @@
 
 * Active
 
-** DONE v1/v2/native deep-research bake-off on a Dutch-primary-source VOC topic [[file:2026-05-31-dr-v1-v2-native-bakeoff.md]]
-   :PROPERTIES:
-   :ID: dr-v1-v2-native-dutch-bakeoff
-   :END:
-
 ** TODO Injection weak-model arm — run Module B canaries on a non-Claude weak model (portability) [[file:2026-05-30-deep-research-improvement-plan.md]]
    :PROPERTIES:
    :ID: injection-weak-model-arm
-   :END:
-
-** DONE Tune rpm-research workflow from VOC bake-off — lower maxVerify default + flag suppresses kill-and-replace [[file:2026-06-08-rpm-research-workflow-tuning.md]] :CLOSED: [2026-06-08]
-   :PROPERTIES:
-   :ID: rpm-research-workflow-tuning
-   :END:
-
-** DONE Round-2 tune rpm-research workflow — contested calibration + fetch coverage + cost guard [[file:2026-06-08-rpm-research-workflow-round2.md]] :CLOSED: [2026-06-08]
-   :PROPERTIES:
-   :ID: rpm-research-workflow-round2
    :END:
 
 ** BLOCKED Pivot-capture hook: mirror marker → tasks.org top [[file:2026-04-21-pivot-capture-hook.md]]
