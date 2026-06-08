@@ -15,19 +15,19 @@ orchestrator spot-checked the crux passages directly.
   primary text. Genuinely ambiguous-by-source.
 
 ## Scorecard
-| Metric | v1 (pre-harden `24d8ab0`) | v2 (hardened HEAD) | native |
-|---|---|---|---|
-| Sub-Q1 — octrooi 17-seat rule | **CORRECT** (Amsterdam-17th trap avoided) | **CORRECT** (avoided) | **CORRECT** (avoided) |
-| Sub-Q2a — Banda casualties / officer | **CORRECT** (9 dead/35 wnd/De Ros) | **WRONG** (1 killed; officer "Vogel" **fabricated**) | **CORRECT** (9 dead/35 wnd/De Ros + standard-bearer; no fabrication) |
-| Sub-Q2b — the "1,200" referent | literal "taken" @HIGH, **surfaced** the "died" reading @MED | "captured/deported"; **claimed trap-avoided**, ambiguity not surfaced | **UNRESOLVED by design** — surfaced both readings, refused to assert (only arm delivering no wrong referent) |
-| Sub-Q3 — van Riebeeck heading | **CORRECT** (governor / from-Amsterdam traps avoided) | **CORRECT** (avoided) | **CORRECT** (both traps avoided; "from Amsterdam" refuted 0-3) |
-| Unsupported-claim rate (primary, sampled) | 0/10 | 0/10 | 0/10 |
-| Translation-fidelity errors | 1 (Q2b — contestable) | 2–4 (Q2a wrong-referent + fabricated officer) | **0** |
-| Figure orphans | 0 | 0 self-reported — **FALSE** (Q2 wrong-referent cluster) | 0 (every number anchored to a quoted/cited source) |
-| Over-kill (true claims wrongly dropped) | N/A (build-up report) | 0 | 0 (both kills removed non-true claims: "1,200 died" + "from Amsterdam") |
-| Live-URL rate | 10/10 | 12/12 | 17/18 (94%; one ANRI 403, self-disclosed) |
-| Load-bearing claims / citations | ~24 / 9 | ~23 / 10 | ~21 / 21 |
-| Cost (subagent tokens) | ~98k | ~115k | **~2.32M** (103 agents, 757 tool-uses, ~27 min) |
+| Metric | v1 (pre-harden `24d8ab0`) | v2 (hardened HEAD) | native | v2-Workflow (CC, HEAD) |
+|---|---|---|---|---|
+| Sub-Q1 — octrooi 17-seat rule | **CORRECT** (Amsterdam-17th trap avoided) | **CORRECT** (avoided) | **CORRECT** (avoided) | **CORRECT** ("by beurten" verbatim; Amsterdam denied majority; flagged Valentyn 18th-c. provenance) |
+| Sub-Q2a — Banda casualties / officer | **CORRECT** (9 dead/35 wnd/De Ros) | **WRONG** (1 killed; officer "Vogel" **fabricated**) | **CORRECT** (9 dead/35 wnd/De Ros + standard-bearer; no fabrication) | **CORRECT** (9 dead/35 wnd/De Ros + standard-bearer; **no fabrication**) |
+| Sub-Q2b — the "1,200" referent | literal "taken" @HIGH, **surfaced** the "died" reading @MED | "captured/deported"; **claimed trap-avoided**, ambiguity not surfaced | **UNRESOLVED by design** — surfaced both readings, refused to assert (only arm delivering no wrong referent) | **PARTIAL** — asserted "captives/deported" @HIGH (grounded in corpus, not fabricated) + killed the editorial "died" gloss; over-committed where native declined |
+| Sub-Q3 — van Riebeeck heading | **CORRECT** (governor / from-Amsterdam traps avoided) | **CORRECT** (avoided) | **CORRECT** (both traps avoided; "from Amsterdam" refuted 0-3) | **CORRECT** (Texel port / Amsterdam chamber split; never "governor"; caught the question's own inv.1188 pin conflict) |
+| Unsupported-claim rate (primary, sampled) | 0/10 | 0/10 | 0/10 | 0/10 |
+| Translation-fidelity errors | 1 (Q2b — contestable) | 2–4 (Q2a wrong-referent + fabricated officer) | **0** | **0 hard** (1 Q2b over-assertion) |
+| Figure orphans | 0 | 0 self-reported — **FALSE** (Q2 wrong-referent cluster) | 0 (every number anchored to a quoted/cited source) | 0 |
+| Over-kill (true claims wrongly dropped) | N/A (build-up report) | 0 | 0 (both kills removed non-true claims: "1,200 died" + "from Amsterdam") | 0 (replace-integrity clean; replaced rivals R-1/R-2 verified correct) |
+| Live-URL rate | 10/10 | 12/12 | 17/18 (94%; one ANRI 403, self-disclosed) | 15/16 (94%) |
+| Load-bearing claims / citations | ~24 / 9 | ~23 / 10 | ~21 / 21 | ~30 / 30 |
+| Cost (subagent tokens) | ~98k | ~115k | **~2.32M** (103 agents, 757 tool-uses, ~27 min) | **~5.4M** (128 agents, 2317 tool-uses, ~66 min; `maxVerify=30` → 120 verifiers) |
 
 ## Primary verdict (v1 vs v2)
 On this single Dutch-primary probe, the **v1→v2 hardening did not improve Dutch-source fidelity,
@@ -72,3 +72,43 @@ the wrong-referent traps. The lesson is that **independent adversarial verificat
 literal-presence self-certification** for Dutch-primary fidelity — but it is expensive, so it is
 worth reserving for high-stakes primary-source claims rather than every run. n=1 probe, one
 topic; treat the cost/fidelity ratio as directional, not precise.
+
+## Four-column verdict (v2-Workflow added 2026-06-08)
+**The collapse-proof Workflow closes almost the whole fidelity gap with native and fully fixes the
+old-v2 regression — but it cost 2.3× *more* than native, not less.** Run on Claude Code as a real
+Workflow (independent per-lens panel, not a collapsed subagent), v2-Workflow scored **CORRECT on
+Q1, Q2a, Q3** and **PARTIAL on Q2b** — re-finding the same authoritative primaries native used
+(NL-Wikisource octrooi, the Nationaal Archief Banda *hertaling*, the DBNL Daghregister) and quoting
+every crux Dutch span verbatim-faithfully (graded blind; `grading/v2-workflow-grading.md`).
+
+**The old-v2 failure is gone.** Where collapsed-v2 fabricated "Captain Vogel" and certified
+wrong-referent figures at HIGH, v2-Workflow named **De Ros + standard-bearer, 9 dead / 35 wounded**
+— exactly right, no fabrication, 0 hard fidelity errors. This confirms the un-nested experiment's
+diagnosis: v2's "regression" was fan-out collapse, and structural independence removes it.
+
+**It answers the experiment's open question — killing ≠ correcting — in the Workflow's favor.** The
+panel did not merely *refuse* wrong claims; **kill-and-replace let it positively deliver the right
+ones**: it adopted better-sourced rivals (R-1 "by beurten" over the Valentyn mis-quote; R-2
+autumn-vs-spring meeting function; R-5 killed an issuer-wrong, intent-inverted Macassar "support"
+claim and replaced the framing). 14 of 30 load-bearing claims were killed/replaced, replace-integrity
+clean. That delivery — not just refusal — is what lifts it from old-v2 to near-native.
+
+**Where it still trails native: Q2b, and the cause is instructive.** kill-and-replace's bias toward
+*adopting the rival* made it **over-commit on a genuinely ambiguous span** — it killed the editorial
+"(red.: …overleden)" gloss and asserted the literal "captives/deported" reading at HIGH, where
+native surfaced both readings and declined. The rival is grounded in real corpus text (not a
+fabrication, no side-swap onto the Dutch force), so it is PARTIAL not WRONG — but native's epistemic
+refusal is the better call on a by-design-ambiguous claim. **The same mechanism that fixes
+under-delivery can cause over-delivery on ambiguity.**
+
+**Cost is the real trade-off, and it inverted the pre-run guess.** `maxVerify=30` × 4 lenses spawned
+**120 verifier agents → ~5.4M tokens / ~66 min**, *heavier* than native's 103-agent / 2.32M run. The
+very independence that makes the panel collapse-proof is what makes it expensive; collapse-proof is
+**not** cheap. The cost is tunable (lower `maxVerify`, or scale it to dimension count), but at the
+shipped default the win is **fidelity at parity with native + the old-v2 fix at ~47× old-v2's cost**,
+not a cost saving over native.
+
+**Tuning implications (next):** (1) lower the `maxVerify` default or scale it to dimension/claim
+count — 120 verifiers for a 6-dimension probe overshot; (2) let a genuinely-ambiguous result (a
+`flag` verdict) suppress kill-and-replace so synthesis surfaces-both like native instead of
+over-asserting (the Q2b fix). n=1 probe, one topic — directional, not precise.
