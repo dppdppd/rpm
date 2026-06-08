@@ -112,3 +112,42 @@ not a cost saving over native.
 count — 120 verifiers for a 6-dimension probe overshot; (2) let a genuinely-ambiguous result (a
 `flag` verdict) suppress kill-and-replace so synthesis surfaces-both like native instead of
 over-asserting (the Q2b fix). n=1 probe, one topic — directional, not precise.
+
+## Tuned re-run (2026-06-08) — did the two fixes work?
+After committing both tuning fixes (`fcb3447`: verify budgeted by agents → 12-claim cap; a `flag`
+verdict marks a claim `contested` so synthesis surfaces-both instead of over-asserting), the
+v2-Workflow arm was re-run on the same probe, same fairness rules, graded blind
+(`grading/v2-workflow-tuned-grading.md`). Before → after on the v2-Workflow arm:
+
+| Axis | v2-Workflow (untuned) | v2-Workflow (tuned) |
+|---|---|---|
+| Sub-Q1 octrooi | CORRECT | CORRECT |
+| Sub-Q2a Banda / officer | CORRECT (De Ros) | CORRECT (De Ros, no fabrication) |
+| **Sub-Q2b the "1,200"** | **PARTIAL — over-asserted "captives" @HIGH** | **CORRECT — surface-both @MEDIUM** (fidelity errors 4→0; literal reading now grounded in real `'t Postpaert`/orangkaja corpus lines) |
+| Sub-Q3 van Riebeeck | CORRECT | **UNSUPPORTED — heading never fetched this run** |
+| Contested calibration | n/a | 8 of 12 flagged: **5 genuine / 3 over-hedged** (trigger-happy) |
+| Verify fan-out | 120 agents (30 claims) | **48 agents (12-claim cap engaged)** |
+| Cost | ~5.4M / 128 agents / 66 min | ~3.87M / 55 agents / 40 min |
+
+**Fix 2 (flag→contested) worked — cleanly on its target.** Q2b moved from a HIGH-confidence
+over-assertion to native-style surface-both at MEDIUM; the grader scored its translation-fidelity
+errors **4→0**, and the literal "taken" reading is now anchored in verbatim corpus text rather than
+asserted on faith. This is the un-nested experiment's prescription delivered.
+
+**But Fix 2 is slightly trigger-happy.** Of 8 contested claims, the grader judged **5 genuinely
+ambiguous and 3 over-hedged** — a determinable winning reading was asserted yet still wore the
+"contested" label. The pendulum swung a notch past native's calibration; worth tightening (e.g.
+require the flag to carry a real rival, or a second concurring flag, before contesting).
+
+**Fix 1's cap engaged, but cost parity with native was NOT reached.** The verifier fan-out dropped
+exactly as designed (120→**48** agents = the 12-claim cap × 4 lenses), yet total tokens fell only
+~28% (5.4M→3.87M), still ~1.67× native. The drop was muted by run variance — this run fetched a
+**2.79 MB NA-archive PDF** that agents had to read. The mechanism is right; "≤ native cost" is
+unproven and likely needs a smaller cap and/or a fetch-size guard.
+
+**A non-tuning regression surfaced: Sub-Q3.** This run's Scope made **4 dimensions, not 6**, and
+Fetch grabbed **no van Riebeeck source at all**, so Q3 went unanswered — despite the heading
+existing in the frozen corpus. This is Scope/Fetch coverage variance (Phases 1–3), independent of
+the Phase-4 tuning, but it exposes a real fragility: per-sub-question fidelity depends on Scope
+isolating it as a dimension and Fetch landing its primary. **Net: tuned > untuned on Q2b, still
+< native** (which answered all four). n=1 — directional.
