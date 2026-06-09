@@ -6,7 +6,7 @@ export const meta = {
     { title: 'Search', detail: 'one WebSearch sonnet agent per dimension' },
     { title: 'Fetch', detail: 'one agent fetches top sources + writes durable fetched/ artifacts' },
     { title: 'Verify', detail: 'one INDEPENDENT agent per lens per load-bearing claim — structurally collapse-proof' },
-    { title: 'Synthesize', detail: 'one agent writes the cited report with kill-and-replace' },
+    { title: 'Synthesize', detail: 'one agent returns the cited report markdown (main session writes it) with kill-and-replace' },
   ],
 }
 
@@ -143,12 +143,16 @@ const LENS_SCHEMA = {
 const REPORT_SCHEMA = {
   type: 'object',
   properties: {
+    // The synthesize subagent RETURNS the report markdown rather than writing it — some runtimes
+    // block a subagent's Write to a report file ("return findings as text"). reportPath is NOT a
+    // returned field (the workflow computes it); requiring it here was the field the agent kept
+    // omitting, which thrashed the validator into a stub summary.
+    reportMarkdown: { type: 'string' },
     summary: { type: 'string' },
-    reportPath: { type: 'string' },
     keyFindings: { type: 'array', items: { type: 'string' } },
     droppedTally: { type: 'string' },
   },
-  required: ['summary', 'reportPath'],
+  required: ['reportMarkdown', 'summary'],
   additionalProperties: false,
 }
 
@@ -377,12 +381,14 @@ log(
 phase('Synthesize')
 const report = (await agent(
   `You write the final research report for this run. Tools: Read, Write, Bash.\n` +
-    `QUESTION:\n${QUESTION}\n\nFirst \`mkdir -p ${TOPIC_DIR}/findings ${TOPIC_DIR}/validation\`. ` +
-    `Write the report to \`${TOPIC_DIR}/findings/report.md\`, the per-lens panel rows to ` +
-    `\`${TOPIC_DIR}/validation/adversarial.md\`, and killed claims + reasons + drop tally to ` +
-    `\`${TOPIC_DIR}/validation/refuted.md\`.\n\n` +
+    `QUESTION:\n${QUESTION}\n\nFirst \`mkdir -p ${TOPIC_DIR}/validation\`. Write the per-lens panel ` +
+    `rows to \`${TOPIC_DIR}/validation/adversarial.md\` and killed claims + reasons + drop tally to ` +
+    `\`${TOPIC_DIR}/validation/refuted.md\`.\n` +
+    `Do NOT write the report to a file — in some runtimes a subagent's Write to a report file is ` +
+    `blocked ("return findings as text"). RETURN the full report markdown in \`reportMarkdown\`; the ` +
+    `main session writes it to \`${TOPIC_DIR}/findings/report.md\`.\n\n` +
     `RULES:\n` +
-    `- Write the report ONCE. Every load-bearing claim carries a confidence tag + source URL.\n` +
+    `- Compose the report ONCE. Every load-bearing claim carries a confidence tag + source URL.\n` +
     `- KILL-AND-REPLACE: for any claim with decision "replaced", assert the rival reading (with its ` +
     `source) instead of the original; the killed original goes only to refuted.md.\n` +
     `- CONTESTED (decision "contested"): the lenses found the claim genuinely ambiguous. Do NOT pick a ` +
@@ -390,19 +396,28 @@ const report = (await agent(
     `source), labelled contested/ambiguous at MEDIUM-or-lower, like a careful analyst declining to ` +
     `settle it. This is a finding, not a hole.\n` +
     `- "killed" claims (no rival) go to a "## Could not verify / refuted" section — never asserted.\n` +
-    `- Before writing any load-bearing claim, Read the relevant fetched/ artifact window to confirm it.\n\n` +
+    `- Before asserting any load-bearing claim, Read the relevant fetched/ artifact window to confirm it.\n\n` +
     `VERIFICATION LEDGER (JSON):\n${JSON.stringify(verified)}\n\n` +
     `CONTRADICTIONS surfaced in search:\n${JSON.stringify(contradictions)}\n\n` +
     `FETCHED ARTIFACTS:\n${fetchedManifest}\n\n` +
-    `Return summary (3-6 sentences), reportPath, keyFindings[] (each with confidence + source), and ` +
+    `Return reportMarkdown (the COMPLETE report markdown, including a "## Could not verify / refuted" ` +
+    `section), summary (3-6 sentences), keyFindings[] (each with confidence + source), and ` +
     `droppedTally (e.g. "killed 3, replaced 1, contested 2 of N load-bearing claims").`,
   { schema: REPORT_SCHEMA, label: 'synthesize', phase: 'Synthesize' },
 )) || {}
 
+const reportPath = `${TOPIC_DIR}/findings/report.md`
+const reportMarkdown = report.reportMarkdown || ''
 return {
   topicDir: TOPIC_DIR,
-  summary: report.summary || '(synthesis agent returned no summary)',
-  reportPath: report.reportPath || `${TOPIC_DIR}/findings/report.md`,
+  reportPath,
+  // Synthesis RETURNS the markdown; the SKILL's main session writes it to reportPath (a subagent's
+  // Write to a report file is blocked in some runtimes). reportWritten=false signals that owed write.
+  reportMarkdown,
+  reportWritten: false,
+  // ok=false => synthesis produced no usable report; the skill must surface that, never show a stub.
+  ok: Boolean(reportMarkdown && report.summary),
+  summary: report.summary || '',
   keyFindings: report.keyFindings || [],
   droppedTally: report.droppedTally || '',
   stats: {
