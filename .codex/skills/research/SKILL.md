@@ -126,12 +126,18 @@ Steps:
    `$CLAUDE_PLUGIN_ROOT`, or locate `rpm-research.workflow.js` under the rpm plugin dir):
    `Workflow({ scriptPath: "<…>/skills/research/rpm-research.workflow.js", args: { question, topicDir, dimensions } })`
    — `question` verbatim, `dimensions` the confirmed list (`{key, question, namedPrimarySource}` items).
-4. The workflow runs Search → Fetch → independent Verify panel → Synthesize, writing durable
-   artifacts under the topic dir (`fetched/`, `validation/{adversarial,refuted}.md`,
-   `findings/report.md`). It runs in the background and notifies on completion.
-5. On completion deliver the **Final summary** (the Phase-5 rules below still apply) from the
-   workflow's return — Key Findings with confidence + source, the drop/replace tally, and the path
-   to `findings/report.md`. Do NOT then re-run Phases 2–5 in prose.
+4. The workflow runs Search → Fetch → independent Verify panel → Synthesize. Its agents write the
+   durable `fetched/` and `validation/{adversarial,refuted}.md` artifacts, but the synthesize agent
+   **returns** the report markdown rather than writing it — some runtimes block a subagent's Write
+   to a report file. It runs in the background and notifies on completion.
+5. On completion, in the main session:
+   - **Write the report yourself.** Take the workflow return's `reportMarkdown` and write it to
+     `<topicDir>/findings/report.md` (`mkdir -p` the dir first). Main-session writes are not blocked
+     (Principle 5). If `reportMarkdown` is empty or the return's `ok` is false, **report the failure
+     — never present a stub summary**; do not claim a report was produced when it was not.
+   - **Then deliver the Final summary** (the Phase-5 rules below still apply) from the workflow's
+     return — Key Findings with confidence + source, the drop/replace tally, and the path to
+     `findings/report.md`. Do NOT then re-run Phases 2–5 in prose.
 
 ## Phase 2: Parallel Discovery
 
