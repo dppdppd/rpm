@@ -28,6 +28,21 @@ require_codex_port_layout() {
   [[ "$output" == *$'rpm\n'"${version}"$'\n./skills/\n./hooks.json\nrpm'* ]]
 }
 
+@test "hook manifests use Codex-compatible top-level schema" {
+  require_codex_port_layout
+  local root bad file
+  root=$(repo_root)
+
+  bad=""
+  for file in "$root/plugin/hooks/hooks.json" "$root/codex/.codex/hooks.json"; do
+    if ! jq -e 'keys == ["hooks"] and (.hooks | type == "object")' "$file" >/dev/null; then
+      bad="${bad}${file}"$'\n'
+    fi
+  done
+
+  [ -z "$bad" ] || { echo "$bad"; return 1; }
+}
+
 @test "codex skill frontmatter avoids unsafe plain YAML scalars" {
   require_codex_port_layout
   local root bad

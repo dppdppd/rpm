@@ -1,5 +1,4 @@
 {
-  "description": "rpm hooks for Codex CLI. Subset of plugin/hooks/hooks.json \u2014 only events Codex actually fires.",
   "hooks": {
     "SessionStart": [
       {
