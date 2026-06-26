@@ -73,6 +73,11 @@ Codex-specific generated additions live under `codex/overlays/` so
 experimental Codex behavior does not alter the shared Claude Code
 plugin guidance.
 
+Hook manifests intentionally keep only a top-level `hooks` field.
+Codex rejects sibling metadata such as `description` in `hooks.json`;
+human-facing explanations belong in this README or the plugin manifest
+instead.
+
 To regenerate from `plugin/` plus Codex overlays:
 
 ```bash
