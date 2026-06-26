@@ -1,5 +1,4 @@
 {
-  "description": "rpm hooks for session lifecycle",
   "hooks": {
     "SessionStart": [
       {
