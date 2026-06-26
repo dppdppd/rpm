@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-auto.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook session-start-auto.sh"
           }
         ]
       }
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-end.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook session-end.sh"
           }
         ]
       }
@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook pre-compact.sh"
           }
         ]
       }
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/post-compact.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook post-compact.sh"
           }
         ]
       }
@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/context-monitor.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook context-monitor.sh"
           }
         ]
       },
@@ -55,7 +55,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/codex-sync-reminder.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook codex-sync-reminder.sh"
           }
         ]
       }
@@ -65,11 +65,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-learn-capture.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook stop-learn-capture.sh"
           },
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/handoff-validator.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook handoff-validator.sh"
           }
         ]
       }
@@ -79,7 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/task-capture.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook task-capture.sh"
           }
         ]
       }
@@ -89,7 +89,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/task-capture.sh\""
+            "command": "bash -c 'script=\"$1\"; shift; roots=(); [ -n \"${RPM_PLUGIN_ROOT:-}\" ] && roots+=(\"$RPM_PLUGIN_ROOT\"); [ -n \"${CODEX_PLUGIN_ROOT:-}\" ] && roots+=(\"$CODEX_PLUGIN_ROOT\"); [ -n \"${CLAUDE_PLUGIN_ROOT:-}\" ] && roots+=(\"$CLAUDE_PLUGIN_ROOT\"); roots+=(\"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-plugins/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/plugins/cache/dppdppd-rpm/rpm/\"* \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-plugins\" \"${CODEX_HOME:-$HOME/.codex}/.tmp/marketplaces/dppdppd-rpm/.codex\"); for root in \"${roots[@]}\"; do [ -f \"$root/hooks/$script\" ] && exec bash \"$root/hooks/$script\"; done; echo \"rpm hook not found: $script\" >&2; exit 127' rpm-hook task-capture.sh"
           }
         ]
       }

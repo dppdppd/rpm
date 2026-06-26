@@ -43,6 +43,24 @@ require_codex_port_layout() {
   [ -z "$bad" ] || { echo "$bad"; return 1; }
 }
 
+@test "shared hook commands resolve without Claude plugin env" {
+  require_codex_port_layout
+  local root cmd payload
+  root=$(repo_root)
+  seed_minimal_trackers
+  unset CLAUDE_PLUGIN_ROOT
+
+  payload=$(printf '{"cwd":"%s","session_id":"codex-sess","last_assistant_message":"key finding: shared hook resolver smoke test"}' "$TEST_DIR")
+
+  cmd=$(jq -r '.hooks.Stop[0].hooks[0].command' "$root/plugin/hooks/hooks.json")
+  run env CODEX_PLUGIN_ROOT="$root/plugin" bash -c 'cd "$1" && printf "%s" "$2" | bash -c "$3"' _ "$TEST_DIR" "$payload" "$cmd"
+  [ "$status" -eq 0 ]
+
+  cmd=$(jq -r '.hooks.Stop[0].hooks[1].command' "$root/plugin/hooks/hooks.json")
+  run env CODEX_PLUGIN_ROOT="$root/plugin" bash -c 'cd "$1" && printf "%s" "$2" | bash -c "$3"' _ "$TEST_DIR" "$payload" "$cmd"
+  [ "$status" -eq 0 ]
+}
+
 @test "codex skill frontmatter avoids unsafe plain YAML scalars" {
   require_codex_port_layout
   local root bad
