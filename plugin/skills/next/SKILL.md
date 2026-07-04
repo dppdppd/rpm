@@ -1,6 +1,6 @@
 ---
 name: next
-description: One-step rpm orchestrator, or a bounded internal sequence when given a count or scope. Runs preflight maintenance, then starts the next obvious backlog action (or, in direct use, asks for clarification when nothing is clearly next). With no argument it runs one step; with `N`, `blocked`, `all`, or a group name it runs several steps itself — one worker at a time, skipping the heavy preflight between steps, and is the recommended way to work several backlog items at once — cheaper than wrapping `/next` in an external `/loop`. It never fans out and never waits for input mid-sequence. TRIGGER on terse forward-motion prompts — phrasings like "next", "next?", "next.", "next task", "what's next", "do next", "go next", "keep going", "continue" (when the prior turn was rpm work) all qualify and must route through this skill instead of being answered inline from the SessionStart preview. Use whenever the user wants the session to autonomously work the rpm backlog.
+description: One-step rpm orchestrator, or a bounded internal sequence when given a count or scope. Runs preflight maintenance, then starts the next obvious backlog action (or, in direct use, asks for clarification when nothing is clearly next). With no argument it runs one step; with `N`, `blocked`, `all`, or a group name it runs several steps itself — one worker at a time by default, skipping the heavy preflight between steps, and is the recommended way to work several backlog items at once — cheaper than wrapping `/next` in an external `/loop`. It fans out to concurrent workers only when a batch of tasks is genuinely independent (disjoint edits, no shared resource, independent verification); otherwise it stays single-threaded, and it never waits for input mid-sequence. TRIGGER on terse forward-motion prompts — phrasings like "next", "next?", "next.", "next task", "what's next", "do next", "go next", "keep going", "continue" (when the prior turn was rpm work) all qualify and must route through this skill instead of being answered inline from the SessionStart preview. Use whenever the user wants the session to autonomously work the rpm backlog.
 argument-hint: "[N | blocked | all | <group> | status]"
 allowed-tools: Read Write Edit Glob Grep Bash Agent
 ---
@@ -16,10 +16,11 @@ loop-exhausted guard stops it.
 
 When given a **count or scope** (`N`, `blocked`, `all`, or a group
 name), `/next` runs a **bounded internal sequence** instead: it works
-several backlog items in one turn, one worker at a time, skipping the
-heavy preflight between steps (see **Sequencing**). Even then it never
-fans out — sequencing adds *depth*, not parallel *width* — and it never
-waits for user input mid-sequence. **For an attended multi-step push,
+several backlog items in one turn, one worker at a time by default,
+skipping the heavy preflight between steps (see **Sequencing**). It
+fans out to concurrent workers only when a batch passes the independence
+test (see **Concurrency**); otherwise it stays single-threaded, adding
+*depth* not *width*. It never waits for user input mid-sequence. **For an attended multi-step push,
 reach for a sequence first** — it is cheaper than an external loop (heavy
 preflight only at the start and end, not every tick) and stays in one
 turn. `/loop /next` still works and remains the right tool for genuinely
@@ -67,7 +68,7 @@ Usage block (print only when the argument is unrecognized):
 
 ```
 /next               — one orchestrator step
-/next N             — up to N steps (one worker each); heavy preflight only at start + end
+/next N             — up to N steps (one worker each, or a concurrent batch if independent); heavy preflight only at start + end
 /next blocked       — run until a task needs you, or nothing is actionable
 /next all           — run everything actionable, skipping tasks that need you
 /next <group> [N]   — work only that backlog group (drain it, or N steps)
@@ -94,9 +95,10 @@ There are three modes:
 ## Sequencing
 
 Triggered by a count or scope argument. A sequence runs cycles **in the
-foreground, strictly one worker at a time** — never in parallel. The
-one-worker-at-a-time ceiling from **Concurrency** still holds; a sequence
-adds depth, not width.
+foreground, one worker at a time by default** — it adds depth, not width.
+It may fan out a batch of concurrent workers only when that batch passes
+the independence test in **Concurrency**; otherwise it stays
+single-threaded.
 
 1. **Full preflight once, at the start.** Run the delegated preflight
    (Preflight step 2) with `phases=full`, act on its report, and log a
@@ -115,14 +117,17 @@ adds depth, not width.
    - **b. Task Selection.** Recompute in-flight, walk the tree,
      goal-aligned dispatch, apply the group filter if scoped, and run the
      `is-pre-completed.sh` skip check.
-   - **c. Dispatch ONE worker** using the Worker Contract, **in the
-     foreground** — await its terse result, do not background it. Log
-     `actionable-backlog`.
-   - **d. Review inline.** Evaluate the returned result, mark the backlog
+   - **c. Dispatch.** Default: dispatch **one** worker using the Worker
+     Contract, **in the foreground** — await its terse result, do not
+     background it. Log `actionable-backlog`. If the next candidates pass
+     the independence test in **Concurrency**, you may instead dispatch a
+     batch of up to 4 concurrent workers (one `actionable-backlog` log
+     each) and await them all before reviewing.
+   - **d. Review inline.** Evaluate each returned result, mark the backlog
      entry DONE (or append changes-requested notes to the detail file),
-     then log `review-result` and a paired `backlog-result`. Lean on the
-     worker's terse report (it also persisted the full result to the
-     detail file) to keep orchestrator context lean.
+     then log `review-result` and a paired `backlog-result` per worker.
+     Lean on the worker's terse report (it also persisted the full result
+     to the detail file) to keep orchestrator context lean.
 
 3. **Full preflight once, at the end.** After the loop stops, run the
    delegated preflight again with `phases=full` — it catches any drift
@@ -545,32 +550,49 @@ failed> "killed: <reason>"`) and log a paired `backlog-result` so the
 dashboard reflects reality and the in-flight count is accurate. Do
 not rely on the worker's own logging — it didn't reach that step.
 
-## Concurrency — one worker at a time
+## Concurrency — one worker by default, fan out when the work is independent
 
-A no-argument `/next` is a single orchestrator turn that dispatches at
-most one new `actionable-backlog` worker in the background; the next turn
-reviews it. A **sequence** (`N` / `blocked` / `all` / `<group>`)
-dispatches workers one after another in the **foreground**, waiting for
-each to finish before starting the next. Either way, **only ONE worker is
-ever in-flight at a time** — sequencing adds depth, never width. Full
-depth, verified before merge.
+**Default: one worker at a time.** A no-argument `/next` is a single
+orchestrator turn that dispatches at most one new `actionable-backlog`
+worker in the background; the next turn reviews it. A **sequence** (`N` /
+`blocked` / `all` / `<group>`) dispatches workers one after another in the
+**foreground**, waiting for each to finish before starting the next. This
+is the safe default and the right choice for interdependent work.
 
-For the no-argument form: if `<N>` >= 1 after preflight, do not dispatch
-another worker. Output `action: idle` with `next: waiting on in-flight
-worker`.
+**Fan out only when the work clearly supports it.** The orchestrator MAY
+dispatch several workers concurrently when **all** of these hold for the
+selected batch:
 
-Rationale (2026-05-04 audit): saturating to 4 produced an 8.4%
-dispatch hit rate (107 dispatches -> 9 shipped fixes) because (a)
-workers competed for the daemon render queue, (b) concurrent edits
-created non-FF push conflicts, (c) each fix verified against one game
-shipped before contradictions in other games surfaced. Single-threaded
-with corpus-wide verification trades throughput for hit rate.
+- **Disjoint edits** — each worker touches files/directories no other
+  worker in the batch touches, so no concurrent-edit or non-FF push
+  conflict is possible.
+- **No shared serialized resource** — the tasks do not compete for a
+  single render queue, build lock, dev server, port, or shared fixture.
+- **Independent verification** — each task can be verified on its own; no
+  corpus-wide check exists that one worker's change could invalidate for
+  another.
+- **No user input needed** — every task in the batch is unambiguous.
 
-This ceiling is deliberate and overrides any default to fan out —
-including ultracode / automatic Workflow orchestration. Do not raise
-`/next` concurrency to chase throughput; the hit-rate math above is the
-reason. A sequence does not violate this: it is still single-threaded,
-raising depth (more items, one at a time) rather than concurrency.
+When **any** condition is uncertain, stay single-threaded — the default
+wins ties. Cap concurrent width at **4** (rpm's evidence-based ceiling;
+see the research skill). A sequence may fan out a batch under the same
+test, then resume cycle-by-cycle.
+
+For the no-argument single-worker case: if `<N>` >= 1 after preflight and
+you are not fanning out, do not dispatch another worker. Output
+`action: idle` with `next: waiting on in-flight worker`.
+
+Cautionary rationale (2026-05-04 audit) — **why the default is one, and
+why the independence test is strict**: on a game-fix corpus, saturating
+to 4 produced an 8.4% dispatch hit rate (107 dispatches -> 9 shipped
+fixes) because (a) workers competed for the daemon render queue, (b)
+concurrent edits created non-FF push conflicts, (c) each fix verified
+against one game shipped before contradictions in other games surfaced.
+That is exactly the shared-resource, shared-verification shape the fan-out
+test screens out. When the batch genuinely lacks those couplings,
+throughput is free and fan-out is appropriate; when it has any of them,
+stay single-threaded — including under ultracode / automatic Workflow
+orchestration, which does not override this test.
 
 ## What this skill does NOT do
 
