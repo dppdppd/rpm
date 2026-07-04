@@ -51,7 +51,7 @@ recommend. You do NOT write feature code.
 | `/audit documents` | Scan docs, agent instructions, memory, session drift via `rpm:auditor` |
 | `/audit project` | Full review — code, architecture, competitive research, plan file |
 | `/backlog` | Manage the **rpm backlog** (long-term, `tasks.org`) — add, list, review, postpone, complete. Distinct from Claude's native `TaskCreate` list (session-scoped). |
-| `/next` | Orchestrator. With `N` / `blocked` / `all` / a group name: runs a bounded internal sequence — the recommended way to work several items at once, one worker at a time by default (fans out to a concurrent batch only when the tasks are genuinely independent), heavy preflight only at the start and end. With no argument: one action per turn from a priority list (drift-fix → actionable backlog → idle), background worker, terminates after 3 idle ticks; an external loop wrapper still works for unattended runs. |
+| `/next` | Orchestrator. With `N` / `blocked` / `all` / a group name: runs a bounded internal sequence — the recommended way to work several items at once, fan-out width per step is the orchestrator's judgment call (one worker, or a concurrent batch sized to how independent the work is), heavy preflight only at the start and end. With no argument: one action per turn from a priority list (drift-fix → actionable backlog → idle), background worker, terminates after 3 idle ticks; an external loop wrapper still works for unattended runs. |
 
 | Skill | What you do |
 |---|---|
