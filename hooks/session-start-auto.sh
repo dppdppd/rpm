@@ -259,6 +259,13 @@ if [ -f "$FUTURE" ]; then
   if [ -f "$LAST_SESSION" ]; then
     LAST_TASK=$(grep -oP 'task: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
     LAST_NEXT=$(grep -oP 'next: \K.*' "$LAST_SESSION" 2>/dev/null | head -1)
+    # Sentinel written by /session-end when the session's thread was
+    # finished with no obvious follow-up: treat as "no next step" so the
+    # instructions fall through to the backlog menu instead of announcing
+    # the placeholder text as if it were a real task.
+    case "$LAST_NEXT" in
+      "(no obvious next step"*|"unknown"|"{resolved What's next}") LAST_NEXT="" ;;
+    esac
   fi
   echo "Your rpm backlog:"
   echo ""
@@ -446,18 +453,22 @@ echo "   Edit docs/rpm/~rpm-session-start — change 'task: (unassigned)'"
 echo "   to 'task: <chosen task>'. Preserve session_id and started: fields."
 echo "   Then create a native task via TaskCreate and begin working."
 elif [ -n "$LAST_NEXT" ]; then
+echo "The previous session handed off a specific next step. This is the"
+echo "plan — treat it as what you are about to do, not one option among many."
 echo "Then:"
-echo "1. Tell the user what was next from the last session as a statement"
-echo "   (not a question): \"$LAST_NEXT\""
-echo "2. End your response by asking — and ONLY at the end — whether to"
-echo "   continue with that or pick something else."
+echo "1. State the next step plainly, as a fact, not a question:"
+echo "   \"$LAST_NEXT\""
+echo "   If it names a file, command, or decision, you already know where to"
+echo "   start — do NOT dump the backlog menu, and do NOT act unsure."
+echo "2. End your response with ONE question: confirm you should start on it"
+echo "   now (offer picking something else only as the alternative)."
 echo "   - If yes → proceed to step 3"
-echo "   - If no → present the backlog menu (title through prompt line, verbatim)"
-echo "     and handle their selection"
-echo "3. On task selection, update the marker task field:"
-echo "   Edit docs/rpm/~rpm-session-start — change 'task: (unassigned)'"
-echo "   to 'task: <chosen task>'. Preserve session_id and started: fields"
-echo "   (the hook already set them)."
+echo "   - If they'd rather do something else → THEN present the backlog menu"
+echo "     (title through prompt line, verbatim) and handle their selection"
+echo "3. On task selection (the handed-off step, or a menu pick), update the"
+echo "   marker task field: Edit docs/rpm/~rpm-session-start — change"
+echo "   'task: (unassigned)' to 'task: <chosen task>'. Preserve session_id"
+echo "   and started: fields (the hook already set them)."
 echo "4. Create a native task via TaskCreate."
 echo "5. Begin working."
 else
