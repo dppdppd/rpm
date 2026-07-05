@@ -100,8 +100,9 @@ the orchestrator's call, sized to how independent the selected work is
 (see **Concurrency**).
 
 1. **Full preflight once, at the start.** Run the delegated preflight
-   (Preflight step 2) with `phases=full`, act on its report, and log a
-   marker:
+   (Preflight step 3) with `phases=full` — bypassing the cadence gate,
+   since a sequence always forces full at its start — act on its report,
+   and log a marker:
 
    ```bash
    bash ${CLAUDE_SKILL_DIR}/scripts/log-decision.sh preflight-full "" "sequence start"
@@ -153,22 +154,29 @@ the orchestrator's call, sized to how independent the selected work is
   25 is honored, still cycle-by-cycle; the ceiling only bounds the
   open-ended forms.
 
-### Preflight cadence (loop mode)
+### Preflight cadence
 
-Outside a sequence, `/loop /next` repeats the single-step flow across
-separate turns. To avoid re-paying the full preflight every tick, run
-`bash ${CLAUDE_SKILL_DIR}/scripts/preflight-due.sh` at the top of a loop
-tick:
+Every single-step turn — a direct `/next` **and** a `/loop /next` tick —
+decides its preflight depth by running
+`bash ${CLAUDE_SKILL_DIR}/scripts/preflight-due.sh` first. The drift scan
+and contradiction check are housekeeping (also run by `/session-end` and
+`/audit`); re-paying them on a `/next` that follows one minutes ago, with
+nothing changed, is the cost this cadence removes.
 
 - **`full`** → run the delegated preflight with `phases=full` and log a
-  `preflight-full` marker (this happens when there is no prior marker,
-  the last one is stale, or a guidance input changed).
+  `preflight-full` marker. This fires when there is no prior marker (so the
+  first `/next` of a session is always full), the last one is stale
+  (older than the freshness window), or a guidance input changed.
 - **`lite`** → skip the drift scan and contradiction check. Do the inline
-  blocker check, then run `review-ready.sh`; **only if** a worker result
-  is pending, dispatch the preflight subagent with `phases=review-only`
-  to review it. Then continue to Task Selection.
+  blocker check, then run `review-ready.sh`:
+  - a worker result **is** pending → dispatch the preflight subagent with
+    `phases=review-only` to review just that result.
+  - **no** worker pending → there is nothing to delegate, so **dispatch no
+    subagent at all**. Go straight to Task Selection.
 
-Direct single-step `/next` (no argument) always runs a full preflight.
+This applies to both direct and loop single-step turns; a **Sequence**
+ignores the cadence and forces `full` at its start and end (see
+**Sequencing**).
 
 ## Orchestrator Flow
 
@@ -193,15 +201,28 @@ in-between cycle skips the preflight and goes straight to Task Selection.
      `blocked-on-user unresolved`, then stop or `loop-exhausted` if the
      idle streak reached 3.
 
-2. **Delegated preflight** — dispatch the `rpm:preflight` subagent
-   (foreground) so the token-heavy work (raw `scan.sh` output,
-   contradiction classification, worker diffs) stays in the agent's
-   context, not this one. Resolve each value before sending — pass real
-   paths, not literals:
+2. **Decide preflight depth (cadence gate).** Unless this is a Sequence
+   start/end (which forces `full`), run
+   `bash ${CLAUDE_SKILL_DIR}/scripts/preflight-due.sh` and branch per
+   **Preflight cadence**:
+   - **`lite` + no pending worker** (`review-ready.sh` finds nothing):
+     there is nothing to delegate. Skip step 3 entirely — do not dispatch
+     the subagent — and go straight to **Task Selection**. This is the
+     common fast path for a `/next` that follows a recent one.
+   - **`lite` + a pending worker**: dispatch the subagent below with
+     `phases=review-only`.
+   - **`full`**: dispatch the subagent below with `phases=full` and log a
+     `preflight-full` marker.
+
+3. **Delegated preflight** — when the gate calls for it, dispatch the
+   `rpm:preflight` subagent (foreground) so the token-heavy work (raw
+   `scan.sh` output, contradiction classification, worker diffs) stays in
+   the agent's context, not this one. Resolve each value before sending —
+   pass real paths, not literals:
    - `mode=` `direct` or `loop` (this turn's mode)
-   - `phases=` `full` (default — all three phases) or `review-only`
-     (Phase 3 worker review only; used on a `lite` loop tick that has a
-     pending worker result, per **Preflight cadence**)
+   - `phases=` `full` (all three phases) or `review-only` (Phase 3 worker
+     review only; used on a `lite` tick that has a pending worker result,
+     per **Preflight cadence**), as the gate above decided
    - `scan_script=${CLAUDE_PLUGIN_ROOT}/skills/session-end/scripts/scan.sh`
    - `contradiction_script=${CLAUDE_SKILL_DIR}/scripts/contradiction-check.sh`
    - `review_ready_script=${CLAUDE_SKILL_DIR}/scripts/review-ready.sh`
