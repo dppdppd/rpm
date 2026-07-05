@@ -1,6 +1,6 @@
 ---
 name: session-end
-description: End the current rpm session. Three modes — Express (silent, one message), Inline (one message + one follow-up), Phased (four-phase ceremony for complex sessions). Picks the leanest that fits. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
+description: End the current rpm session. Three modes — Express (silent, one message), Inline (asks decisions one at a time in short round-trips), Phased (four-phase ceremony for complex sessions). Never batches questions — exactly one question per message. Picks the leanest that fits. Commits rpm bookkeeping. Invoke when the user signals wrap-up. Do not auto-run — if you think it's time, propose first and wait for confirmation.
 ---
 
 # /session-end
@@ -19,9 +19,10 @@ decision surfaces, or extend the handoff cleanup. They cannot remove
 or override plugin defaults — on conflict, this SKILL.md wins.
 
 - **Express** — clean wrap-up. One message, no questions.
-- **Inline** — one or two small decision surfaces. One message with
-  inline asks, then one follow-up that applies decisions and hands off.
-- **Phased** — genuine multi-decision complexity. Four numbered phases.
+- **Inline** — a few small decision surfaces. Asks them one at a time in
+  short round-trips (never batched), then hands off.
+- **Phased** — genuine multi-decision complexity. Four numbered phases,
+  still one question at a time.
 
 Append ` (rpm <version>)` to the first visible heading, using
 `version=` from scan.sh's `=== plugin ===` section.
@@ -139,6 +140,26 @@ sessions, and forced whenever the guidance report shows any
 
 ## Shared Mechanics
 
+### Question Discipline
+
+**Ask exactly one question per message, and make it the last line.** This
+governs every mode. A message may end with at most one `QUESTION:` line;
+never stack two distinct decisions in one message. The user must never be
+in a state where a positional answer (`all`, `yes`, `1,2`) could resolve
+more than one question — that ambiguity is the failure this rule exists to
+prevent.
+
+A single multi-select menu (e.g. "Which learnings to promote? 1,2 / all /
+none") is **one** question and is allowed — every option answers the same
+decision. Two different decisions (promote a learning **and** dispose of a
+file) are **two** questions and must be asked in separate messages.
+
+When several decision surfaces need the user, ask them **sequentially**:
+ask the first, wait, apply the answer, then ask the next. Order them
+commit → drift/overrides → memory drift → learnings → backlog, skipping
+any that need no input. Everything the skill can decide on its own (see
+the auto-apply steps) is done silently and never becomes a question.
+
 ### Commit Surface
 
 Do not use `git add .`. List intended files explicitly. Resolve
@@ -210,12 +231,38 @@ parent. Then mark every surfaced native task completed. No user question.
 After edits, sweep each `* Parent` in `tasks.org` into Actionable,
 Blocked, Postponed bands, preserving relative order. Ask one ordering
 question only when session work, dependency changes, or user feedback
-conflicts with the top item. Otherwise use the top actionable entry as
-`What's next`.
+conflicts with the top item.
+
+### Resolving What's next
+
+`What's next` is the single most important handoff output — the next
+session reads it cold and must know exactly what to do without
+re-deriving context. Resolve it in this priority order:
+
+1. **The obvious continuation of this session's work.** If the session
+   left something unfinished, or the work just completed has a clear
+   immediate follow-up (the next step you would take if you kept going),
+   that is `What's next`. This almost always beats an unrelated backlog
+   item — the user was just here.
+2. **Only if this session's thread is genuinely finished with no obvious
+   follow-up:** use the top actionable backlog entry.
+3. **If neither exists:** write `next: (no obvious next step — pick from
+   backlog)` so the next session knows to offer the menu rather than
+   guessing.
+
+Whatever you pick, phrase it as a **concrete, self-contained action**, not
+a topic. Name the file, command, or decision so a cold agent can start
+immediately. Good: "add the number-provenance gate to Phase 4 of
+`plugin/skills/deep-research/SKILL.md`, then run bats." Bad:
+"deep-research hardening."
 
 ### Handoff Cleanup
 
-Use this cleanup in Express, Inline message 2, and Phased Phase 4:
+Use this cleanup in Express, the Inline final message, and Phased Phase 4.
+Substitute `{resolved What's next}` with the value from **Resolving What's
+next** — a concrete, self-contained action (or the explicit
+`(no obvious next step — pick from backlog)` sentinel). Never leave it
+vague, and never leave the literal placeholder.
 
 ```bash
 TASK=$(grep -oP 'task: \K.*' docs/rpm/~rpm-session-start 2>/dev/null | head -1)
@@ -235,19 +282,27 @@ start a new conversation). Run cleanup in the same response.
 
 ## Inline
 
-Message 1 contains the summary plus every active ask. Omit empty
-sections. Keep to at most one question per surface and at most three
-questions total; otherwise switch to Phased.
+Inline asks its decisions **one at a time**, in sequence (see Question
+Discipline) — not all in one message. It is a short conversation, not a
+single batched form.
 
-Message 1 output: `## Session end (rpm <version>)`, Accomplished,
-Tracker updates, then only active sections: Commit, Worth keeping,
-Drift, Memory drift, Native cleanup, or Backlog. End each active
-section with one `QUESTION:` line.
+**First message:** `## Session end (rpm <version>)`, Accomplished, Tracker
+updates, then the **first** decision surface that needs the user (in the
+order commit → drift/overrides → memory drift → learnings → backlog),
+ending with its single `QUESTION:` line. Omit empty sections.
 
-After the user replies, apply decisions, run native cleanup, sweep the
-backlog, run handoff cleanup, and end with:
+**Each reply:** apply that decision silently, then either ask the **next**
+outstanding surface (again, one `QUESTION:` line, last line) or — if none
+remain — run native cleanup, sweep the backlog, resolve `What's next`, run
+handoff cleanup, and emit the final message.
 
-Message 2 output: `**Handoff**`, `What's next`, the two restart lines.
+**Final message:** `**Handoff**`, `What's next`, the two restart lines
+(`/clear`, then start a new conversation).
+
+If more than one surface is outstanding, that is normal for Inline — it
+just means more than one short round-trip. Only switch to Phased when a
+surface needs genuine discussion (see Mode Selection triggers), not merely
+because several surfaces exist.
 
 ## Phased
 
@@ -258,7 +313,10 @@ the phase header.
    accomplishments, uncommitted changes, learnings, tracker updates,
    drift.
 2. `## Phase 2 (of 4): Housekeeping` — commit changes, record
-   findings, fix drift. One question per active section.
+   findings, fix drift. Ask surfaces one at a time per Question
+   Discipline — one `QUESTION:` per message, waiting for each answer
+   before the next; do not stack them within the phase.
 3. `## Phase 3 (of 4): Reviewing Tasks` — native cleanup, backlog band
-   sweep, ordering reconciliation.
+   sweep, ordering reconciliation. Same one-question-at-a-time rule if
+   any ordering decision needs the user.
 4. `## Phase 4 (of 4): Handing Off` — cleanup plus final handoff text.
