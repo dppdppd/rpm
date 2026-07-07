@@ -2,8 +2,8 @@
 
 ## Project Status
 - **Current phase**: Active development
-- **Last updated**: 2026-07-04
-- **Version**: 2.27.1
+- **Last updated**: 2026-07-07
+- **Version**: 2.30.0
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -64,6 +64,8 @@
 - **Dissuade external/manual looping (v2.25.0, 2026-06-06).** Now that `/next` has real interior sequencing (v2.24.0), the skill copy stopped *promoting* external loop wrappers and steers users to the cheaper path. `next/SKILL.md` description, opening paragraph, and usage block now lead with the sequence forms (`/next N | blocked | all | <group>`) as the recommended way to work several items at once; `/loop /next` is kept but reframed as the tool for genuinely unattended, multi-turn runs. `rpm/SKILL.md`'s `/next` row puts the sequence first and drops the `/loop /next` literal (which also fixed a latent leak — that literal was passing untranslated into the Codex `rpm` skill, since the loop→directive catch-alls only run for the `next` skill). New **Cheaper-path tip**: on a Loop-mode tick with ≥2 actionable tasks and no prior `nudge` marker since the last `loop-exhausted`, `/next` appends one line (`tip: /next all runs this in one cheaper turn`) and logs an ignored `nudge` marker — fires at most once per loop run, never blocks, never repeats. `translate-skill-codex.py` codex description refreshed to match. Synced to codex; bats 212/212.
 
 - **`research` skill gains a collapse-proof Claude Code Workflow + VOC bake-off 4th column + two tuning passes (2026-06-08, in-tree, unreleased).** Built `plugin/skills/research/rpm-research.workflow.js` — on Claude Code, runs research Phases 2–5 as a Workflow whose per-lens verification panel is genuinely **independent agents** (structurally collapse-proof; opencode/codex self-gate to prose). Wired via a SKILL.md fast-path section; sync excludes the CC-only `.workflow.js` from both ports; bats 212/212. Proven end-to-end (smoke), then graded blind on the same VOC Dutch-primary probe as a **4th bake-off column**: near-native fidelity (Q1/Q2a/Q3 CORRECT), **fully fixes the old-v2 "Captain Vogel" fabrication**, kill-and-replace positively delivers right answers — but ~5.4M tokens (2.3× native; `maxVerify=30`→120 verifiers). **Round-1 tuning** (agent-budgeted verify cap 120→48; `flag`→`contested` surface-both) flipped Sub-Q2b PARTIAL→correct (fidelity 4→0) at ~3.87M tokens, but was trigger-happy (8/12 contested, 3 over-hedged) and a Scope/Fetch variance left Sub-Q3 unfetched. **Round-2** tightened `contested` (corroborated flags only), guaranteed per-dimension fetch coverage, added a multi-MB-artifact cost guard; validated by node --check + deterministic `decide()` unit tests + bats 212/212 (no further live re-run — token budget). Commits `f01dddb`,`6d2be0c`,`8fed8b6`,`fcb3447`,`3b2e2fe`,`7d53552`. Live cost-parity re-measure parked.
+
+- **Committed-handoff continuation fix (v2.30.0, 2026-07-07).** Session-start's concrete `next:` handoff now proceeds as already selected instead of asking whether to continue or do something else. The plugin and Codex hook mirrors both tell the agent to state the handoff, update `docs/rpm/~rpm-session-start`, create the native task, and begin; the ordinary backlog menu remains the escape hatch only when the user explicitly rejects the handoff. Regression coverage now checks both hook surfaces, and the full Bats suite is 216 tests.
 
 ## Active Specs
 

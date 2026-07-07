@@ -3,6 +3,11 @@
 
 * Active
 
+** DONE Fix committed-handoff continuation loop [[file:2026-07-07-committed-handoff-continuation-loop.md]]
+   :PROPERTIES:
+   :ID: committed-handoff-continuation-loop
+   :END:
+
 ** DONE Fix rpm-research synthesize: stub summary + lost report.md — synth returns markdown, main session writes (fixed v2.26.1)
    :PROPERTIES:
    :ID: research-synthesize-overload

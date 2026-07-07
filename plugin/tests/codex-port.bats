@@ -228,3 +228,28 @@ require_codex_port_layout() {
   marker_content=$(cat "$PM_DIR/~rpm-session-start")
   [[ "$marker_content" == *"session_id: codex-sess"* ]]
 }
+
+@test "codex session-start committed handoff is not a confirmation prompt" {
+  require_codex_port_layout
+  local root payload hook
+  root=$(repo_root)
+  seed_minimal_trackers
+  : > "$PM_DIR/future/tasks.org"
+  cat > "$PM_DIR/~rpm-last-session" <<EOF
+task: prior thing
+ended: 2026-04-11T12:00:00Z
+next: wire up the widget
+EOF
+  unset CLAUDE_PROJECT_DIR
+  unset CLAUDE_PLUGIN_ROOT
+
+  payload=$(printf '{"source":"startup","session_id":"codex-sess","cwd":"%s"}' "$TEST_DIR")
+  hook="$root/codex/.codex/hooks/session-start-auto.sh"
+  run bash -c 'printf "%s
+" "$1" | bash "$2"' _ "$payload" "$hook"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Treat that handoff as already selected"* ]]
+  [[ "$output" == *"task: wire up the widget"* ]]
+  [[ "$output" != *"confirm you should start"* ]]
+  [[ "$output" != *"offer picking something else"* ]]
+}
