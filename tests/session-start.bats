@@ -379,6 +379,23 @@ EOF
   [[ "$output" == *"wire up the widget"* ]]
 }
 
+@test "last-session next handoff is committed, not a confirmation prompt" {
+  seed_minimal_trackers
+  : > "$PM_DIR/future/tasks.org"
+  cat > "$PM_DIR/~rpm-last-session" <<EOF
+task: prior thing
+ended: 2026-04-11T12:00:00Z
+next: wire up the widget
+EOF
+  run run_session_start startup
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Treat that handoff as already selected"* ]]
+  [[ "$output" == *"Do NOT ask whether to"*"continue it"* ]]
+  [[ "$output" == *"task: wire up the widget"* ]]
+  [[ "$output" != *"confirm you should start"* ]]
+  [[ "$output" != *"offer picking something else"* ]]
+}
+
 # --- (unassigned) fallback for display: prefer last-session top_actionable ---
 
 @test "(unassigned) marker + last-session top_actionable → resume nudge shows top_actionable" {
