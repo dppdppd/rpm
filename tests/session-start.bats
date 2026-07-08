@@ -41,6 +41,23 @@ EOF
   [[ "$output" != *"didn't wrap up"* ]]
 }
 
+@test "active marker resume is committed, not an A/B/C confirmation prompt" {
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: test-sess-123
+started: 2026-04-12T10:00:00Z
+task: fix flux capacitor
+EOF
+  run run_session_start clear test-sess-123
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Treat that task as already selected"* ]]
+  [[ "$output" == *"Create or continue the native task for: fix flux capacitor"* ]]
+  [[ "$output" != *"with ONE question offering these options"* ]]
+  [[ "$output" != *"A. Continue the in-flight task"* ]]
+  [[ "$output" != *"B. Switch to something else"* ]]
+  [[ "$output" != *"C. Wrap up with /session-end"* ]]
+}
+
 @test "active marker + startup + no last-session = stale — soft note, falls through to backlog" {
   seed_minimal_trackers
   cat > "$PM_DIR/~rpm-session-start" <<EOF

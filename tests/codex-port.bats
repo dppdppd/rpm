@@ -253,3 +253,29 @@ EOF
   [[ "$output" != *"confirm you should start"* ]]
   [[ "$output" != *"offer picking something else"* ]]
 }
+
+@test "codex session-start active marker resume is not a confirmation prompt" {
+  require_codex_port_layout
+  local root payload hook
+  root=$(repo_root)
+  seed_minimal_trackers
+  cat > "$PM_DIR/~rpm-session-start" <<EOF
+session_id: codex-sess
+started: 2026-04-12T10:00:00Z
+task: fix flux capacitor
+EOF
+  unset CLAUDE_PROJECT_DIR
+  unset CLAUDE_PLUGIN_ROOT
+
+  payload=$(printf '{"source":"clear","session_id":"codex-sess","cwd":"%s"}' "$TEST_DIR")
+  hook="$root/codex/.codex/hooks/session-start-auto.sh"
+  run bash -c 'printf "%s
+" "$1" | bash "$2"' _ "$payload" "$hook"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Treat that task as already selected"* ]]
+  [[ "$output" == *"Create or continue the native task for: fix flux capacitor"* ]]
+  [[ "$output" != *"with ONE question offering these options"* ]]
+  [[ "$output" != *"A. Continue the in-flight task"* ]]
+  [[ "$output" != *"B. Switch to something else"* ]]
+  [[ "$output" != *"C. Wrap up with /session-end"* ]]
+}

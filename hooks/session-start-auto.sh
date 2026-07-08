@@ -156,7 +156,7 @@ if [ -f "$MARKER" ] && [ "$STALE" = "1" ]; then
 fi
 
 # Active resume path: same CC process, marker still valid. Emit resume
-# header + task-menu-style options and exit.
+# header and procedural instructions for the already-selected task.
 if [ -f "$MARKER" ]; then
   echo "rpm: resuming — ${TASK:-unknown task}${VTAG}"
   [ -n "$STARTED" ] && echo "(session started $STARTED)"
@@ -176,11 +176,13 @@ if [ -f "$MARKER" ]; then
   echo "Open your first response with exactly this line: rpm: resuming — ${TASK:-unknown task}${VTAG}"
   echo ""
   echo "An rpm session marker is present — unfinished work on this task."
-  echo "Check git state and recent commits to orient, then end your response"
-  echo "with ONE question offering these options:"
-  echo "  A. Continue the in-flight task"
-  echo "  B. Switch to something else (then present the backlog menu)"
-  echo "  C. Wrap up with /session-end"
+  echo "Treat that task as already selected. Do NOT ask whether to continue"
+  echo "it, and do NOT offer to switch tasks or wrap up unless the user"
+  echo "explicitly asks for that."
+  echo "Then:"
+  echo "1. Check git state and recent commits to orient."
+  echo "2. Create or continue the native task for: ${TASK:-unknown task}."
+  echo "3. Begin working on the in-flight task."
   echo ""
   emit_rpm_directives
   exit 0
