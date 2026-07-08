@@ -3,6 +3,11 @@
 
 * Active
 
+** DONE Fix active-marker resume confirmation loop [[file:2026-07-07-active-marker-resume-confirmation-loop.md]]
+   :PROPERTIES:
+   :ID: active-marker-resume-confirmation-loop
+   :END:
+
 ** DONE Fix committed-handoff continuation loop [[file:2026-07-07-committed-handoff-continuation-loop.md]]
    :PROPERTIES:
    :ID: committed-handoff-continuation-loop

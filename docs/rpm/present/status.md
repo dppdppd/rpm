@@ -3,7 +3,7 @@
 ## Project Status
 - **Current phase**: Active development
 - **Last updated**: 2026-07-07
-- **Version**: 2.30.0
+- **Version**: 2.30.1
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -66,6 +66,8 @@
 - **`research` skill gains a collapse-proof Claude Code Workflow + VOC bake-off 4th column + two tuning passes (2026-06-08, in-tree, unreleased).** Built `plugin/skills/research/rpm-research.workflow.js` — on Claude Code, runs research Phases 2–5 as a Workflow whose per-lens verification panel is genuinely **independent agents** (structurally collapse-proof; opencode/codex self-gate to prose). Wired via a SKILL.md fast-path section; sync excludes the CC-only `.workflow.js` from both ports; bats 212/212. Proven end-to-end (smoke), then graded blind on the same VOC Dutch-primary probe as a **4th bake-off column**: near-native fidelity (Q1/Q2a/Q3 CORRECT), **fully fixes the old-v2 "Captain Vogel" fabrication**, kill-and-replace positively delivers right answers — but ~5.4M tokens (2.3× native; `maxVerify=30`→120 verifiers). **Round-1 tuning** (agent-budgeted verify cap 120→48; `flag`→`contested` surface-both) flipped Sub-Q2b PARTIAL→correct (fidelity 4→0) at ~3.87M tokens, but was trigger-happy (8/12 contested, 3 over-hedged) and a Scope/Fetch variance left Sub-Q3 unfetched. **Round-2** tightened `contested` (corroborated flags only), guaranteed per-dimension fetch coverage, added a multi-MB-artifact cost guard; validated by node --check + deterministic `decide()` unit tests + bats 212/212 (no further live re-run — token budget). Commits `f01dddb`,`6d2be0c`,`8fed8b6`,`fcb3447`,`3b2e2fe`,`7d53552`. Live cost-parity re-measure parked.
 
 - **Committed-handoff continuation fix (v2.30.0, 2026-07-07).** Session-start's concrete `next:` handoff now proceeds as already selected instead of asking whether to continue or do something else. The plugin and Codex hook mirrors both tell the agent to state the handoff, update `docs/rpm/~rpm-session-start`, create the native task, and begin; the ordinary backlog menu remains the escape hatch only when the user explicitly rejects the handoff. Regression coverage now checks both hook surfaces, and the full Bats suite is 216 tests.
+
+- **Active-marker resume continuation fix (v2.30.1, 2026-07-07).** KL-tricktaker exposed a second branch with the same bad prompt shape: active `~rpm-session-start` resumes still asked whether to continue, switch, or wrap up. Session-start now treats a valid active marker as already selected, orients from git state/recent commits, creates or continues the native task, and begins; switch/wrap-up only happens when the user asks. Regression coverage now checks plugin and Codex active-marker resumes, and the full Bats suite is 218 tests.
 
 ## Active Specs
 
