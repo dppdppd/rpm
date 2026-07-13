@@ -1,71 +1,39 @@
 # rpm - Relentless Project Manager
 
-rpm is an operational layer for LLM-assisted engineering work.
+rpm is an operational layer for LLM-assisted development.
 
-It does not make the model smarter. It makes the work more resumable,
-auditable, and harder to lose between chat sessions, context compaction,
-model changes, and agent runtimes.
+It gives coding agents durable project state, session lifecycle hooks, a
+repo-local backlog, drift checks, and reviewable handoffs.
 
-If you know ML systems, the closest analogy is experiment tracking plus a
-runbook plus a task queue for coding agents. The model is still the model;
-rpm supplies durable state, lifecycle hooks, and verification pressure around
-it.
+## What rpm Does
 
-## Why It Exists
+rpm stores project memory in `docs/rpm/`:
 
-LLM coding agents are good at local reasoning inside a context window. Software
-projects are not local. They need continuity across days, commits, interrupted
-sessions, tool restarts, and different model surfaces.
+- `context.md` records the project summary, key files, and review focus
+- `present/status.md` records current phase, version, completed work, and open issues
+- `future/tasks.org` records the durable project backlog
+- `past/` records daily logs and session history
+- `reviews/` stores audit findings and plans
+- `research/` stores research artifacts
 
-rpm keeps that continuity in the repository:
+rpm starts each session with the state an agent needs:
 
-- what the project is
-- what just changed
-- what is currently in flight
-- what should happen next
-- what the agent learned
-- where docs, plans, or handoffs drifted from reality
+- current git state
+- recent commits
+- active task or prior handoff
+- open backlog items
+- recent logs and learnings
+- project-specific instructions
 
-The result is less re-explaining, fewer lost handoffs, and a more inspectable
-trail of agent work.
+rpm also provides control loops:
 
-## What rpm Adds
-
-### Durable Project State
-
-rpm writes project memory into `docs/rpm/` instead of relying on chat history.
-The important files are plain text and reviewable:
-
-- `context.md` - stable project summary and key files
-- `present/status.md` - current phase, version, completed work, known issues
-- `future/tasks.org` - long-term backlog, separate from the model's native task UI
-- `past/` - daily logs and session records
-- `reviews/` and `research/` - audit and research artifacts when used
-
-### Session Lifecycle
-
-Session-start hooks inject the current task, git state, recent commits, backlog,
-and handoff notes. Session-end writes a compact handoff for the next run. If a
-session dies without wrapping up, rpm leaves enough state for the next agent to
-recover.
-
-This is the main value: an agent can resume the work as a workflow, not as a
-guess from a transcript.
-
-### Drift Control
-
-rpm has cheap mechanical scans and deeper audit modes that look for stale docs,
-broken references, unfinished handoffs, and contradictions between instructions
-and code.
-
-This is not meant to replace tests. It catches the failure class where the code,
-docs, task list, and agent instructions stop describing the same project.
-
-### Runtime Portability
-
-The same repo state supports Claude Code, Codex, and opencode ports. The model
-surface can change while the project memory remains local, textual, and under
-version control.
+- resumes active tasks from `~rpm-session-start`
+- carries committed handoffs from the previous session
+- checkpoints state before context compaction
+- restores state after compaction
+- captures high-signal learnings
+- scans for documentation and instruction drift
+- writes session-end handoffs for the next run
 
 ## Install
 
@@ -99,15 +67,15 @@ Enable the plugin in `~/.codex/config.toml`:
 enabled = true
 ```
 
-Codex hooks also need hooks enabled:
+Enable hooks:
 
 ```toml
 [features]
 hooks = true
 ```
 
-Then run `$init-rpm` inside the project. Codex uses `$skill-name` invocation
-rather than slash commands.
+Run `$init-rpm` inside the project. Codex skills use `$skill-name`
+invocation.
 
 ### opencode
 
@@ -119,16 +87,17 @@ curl -fsSL https://raw.githubusercontent.com/dppdppd/rpm/opencode/install.sh | b
 
 Then run `/init-rpm`.
 
-## Main Commands
+## Commands
 
 - `/init-rpm` - scaffold `docs/rpm/` and project instructions
 - `/session-end` - wrap up the current session and write the next handoff
-- `/backlog` - add, list, review, postpone, or complete long-term tasks
+- `/backlog` - add, list, review, postpone, or complete durable backlog tasks
 - `/next` - run the next backlog item with rpm preflight checks
-- `/audit quick` - deterministic drift scan, no LLM tokens
-- `/audit documents` - deeper documentation and guidance review
-- `/audit project` - full consultant-style review with research
+- `/audit quick` - deterministic drift scan, zero LLM tokens
+- `/audit documents` - documentation and guidance review
+- `/audit project` - full project review with research
 - `/research` - structured research workflow with saved artifacts
+- `/rpm ?` - command reference
 
 ## Published Surfaces
 
@@ -136,8 +105,7 @@ Then run `/init-rpm`.
 - Codex port: `codex/`
 - opencode port: `opencode/`
 
-The detailed user-facing README for the plugin lives at
-[plugin/README.md](plugin/README.md).
+The detailed plugin README lives at [plugin/README.md](plugin/README.md).
 
 ## License
 
