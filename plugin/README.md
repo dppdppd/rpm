@@ -1,184 +1,313 @@
-# rpm — Relentless Project Manager
+# rpm - Relentless Project Manager
 
-A Claude Code plugin that solves the two hardest problems in
-LLM-assisted development: **session resumption** and **drift**.
+rpm is an operational layer for LLM-assisted engineering work.
 
-## Why
+It does not make the model smarter. It makes the work more resumable,
+auditable, and harder to lose between chat sessions, context compaction,
+model changes, and agent runtimes.
 
-LLM sessions are stateless. Every new conversation starts cold —
-no memory of what you shipped yesterday, what you decided, or what's
-next. You waste time re-explaining context, and the AI wastes tokens
-rediscovering your codebase.
+For an engineer who already understands ML systems: rpm is experiment tracking
+plus a runbook plus a task queue for coding agents. The model remains a
+stateless predictor with a large context window. rpm supplies the durable state,
+workflow boundaries, and verification pressure that software projects need
+around that predictor.
 
-Meanwhile, your docs quietly rot. README instructions fall behind
-the code. CLAUDE.md references files that were renamed three commits
-ago. Nobody notices until something breaks, because nothing is
-watching.
+## The Problem
 
-**rpm fixes both problems.**
+LLM coding agents are good at local reasoning inside the context they can see.
+Software projects are not local.
 
-**Session resumption:** rpm tracks what happened (past), where things
-stand (present), and what's planned (future). Every session starts
-with full context — git state, open tasks, recent drift, handoff
-notes from the last session — and ends with a clean handoff to the
-next one. No re-explaining.
+Real projects span:
 
-**Drift detection:** rpm audits your docs against reality. Quick
-scans catch broken refs and stale instructions in seconds. Deep
-scans find contradictions between documentation and code. Full
-project reviews validate against external sources.
+- days or weeks of work
+- interrupted sessions
+- commits made outside the current chat
+- documentation that can drift from implementation
+- task queues that outlive a single model run
+- multiple agent runtimes with different memory surfaces
 
-## Getting started
+Without an external state layer, every new session has to infer the work from a
+partial transcript. That produces familiar failures: repeated orientation,
+stale plans, "done" claims with no durable evidence, lost findings, and
+handoffs that ask the user what to do even when the next step was already
+known.
 
-Two steps.
+rpm exists to make agent work stateful at the project level.
 
-**1. Install the plugin** (once per machine):
+## What rpm Provides
 
-```
+### Durable Project Memory
+
+rpm writes project memory into the repository, under `docs/rpm/`, using plain
+text files that can be reviewed, diffed, and committed.
+
+Core files:
+
+| File | Meaning |
+|------|---------|
+| `docs/rpm/context.md` | Stable project summary, key files, and review focus |
+| `docs/rpm/present/status.md` | Current phase, version, completed work, known issues |
+| `docs/rpm/future/tasks.org` | Long-term backlog, separate from native task UI |
+| `docs/rpm/past/` | Daily logs and session records |
+| `docs/rpm/reviews/` | Saved audit plans and findings |
+| `docs/rpm/research/` | Saved research artifacts when the research skill is used |
+
+The important distinction is that rpm's backlog is durable project state.
+Claude's native task list, Codex task state, or another runtime's planning UI is
+session state. rpm keeps those concepts separate.
+
+### Session Lifecycle
+
+rpm hooks give each session a lifecycle:
+
+- Session start loads git state, recent commits, current task, backlog, and any
+  handoff from the prior session.
+- During the session, hooks capture high-signal learnings and watch for context
+  pressure.
+- Before compaction, rpm checkpoints the current task and open state.
+- After compaction, rpm restores that state.
+- Session end updates the daily log, status, backlog, and next handoff.
+- If a session exits without `/session-end`, rpm leaves enough state for the
+  next session to recover.
+
+The goal is not ceremony. The goal is that an agent can resume work as an
+engineering workflow instead of guessing from a chat transcript.
+
+### Drift Control
+
+rpm checks for the kind of drift that tests usually do not catch:
+
+- README, CLAUDE.md, AGENTS.md, or skill instructions describing files that
+  moved or commands that changed
+- backlog items that no longer match the actual state of the repo
+- session handoffs that failed to record what happened
+- project status that lags behind commits
+- documentation that contradicts implementation
+
+There are fast deterministic checks and deeper LLM-assisted audit modes. The
+deterministic checks are cheap and mechanical; the LLM-assisted modes are for
+semantic review.
+
+### Audit Trail
+
+rpm turns agent work into repo artifacts:
+
+- what task was selected
+- what changed
+- what was learned
+- what was left open
+- what got verified
+- what should happen next
+
+That makes agent output inspectable by another engineer without requiring them
+to read the entire chat.
+
+### Runtime Portability
+
+rpm ships for Claude Code, Codex, and opencode. The ports differ because each
+runtime exposes different hooks and task primitives, but the underlying project
+state stays in the repository.
+
+This matters because the model and runtime will change. The project memory
+should not be trapped in one vendor's conversation state.
+
+## Mental Model
+
+rpm is not a better model and not a replacement for tests.
+
+It is the missing control plane around LLM-assisted engineering:
+
+- **External memory:** durable repo-local state instead of chat-only memory
+- **Run lifecycle:** start, checkpoint, resume, compact, end
+- **Task semantics:** long-term backlog separated from session-local tasks
+- **Drift detection:** docs, instructions, status, and code kept aligned
+- **Reviewability:** decisions and handoffs saved as text artifacts
+
+One-line pitch:
+
+> rpm makes LLM coding agents less like clever chat sessions and more like
+> resumable, auditable engineering workers.
+
+## Getting Started
+
+### Claude Code
+
+Install once per machine:
+
+```text
 /plugins marketplace add https://github.com/dppdppd/rpm
 /plugins install rpm@dppdppd-plugins
 ```
 
-Or for local development:
+For local development against a checkout:
 
 ```bash
 claude --plugin-dir /path/to/rpm
 ```
 
-**2. Run `/init-rpm`** (once per project) inside the project you
-want to track:
+Initialize once inside the project you want to track:
 
-```
+```text
 /init-rpm
 ```
 
-It scans the codebase, asks a few clarifying questions, scaffolds
-`docs/rpm/` (context, trackers, backlog, past/future/reviews), and
-creates `CLAUDE.md` if one doesn't exist. Hooks activate immediately
-— no restart — and every session after that auto-loads context at
-session start.
+`/init-rpm` scans the codebase, asks a few clarifying questions, scaffolds
+`docs/rpm/`, and creates or updates project instructions. Hooks activate
+immediately.
 
-Requirements: [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-CLI. No other dependencies — pure markdown and bash.
+Requirements: [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+The plugin itself is markdown and bash.
 
-Using another agent runtime? See the
-[opencode branch](https://github.com/dppdppd/rpm/tree/opencode) or
-[Codex branch](https://github.com/dppdppd/rpm/tree/codex).
+### Codex
 
-Codex quick install:
+Install from a shell:
 
 ```bash
 codex plugin marketplace add dppdppd/rpm@codex --enable hooks
 ```
 
-Then add this to `~/.codex/config.toml`:
+Enable the plugin in `~/.codex/config.toml`:
 
 ```toml
 [plugins."rpm@dppdppd-rpm"]
 enabled = true
 ```
 
-The current Codex CLI manages marketplaces only; plugin activation is
-the `[plugins."rpm@dppdppd-rpm"]` config entry above.
+Enable hooks if needed:
 
-## The workflow
+```toml
+[features]
+hooks = true
+```
 
-**First time:** Run `/init-rpm`. It scans your project, asks a few
-questions, and scaffolds the tracking infrastructure under `docs/rpm/`.
+Then run `$init-rpm` inside the project. Codex skills use `$skill-name`
+invocation rather than slash commands.
 
-**Every session after that:** Just start working. rpm automatically
-loads your project context — git state, open tasks, daily log,
-recent drift — and proposes a task from the backlog. You confirm and
-work.
+### opencode
 
-**Mid-session:** rpm quietly captures learnings and checkpoints your
-progress. Use `/backlog` to add, list, review, or complete entries
-in your rpm backlog. If you run `/compact`, rpm saves your state before
-compaction and restores it after — so you pick up exactly where you
-left off without re-explaining anything.
+From inside the project directory:
 
-**End of session:** Run `/session-end`. It auto-updates all three
-trackers, surfaces uncommitted work and learnings, and writes a
-handoff for the next session. Start a new conversation and the cycle
-repeats.
+```bash
+curl -fsSL https://raw.githubusercontent.com/dppdppd/rpm/opencode/install.sh | bash
+```
 
-The result: every session starts informed and ends clean. Nothing
-falls through the cracks between sessions.
+Then run:
+
+```text
+/init-rpm
+```
+
+## Daily Workflow
+
+### First Run
+
+Run `/init-rpm`. rpm creates the project state under `docs/rpm/` and wires the
+session hooks.
+
+### Start A Session
+
+Start the agent normally. rpm injects context at session start:
+
+- current git state
+- recent commits
+- current or previous task
+- open backlog items
+- project status
+- recent session notes
+- instructions for how to continue
+
+If rpm already knows the in-flight task, it tells the agent to continue it. If
+there is a committed handoff from the prior session, it treats that handoff as
+selected. If there is no active task, it shows the backlog menu.
+
+### Work Mid-Session
+
+Use `/backlog` for durable project tasks. Native task UIs remain session-local.
+
+When a high-signal learning appears, prefix it with `Key finding:` so rpm can
+capture it. When context gets tight or compaction happens, rpm checkpoints and
+restores the session state.
+
+### End A Session
+
+Run:
+
+```text
+/session-end
+```
+
+rpm updates the daily log, present state, backlog, native-task reconciliation,
+and next handoff. Clean sessions get a short wrap-up. Messier sessions get
+more structure.
 
 ## Commands
 
 ### `/init-rpm`
 
-First-run setup. Run once per project. Scans the codebase, asks 3
-questions, scaffolds `docs/rpm/` (trackers, daily logs, task
-backlog), and creates a CLAUDE.md if one doesn't exist.
+One-time project setup. Scans the project, creates `docs/rpm/`, and patches the
+project instruction file so future sessions can find rpm state.
 
 ### `/session-end`
 
-Wrap up the current session. Auto-updates past/present/future
-trackers, then scales the wrap-up to fit: clean sessions get a
-single-message Express handoff; sessions with one or two surfaces
-(commit, learnings, drift) get an Inline mode with one combined
-message and one follow-up; only genuinely complex sessions
-(multi-commit splits, untracked triage, mismatch) escalate to the
-four-phase ceremony. Encourages short focused sessions by keeping
-the wrap-up cost proportional to what's there.
+Wraps up the current session. Updates past, present, and future trackers;
+records learnings; reconciles native tasks; and writes the next handoff.
 
 ### `/backlog`
 
-Manage the **rpm backlog** (long-term project tasks in
-`docs/rpm/future/tasks.org` — distinct from Claude's native
-`TaskCreate` list, which is session-scoped and cleared at
-session-end). Add entries, list them with statuses, review and
-reorganize, or mark them done. Also auto-triggers when you mention
-backlog items naturally ("add a task", "what's on my backlog").
+Manages the durable rpm backlog in `docs/rpm/future/tasks.org`. Add, list,
+review, postpone, or mark entries done. Use this for long-term project work,
+not the model's session-local task list.
+
+### `/next`
+
+Runs rpm's "what should I do next?" loop. It performs preflight checks, reviews
+completed worker results when present, then starts the next actionable backlog
+item. It can also run bounded sequences such as `/next 3`, `/next all`, or
+`/next <group>`.
 
 ### `/audit quick`
 
-Fast mechanical scan. Zero LLM tokens. Checks git state, CLAUDE.md
-size, broken refs, daily-log gaps, spec inventory drift. Use when you
-want a quick "anything broken?" check. ~5 seconds.
+Fast deterministic scan. No LLM tokens. Checks common mechanical drift:
+git state, tracker gaps, broken references, task dependency issues, and related
+bookkeeping.
 
 ### `/audit documents`
 
-Deep doc scan via background subagent. Checks every markdown file for
-staleness, contradictions, broken references, and session drift.
-Scored findings, only high-confidence results shown. Use when you
-suspect docs have drifted but aren't sure where. ~3 minutes.
+LLM-assisted documentation audit. Looks for stale docs, contradictions, missing
+updates, and instruction drift.
 
 ### `/audit project`
 
-Full consultant review. Reads the codebase, validates against vendor
-docs, runs competitive research against real alternatives. Outputs an
-executive summary and a plan file. Use when you want outside
-perspective on the project's overall health. ~30 minutes.
+Full project review. Reads the codebase and docs, uses external research when
+needed, and writes a review plus plan file.
 
-## Examples
+### `/research`
 
-### Session start
+Structured research workflow. Useful when a task depends on external facts,
+comparison, source gathering, or adversarial validation. Saves artifacts under
+`docs/rpm/research/`.
 
-Each session opens with a backlog menu pulled from your rpm
-backlog. Pick a number to start working, add `?` to read the detail
-file first, or choose `S` to name your own task:
+### `/rpm ?`
 
-```
-rpm: session active (rpm 2.7.4)
+Quick command reference.
 
-2 untracked files, 3 commits of drift since status.md updated.
+## Example Session Start
 
+When there is no active committed handoff, rpm shows the durable backlog:
+
+```text
+rpm: session active (rpm 2.30.1)
+
+=== git ===
+modified=1 untracked=0 staged=0 stashes=0
+
+=== backlog_menu ===
 Your rpm backlog:
 
-API Layer
-   1. Rate limiter middleware (in-progress)
-      detail: future/2026-04-08-rate-limiter.md
-   2. Request validation
-Data Layer
-   3. Migration rollback support
-   4. Connection pool tuning
-      detail: future/2026-04-05-pool-tuning.md
-Polish
-   5. Error message consistency
-   6. OpenAPI spec generation
+Active
+   1. Add API rate-limit middleware
+      detail: future/2026-07-13-rate-limit.md
+   2. Fix stale deployment docs
 
 S: something else
 R: review tasks
@@ -186,95 +315,52 @@ R: review tasks
 Pick #, #? for details, S, or R.
 ```
 
-### `/audit quick`
+When there is an active marker, rpm resumes instead of asking whether to
+continue:
 
-Fast mechanical scan, zero LLM tokens:
+```text
+rpm: resuming - add API rate-limit middleware (rpm 2.30.1)
 
-```
-## /audit quick — 2 findings
-
-A. 2 broken refs in docs/rpm/context.md                        [70]
-   context.md:12 → api/routes.md (deleted in abc1234)
-   context.md:18 → docs/setup.md (moved to docs/guides/setup.md)
-
-B. Daily log gap — 3 commits since last entry                  [65]
-
-Fix A, B, all, or skip?
-```
-
-### `/audit documents`
-
-Deep doc scan via background subagent:
-
-```
-## /audit documents — 3 findings
-
-A. CLAUDE.md § Build command outdated — says `npm run build`,     [85]
-   codebase switched to `pnpm build` 12 commits ago
-
-B. docs/api-design.md contradicts implementation —                [72]
-   doc says auth uses JWT, code uses session tokens since Phase 4
-
-C. 2 memory files reference renamed src/utils/ directory          [65]
-
-(1 low-confidence finding logged but not shown)
-
-Fix all, pick by letter, or skip?
-```
-
-### `/audit project`
-
-Full consultant review with external research:
-
-```
-## rpm Review — 2026-04-10
-
-### Health
-API layer well-structured. Auth middleware and public endpoint
-exposure are the main risks.
-
-### Research Conducted
-- Inward — session token storage — confirmed non-compliant
-  with SOC2 control CC6.1; tokens stored in plaintext cookies
-- Outward — Hono, Fastify, Express — all three default to
-  httpOnly signed cookies; current impl skips signing
-
-### Findings
-- Auth token storage (Critical) — session tokens stored unsigned
-  in plaintext cookies. Industry standard is httpOnly + signed.
-  Outward research confirms all three comparable frameworks
-  default to signed cookies.
-- Unprotected public endpoints (High) — 3 public routes have no
-  rate limiting. Inward research confirms no middleware registered.
-
-### Plan
-Plan saved to docs/rpm/reviews/2026-04-10-plan.md
-- Fix auth token storage — Critical, ~2 sessions
-- Add rate limiting to public endpoints — High, ~1 session
+An rpm session marker is present - unfinished work on this task.
+Treat that task as already selected. Do NOT ask whether to continue it.
 ```
 
 ## Hooks
 
-Eight hooks drive the automatic behavior:
-
 | Hook | What it does |
 |------|-------------|
-| **SessionStart** | Loads git state, open tasks, daily log, tracker drift. Proposes a task. |
-| **SessionEnd** | Detects sessions that ended without `/session-end`; writes stub log + stderr warning. |
-| **Stop** | Captures learning signals + validates that `/session-end` wrote a complete handoff. |
-| **PostToolUse** | Reads actual token usage from the transcript; soft recommendation when fewer than 10% of the context window remains. |
-| **PreCompact** | Checkpoints progress before context compaction. |
-| **PostCompact** | Re-injects session state after compaction. |
-| **TaskCreated** | Persists native task creations to a JSONL log (survives unexpected termination). |
-| **TaskCompleted** | Persists native task completions for cross-session reconciliation. |
+| `SessionStart` | Loads project state, git state, backlog, handoffs, and current task |
+| `SessionEnd` | Detects sessions that exited without `/session-end` and stubs recovery state |
+| `Stop` | Captures learning signals and validates handoff completeness |
+| `PostToolUse` | Watches transcript token pressure and review-ready worker results |
+| `PreCompact` | Checkpoints state before compaction |
+| `PostCompact` | Re-injects state after compaction |
+| `TaskCreated` | Persists native task creation events |
+| `TaskCompleted` | Persists native task completion events for backlog reconciliation |
 
-### Configuration
+Runtime support varies. Claude Code exposes the full lifecycle. Codex and
+opencode ports use the subset each runtime supports.
 
-Set the context window size used by the PostToolUse monitor (default 1M):
+## Configuration
 
-```sh
-export RPM_CONTEXT_TOKENS=200000   # standard 200K-token window
+Set the context window size used by the PostToolUse monitor. The default is a
+1M-token window; override it for smaller model contexts:
+
+```bash
+export RPM_CONTEXT_TOKENS=200000
 ```
+
+## Repository Layout
+
+| Path | Meaning |
+|------|---------|
+| `plugin/` | Claude Code plugin source |
+| `codex/` | Codex port generated from `plugin/` plus overlays |
+| `opencode/` | opencode port and installer |
+| `docs/rpm/` | This repo's own rpm state |
+| `scripts/sync-codex.sh` | Regenerates the Codex port |
+| `scripts/sync-opencode.sh` | Regenerates opencode mirrors |
+| `scripts/publish-all.sh` | Publishes Claude, Codex, opencode, and version tag |
 
 ## License
 
