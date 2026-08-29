@@ -1,0 +1,252 @@
+---
+description: Manage the rpm backlog (long-term project tasks in docs/rpm/future/tasks.org — distinct from Claude's native TaskCreate list, which is session-scoped). Add, list, review, postpone, or complete entries. TRIGGER on natural-language backlog operations — phrasings like "backlog X", "add X to backlog", "add to backlog", "backlog the following", "what's on the backlog", "show/list backlog", "review backlog", "postpone N", "done N", "mark N done", "defer X" all qualify and must route through this skill instead of editing tasks.org directly. Also use when the user wants to reorder execution sequence, defer to the bottom of a group, or evaluate backlog health.
+---
+
+# /backlog
+
+Manage the **rpm backlog** — persisted at `docs/rpm/future/tasks.org`.
+All operations read and write this file using org-mode format.
+
+## Project Amendments
+
+At the start of every invocation, check whether
+`docs/rpm/skills/backlog.md` exists in the consuming project. If it
+does, read it and apply its contents as additional project-specific
+instructions for this skill. Amendments may add band orderings,
+extra parent groups, or custom triage rules. They cannot remove or
+override plugin defaults — on conflict, this SKILL.md wins.
+
+The backlog is sorted in **execution order** (top-to-bottom = the
+order in which tasks need to get done). "Take from the top" is the
+expected read pattern.
+
+Within each `* Parent` group, keep this band order top-to-bottom:
+
+1. **Actionable** — `** IN-PROGRESS` or `** TODO` with all
+   `:BLOCKED_BY:` deps DONE
+2. **Blocked** — `** BLOCKED`, or `** TODO` with unresolved
+   `:BLOCKED_BY:`
+3. **Postponed** — `** TODO` with a `:POSTPONED:` stamp
+
+Closed entries (`** DONE` / `** CANCELLED`) are archived to
+`docs/rpm/future/done.org` by `/session-end` and do not live in
+tasks.org long-term. `/backlog done` toggles `TODO → DONE` in place;
+the archive sweep runs at the next session-end.
+
+Blocked and postponed items drift to the bottom of their band
+automatically whenever this file is written (during `add`,
+`postpone`, `review`, or session-end Phase 3b). Moves are mechanical
+— no user question. Preserve relative order within each band.
+New `add` entries land at the bottom of the **actionable band**
+(not the absolute bottom); user promotes upward explicitly if
+something needs to happen sooner.
+
+**Pivot capture (automatic, no user question).** When the user
+redirects mid-session to new multi-step work that meets the
+`TaskCreate` bar, the LLM must insert a `** TODO` at the **top** of
+the actionable band AND update `docs/rpm/~rpm-session-start` to set
+the `task:` field to the new work. The ask IS the confirmation —
+don't prompt. Skip for tactical single-step follow-ups. Rationale:
+the backlog should always represent current state, so a dropped
+session (without `/session-end`) still hands off accurately. Full
+rule lives in `plugin/hooks/_directives.sh`.
+
+## Routing
+
+Parse `$ARGUMENTS`:
+
+- `add <description>` → **Add** below
+- `list` → **List** below
+- `review` → **Review** below
+- `postpone <task text or number>` → **Postpone** below
+- `done <task text or number>` → **Done** below
+- empty or natural language → infer intent from context. If unclear,
+  show usage:
+
+  ```
+  /backlog add <description>   — add a backlog entry
+  /backlog list                — show all entries with statuses
+  /backlog review              — evaluate and reorganize
+  /backlog postpone <task>     — defer to the bottom of its group
+  /backlog done <task>         — mark an entry complete
+  ```
+
+---
+
+## Add
+
+**Do NOT call `TaskCreate` for backlog additions.** Your rpm backlog
+is long-term; native tasks (`TaskCreate`/`TaskList`) are reserved for
+work actually happening *this session*. Adding to your rpm backlog
+without a mirrored native task is the correct, intended behavior.
+
+**3 body lines max per entry, plus the org `:PROPERTIES:` drawer.**
+The drawer is its own thing — it doesn't count toward the body
+budget. Body content (heading + any inline notes) caps at 3 lines;
+default is just the heading.
+
+Standard shape:
+
+```
+** TODO <description> [[file:YYYY-MM-DD-slug.md]]
+   :PROPERTIES:
+   :ID: <slug>
+   :END:
+```
+
+Add `:BLOCKED_BY: <other-slug>` inside the drawer when there's a
+dependency. Add up to 2 inline body lines (under the drawer) only
+when something can't reasonably live in the detail file — most of
+the time the detail file is the right home for everything beyond
+the heading.
+
+What does **not** belong inline in tasks.org:
+- Bullet lists describing the task
+- Prose explaining "why", "how", or "defer until"
+- Implementation notes, links to related files, status commentary
+
+All of that goes in the detail file at
+`docs/rpm/future/YYYY-MM-DD-slug.md` — never as 5+ lines of body
+under the heading. Subagents dispatched by `/next` actionable-
+backlog read the detail file, so information isn't lost — it's
+just not in the line-scannable index. Multi-line entries turn
+the backlog into prose-reading and break the SessionStart menu
++ `/next` priority scan, both of which need "topmost unblocked"
+to fit a glance.
+
+1. Read `docs/rpm/future/tasks.org` to see existing parent headings
+   and task structure.
+2. Determine the parent heading:
+   - If an existing heading fits, suggest it (or ask when ambiguous).
+   - If none fits, **create a new `* Parent` group**. When the new
+     group names a coherent objective (a deliverable, capability, or
+     area of work with a demonstrable done-state), **propose a
+     `Goal:` body line for it** — don't silently create a goalless
+     group. State the proposed goal as a **demonstrable test** (a
+     pass/fail artifact that PROVES it met — "N cases pass
+     end-to-end vs reference", "trace 38/38" — not a gap-list or a
+     vague description like "launch ready"). The user accepts,
+     edits, or declines; on accept, write it as a `Goal:` body line
+     directly under the `* Parent`. **Skip the proposal** for pure
+     status bands (`Active`, `Blocked`) or catch-all buckets
+     (`Misc`, `Maintenance`, `Ideas`) where a success metric doesn't
+     apply.
+
+   For any `* Parent` that carries a `Goal:` / `Success:` line (new
+   or existing), keep the metric a **demonstrable test** and ensure
+   the goal's chain terminates in a **verify/sign-off** task — file
+   that terminus now if it's missing, with the build gap-tasks as
+   its `:BLOCKED_BY:` deps. Don't leave a goal defined only by its
+   build gaps.
+3. Add as `** TODO <one-sentence description>
+   [[file:YYYY-MM-DD-slug.md]]` followed by the standard
+   `:PROPERTIES: / :ID: <slug> / :END:` drawer, at the bottom of
+   the **actionable band** in the chosen heading (above any
+   blocked / postponed / DONE entries).
+4. Create the detail file at `docs/rpm/future/YYYY-MM-DD-slug.md`
+   with everything that would otherwise be inline: title,
+   description, action steps, scope, estimate, related links. Ask
+   the user for details if the task is complex.
+5. If the task has obvious dependencies on existing tasks, add
+   `:BLOCKED_BY: <other-slug>` inside the drawer (still
+   structured metadata, not body).
+6. **Research offer (when warranted).** If the task crosses into a
+   domain or technology new to the project, hinges on external or
+   factual unknowns (APIs, libraries, standards, landscape/competitor
+   facts, best practices), or is a selection/evaluation/comparison
+   ("X vs Y", "which approach"), **offer to run the `research` skill
+   (`rpm:research`) on it first** — upfront research de-risks a
+   new-domain task before build effort is committed, and its saved
+   report (`docs/rpm/research/<slug>/`) can be linked from the detail
+   file. Offer only; don't auto-run (matches the research skill's own
+   Offer gate). Skip the offer for internal/mechanical work fully
+   scoped by the existing codebase (refactors, bugfixes, renames,
+   doc/test edits) or when the domain knowledge is already in hand.
+7. Confirm: print the new entry and its location.
+
+---
+
+## List
+
+1. Read `docs/rpm/future/tasks.org`.
+2. Print a summary line and the active task list:
+
+   ```
+   ## Tasks — N in-progress · N todo · N blocked
+
+   <Parent Heading>
+      1. [TODO] <description>
+      2. [IN-PROGRESS] <description>
+         blocked-by: <id>
+   ```
+
+   Grouped by parent heading. Number sequentially for reference.
+   Closed entries live in `docs/rpm/future/done.org` — read that
+   file directly if the user asks for history.
+
+---
+
+## Review
+
+1. Read `docs/rpm/future/tasks.org` and all linked detail files.
+2. Evaluate:
+   - **Organization:** tasks under logical parent headings?
+   - **Dependencies:** relationships correct? Missing or circular?
+   - **Staleness:** TODOs with no activity across multiple sessions?
+   - **Scope:** any tasks too large for one session (~35 min)?
+     Suggest decomposition.
+   - **Duplicates:** overlapping tasks?
+   - **Demonstrable goals:** for any `* Parent` carrying a `Goal:` /
+     `Success:` line, that metric must be a **demonstrable test** (a
+     pass/fail artifact that PROVES it met — "N cases pass end-to-end
+     vs reference", "trace 38/38"), not a gap-checklist or a vague
+     description ("launch ready"). Every `[NOT MET]` goal's task chain
+     must **terminate in a verify/sign-off task** (with the build
+     gap-tasks as its `:BLOCKED_BY:` deps), not merely list build
+     gaps. Flag goals whose `Success:` is a gap-list/description or
+     whose chain has no terminal proof task. A metric reconcile/split
+     must add the "prove it" terminus in the **same** edit.
+   - **Order:** work is sorted top-to-bottom by execution order
+     (when it needs to get done)? Anything that should happen sooner
+     than what's currently above it?
+   - **Deferrals:** anything the user has set aside or signaled they
+     want to come back to later? Surface as candidates for **Postpone**.
+3. Present findings and proposed changes. Wait for confirmation
+   before editing. For postpones, apply the move using the
+   **Postpone** procedure below.
+
+---
+
+## Postpone
+
+Defer a task to the bottom of its `* Parent` group. Status stays
+`TODO` (the task isn't dropped, just moved later in the execution
+order). Adds a `:POSTPONED: YYYY-MM-DD` property so the deferral is
+auditable.
+
+1. Read `docs/rpm/future/tasks.org`.
+2. Match the argument to a task — by number (from most recent
+   `/backlog list`), by text match, or by asking if ambiguous.
+3. Identify the task's `* Parent` heading. Find the last `**` task
+   under that parent (any status — active, blocked, or postponed).
+4. Edit the file to move the matched task's heading + its property
+   drawer to just below that last sibling. **Do not change status**;
+   keep `** TODO`.
+5. Add (or update) `:POSTPONED: YYYY-MM-DD` inside the property
+   drawer with today's date. Create the drawer if the task didn't
+   have one.
+6. Confirm: print the moved task's new position.
+
+If the task is already at the bottom of its group, just stamp the
+`:POSTPONED:` property and note "already at bottom".
+
+---
+
+## Done
+
+1. Read `docs/rpm/future/tasks.org`.
+2. Match the argument to a task — by number (from most recent
+   `/backlog list`), by text match, or by asking if ambiguous.
+3. Change `** TODO` to `** DONE` and append today's date:
+   `** DONE <description> :CLOSED: [YYYY-MM-DD]`
+4. Confirm what was marked done.
