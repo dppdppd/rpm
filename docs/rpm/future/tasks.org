@@ -18,6 +18,11 @@
    :ID: research-synthesize-overload
    :END:
 
+** DONE Session continuity — compact-vs-clear direction + persisted compaction summary (handoff doc investigated, not built) [[file:2026-08-28-session-end-handoff-doc.md]]
+   :PROPERTIES:
+   :ID: session-end-handoff-doc
+   :END:
+
 ** TODO Confirm v2.26.1 research fix on next real run — report.md lands + non-stub summary
    :PROPERTIES:
    :ID: confirm-research-synthesize-fix

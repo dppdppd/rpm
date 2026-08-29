@@ -90,6 +90,9 @@ From the scan output, collect actionable items into a findings list:
 - `session_marker` — informational, not a finding
 - `specs_inventory` — flag if `unlisted > 0`
 - `pm_docs_staleness` — flag if any `days > 3`
+- `status_marker` — flag if `stale=true` (status.md's `**Last updated**`
+  marker is older than the newest dated entry in the file; the mtime-based
+  `pm_docs_staleness` check misses this internal-marker drift)
 - `migration` — if `count > 0`, auto-migrate before presenting
   findings: `mkdir -p` target dirs, `mv` each `move=old→new` pair,
   `git add` both old and new paths. This is safe and non-destructive

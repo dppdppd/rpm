@@ -2,8 +2,8 @@
 
 ## Project Status
 - **Current phase**: Active development
-- **Last updated**: 2026-07-07
-- **Version**: 2.30.1
+- **Last updated**: 2026-08-29
+- **Version**: 2.31.0
 
 ## Completed Work
 - Plugin architecture (skills, hooks, agents)
@@ -68,6 +68,8 @@
 - **Committed-handoff continuation fix (v2.30.0, 2026-07-07).** Session-start's concrete `next:` handoff now proceeds as already selected instead of asking whether to continue or do something else. The plugin and Codex hook mirrors both tell the agent to state the handoff, update `docs/rpm/~rpm-session-start`, create the native task, and begin; the ordinary backlog menu remains the escape hatch only when the user explicitly rejects the handoff. Regression coverage now checks both hook surfaces, and the full Bats suite is 216 tests.
 
 - **Active-marker resume continuation fix (v2.30.1, 2026-07-07).** KL-tricktaker exposed a second branch with the same bad prompt shape: active `~rpm-session-start` resumes still asked whether to continue, switch, or wrap up. Session-start now treats a valid active marker as already selected, orients from git state/recent commits, creates or continues the native task, and begins; switch/wrap-up only happens when the user asks. Regression coverage now checks plugin and Codex active-marker resumes, and the full Bats suite is 218 tests.
+
+- **Session continuity: compact-vs-clear direction, persisted compaction summaries, handoffs yield to the user (v2.31.0, 2026-08-29).** Four changes around what happens when a session runs low or wraps up. (1) The low-context nudge no longer says "consider /session-end" — it names both paths and lets the model pick: `/compact` when the user is continuing the work, `/session-end` when they are stopping. (2) `post-compact.sh` now files each compaction summary under `docs/rpm/past/compact/<date>-<time>.md` and links it from the daily log, so the summary survives a later `/clear` instead of living only in the transcript. (3) `session-end` ends every mode with a Closing Direction naming both continuation paths, and states plainly that the ceremony is worth running whether or not the user is stopping. (4) Session-start's handoff and active-marker branches now treat the remembered task as a default, not a command — if the user's opening message asks for something else, the agent switches silently and repoints the marker. Also new: a `status_marker` check in the session-end scan and the audit skill, catching status.md's `Last updated` marker lagging its own newest entry (a finding that recurred in two documents audits). Synced to codex.
 
 ## Active Specs
 

@@ -1,6 +1,8 @@
 #!/bin/bash
 # PostToolUse hook: monitor actual context token usage from the transcript.
 # Soft recommendation when fewer than 10% of the window remains.
+# Low context means "make room" (/compact), not "stop" (/session-end) —
+# the nudge names both and lets the model pick by what the user is doing.
 #
 # Reads the latest assistant message's usage block (input + cache_read +
 # cache_creation tokens) — this is the real context size, not a byte proxy.
@@ -69,7 +71,7 @@ if [ "$REMAINING" -lt "$THRESHOLD" ]; then
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "rpm: under ${REMAINING_K}k tokens remaining (<10% of window) — consider /session-end soon before the session hits the limit."
+    "additionalContext": "rpm: under ${REMAINING_K}k tokens remaining (<10% of window). If the user is continuing this work, /compact is the right tool — it reclaims the window and keeps the thread. /session-end is for stopping: it commits bookkeeping and hands off to a fresh session. Mention whichever fits what they are actually doing; do not run either without being asked."
   }
 }
 EOF

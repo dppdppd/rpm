@@ -230,7 +230,7 @@ Quick command reference.
 Backlog selection:
 
 ```text
-rpm: session active (rpm 2.30.1)
+rpm: session active (rpm 2.31.0)
 
 === git ===
 modified=1 untracked=0 staged=0 stashes=0
@@ -252,7 +252,7 @@ Pick #, #? for details, S, or R.
 Active-task resume:
 
 ```text
-rpm: resuming - add API rate-limit middleware (rpm 2.30.1)
+rpm: resuming - add API rate-limit middleware (rpm 2.31.0)
 
 An rpm session marker is present - unfinished work on this task.
 Treat that task as already selected.

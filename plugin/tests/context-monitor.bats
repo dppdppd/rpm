@@ -87,7 +87,9 @@ prime_counter() {
   [ "$status" -eq 0 ]
   [[ "$output" == *"under 50k tokens remaining"* ]]
   [[ "$output" == *"<10% of window"* ]]
-  [[ "$output" == *"consider /session-end"* ]]
+  [[ "$output" == *"/compact is the right tool"* ]]
+  [[ "$output" == *"/session-end is for stopping"* ]]
+  [[ "$output" != *"consider /session-end"* ]]
   [[ "$output" == *"hookSpecificOutput"* ]]
   echo "$output" | jq -e . >/dev/null
 }

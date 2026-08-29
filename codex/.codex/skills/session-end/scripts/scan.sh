@@ -336,6 +336,30 @@ fi
 
 # ----------------------------------------------------------------
 echo
+echo "=== status_marker ==="
+# status.md self-marker drift: the "**Last updated**: YYYY-MM-DD" marker vs the
+# newest YYYY-MM-DD date-stamp among the file's own entries. The mtime-based
+# pm_docs_staleness check misses this (the file IS recently committed; only its
+# INTERNAL marker lags its own newer entries). Recurring finding (2026-05-26 +
+# 2026-07-14 documents audits).
+STATUS_MD=docs/rpm/present/status.md
+if [ -f "$STATUS_MD" ]; then
+  SM_MARKER=$(grep -oiE 'Last updated[*: ]+[0-9]{4}-[0-9]{2}-[0-9]{2}' "$STATUS_MD" 2>/dev/null | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)
+  SM_NEWEST=$(grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' "$STATUS_MD" 2>/dev/null | sort -r | head -1)
+  echo "marker=${SM_MARKER:-none}"
+  echo "newest_entry=${SM_NEWEST:-none}"
+  if [ -n "$SM_MARKER" ] && [ -n "$SM_NEWEST" ] && [ "$SM_MARKER" \< "$SM_NEWEST" ]; then
+    echo "stale=true"
+  else
+    echo "stale=false"
+  fi
+else
+  echo "status=no_status_file"
+fi
+
+# ----------------------------------------------------------------
+echo
+
 echo "=== task_deps ==="
 # Validate tasks.org dependency graph: extract :ID: and :BLOCKED_BY:
 # from property drawers, check for dangling refs and cycles, and
