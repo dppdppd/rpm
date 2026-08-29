@@ -36,6 +36,11 @@ wrapping up, ask once: "You seem ready to wrap up. Want me to run
 `/session-end`?" Then wait. If the user explicitly invoked
 `/session-end`, start Prep immediately.
 
+Run the ceremony either way. The document auditing this skill performs —
+tracker updates, drift fixes, guidance alignment, backlog reconciliation —
+is worth doing whether or not the user is stopping. What changes is the
+Closing Direction it ends with.
+
 ## Prep
 
 Prep is silent and runs before any visible wrap-up output. It updates
@@ -258,6 +263,27 @@ immediately. Good: "add the number-provenance gate to Phase 4 of
 `plugin/skills/deep-research/SKILL.md`, then run bats." Bad:
 "deep-research hardening."
 
+### Closing Direction
+
+End every mode with both continuation paths, in this order, as the last
+lines of the final message. Do not turn this into a question.
+
+```
+Continuing this work? `/compact` — reclaims the window, keeps the thread.
+Done for now? `/clear`, then start a new conversation.
+```
+
+Lead with whichever the session actually indicates and keep the other as
+the second line: if the user signalled they are finished, `/clear` goes
+first; if they invoked this skill to checkpoint mid-work, `/compact` does.
+When it is genuinely unclear, leave the order above as written.
+
+Compaction preserves the thread, so a compacting user keeps everything
+this session built. A clearing user does not — which is why
+`post-compact.sh` files each compaction summary under
+`docs/rpm/past/compact/` and links it from the daily log, so the summary
+outlives the conversation that produced it.
+
 ### Handoff Cleanup
 
 Use this cleanup in Express, the Inline final message, and Phased Phase 4.
@@ -279,8 +305,8 @@ rm -rf docs/rpm/~rpm-session-start docs/rpm/~rpm-compact-state docs/rpm/~rpm-lea
 One message, then cleanup. Do not continue the conversation after it.
 
 Output: `## Session end (rpm <version>)`, Accomplished, Tracker
-updates, `What's next`, then the two restart lines (`/clear`, then
-start a new conversation). Run cleanup in the same response.
+updates, `What's next`, then the Closing Direction. Run cleanup in the
+same response.
 
 ## Inline
 
@@ -298,8 +324,8 @@ outstanding surface (again, one `QUESTION:` line, last line) or — if none
 remain — run native cleanup, sweep the backlog, resolve `What's next`, run
 handoff cleanup, and emit the final message.
 
-**Final message:** `**Handoff**`, `What's next`, the two restart lines
-(`/clear`, then start a new conversation).
+**Final message:** `**Handoff**`, `What's next`, then the Closing
+Direction.
 
 If more than one surface is outstanding, that is normal for Inline — it
 just means more than one short round-trip. Only switch to Phased when a

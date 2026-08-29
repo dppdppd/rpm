@@ -59,3 +59,22 @@ run_post() {
   [ "$status" -eq 0 ]
   [[ "$output" != *"=== compact_summary ==="* ]]
 }
+
+@test "files the compaction summary under past/compact and links it from the daily log" {
+  echo "task=widget work" > "$PM_DIR/~rpm-compact-state"
+  run bash -c 'printf "%s" "{\"compact_summary\":\"the widget latches low\"}" | bash "$CLAUDE_PLUGIN_ROOT/hooks/post-compact.sh"'
+  [ "$status" -eq 0 ]
+  local today; today="$(date +%Y-%m-%d)"
+  local f; f=$(ls "$PM_DIR/past/compact/"*.md 2>/dev/null | head -1)
+  [ -n "$f" ]
+  grep -q "the widget latches low" "$f"
+  grep -q "widget work" "$f"
+  grep -q "Compaction summary" "$PM_DIR/past/$today.md"
+}
+
+@test "no summary file written when compact_summary is empty" {
+  echo "task=widget work" > "$PM_DIR/~rpm-compact-state"
+  run bash -c 'printf "%s" "{}" | bash "$CLAUDE_PLUGIN_ROOT/hooks/post-compact.sh"'
+  [ "$status" -eq 0 ]
+  [ ! -d "$PM_DIR/past/compact" ]
+}
